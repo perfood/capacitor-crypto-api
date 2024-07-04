@@ -5,6 +5,15 @@ import { arrayBufferToBase64, base64ToArrayBuffer } from './utils';
 
 /**
  * ECDH fake data
+ * privateKeyApi--- MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg5e58Wl6E8ljJy3Z5BJ6E5mCqjoJU+hIbFGaNIZMIaEihRANCAAQmHAJOw9xQJ8iEku1kmiE7eOfk9qFOZkoMjdEjCSuqsggXowxu6xdO2+8jZ+FvOQQVYxRc4lUYWufCPGtXtNux
+ * publicKeyApi --- MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEJhwCTsPcUCfIhJLtZJohO3jn5PahTmZKDI3RIwkrqrIIF6MMbusXTtvvI2fhbzkEFWMUXOJVGFrnwjxrV7TbsQ==
+ * privateKeyApp--- MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgdQtTbHTY5swFFR0kLc3XNr0TUEvpu/t55gJrxA76zOShRANCAASs4dWdu4XQQ98zfRHzcXPmGoX2kkSaWjlyy70zcUlmpwdY9hkK8rD5Y7JN4PuAThiCxzmlrNilsXHhNEuLqTW3
+ * publicKeyApp --- MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAErOHVnbuF0EPfM30R83Fz5hqF9pJEmlo5csu9M3FJZqcHWPYZCvKw+WOyTeD7gE4Ygsc5pazYpbFx4TRLi6k1tw==
+ * secretKeyApi --- ZA7N4GiZktJ7REOjlknqUF7iwXkVKAwhLNhC6EhoisM=
+ * secretKeyApp --- ZA7N4GiZktJ7REOjlknqUF7iwXkVKAwhLNhC6EhoisM=
+ * random       --- 4XayYy8+CI3MYvBR33nRyeNX47PJhG4uu00Cs9vL5AA=
+ * iv           --- Kn05p+/47v3duVmrOBii7iX33OPqNVVYf9H1vCRGv1c=
+ * challenge    --- PApKZ9emcr0jAm5pXQ9hF1N2L7UOqTXfTt7N2R0PrQBSTjH9N64unhGMhtQ7PpY0
  */
 const CRYPTO_API_ECDH_KEY_ALGORITHM = {
   name: 'ECDH',
@@ -23,6 +32,10 @@ const CRYPTO_API_ECDH_IV = 'Kn05p+/47v3duVmrOBii7iX33OPqNVVYf9H1vCRGv1c=';
 
 /**
  * ECDSA fake data
+ * privateKey--- MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgE8kCrPIT4vLOuEY8vZ2ppmO/dL4IpMofJVl05+/cEJqhRANCAAQTOm3ZLqWs02ahnHkVuE0/K82MqE6Hddo4Vm8z5i9YpzbAIyb36mb/ooc/PREsHF75cqdcDHqVf/Mox6JGZYSO
+ * publicKey --- MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEzpt2S6lrNNmoZx5FbhNPyvNjKhOh3XaOFZvM+YvWKc2wCMm9+pm/6KHPz0RLBxe+XKnXAx6lX/zKMeiRmWEjg==
+ * random    --- kJAQkZkvtee9wUbg/atjL+4HD8NpW0+tnEkYwdePvxI=
+ * signature --- AzeJzeAaWUJuCIFxugswCMrFmtykyrlIHnZNvuwwOjlrtb37Ga3GM0cQG3OSFl9cUulc+ixrx4Jm5aZaBRWHyQ==
  */
 const CRYPTO_API_ECDSA_KEY_ALGORITHM = {
   name: 'ECDSA',
