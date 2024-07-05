@@ -2,13 +2,6 @@ export type CryptoApiAlgorithm = 'ECDH' | 'ECDSA';
 
 export interface CryptoApiPlugin {
   /**
-   * Echo the input.
-   * 
-   * @deprecated  Will be deleted when going live.
-   */
-  echo(options: { value: string }): Promise<{ value: string }>;
-
-  /**
    * Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),
    * tags it for alter referencing and returns the public-key only,
    * since the private-key is protected and can't be extracted.

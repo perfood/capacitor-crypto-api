@@ -12,15 +12,6 @@ public class CryptoApiPlugin extends Plugin {
     private CryptoApi implementation = new CryptoApi();
 
     @PluginMethod
-    public void echo(PluginCall call) {
-        String value = call.getString("value");
-
-        JSObject ret = new JSObject();
-        ret.put("value", implementation.echo(value));
-        call.resolve(ret);
-    }
-
-    @PluginMethod
     public void generateKey(PluginCall call) {
         String tag = call.getString("tag");
         String algorithm = call.getString("algorithm");

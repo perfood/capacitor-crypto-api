@@ -54,11 +54,6 @@ const CRYPTO_API_ECDSA_SIGNATURE =
   'AzeJzeAaWUJuCIFxugswCMrFmtykyrlIHnZNvuwwOjlrtb37Ga3GM0cQG3OSFl9cUulc+ixrx4Jm5aZaBRWHyQ==';
 
 export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
-  async echo(options: { value: string }): Promise<{ value: string }> {
-    console.log('CryptoApi.echo', options);
-    return options;
-  }
-
   async generateKey(options: {
     tag: string;
     algorithm: CryptoApiAlgorithm;

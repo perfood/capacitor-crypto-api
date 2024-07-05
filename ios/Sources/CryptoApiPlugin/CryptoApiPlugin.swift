@@ -10,20 +10,12 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "CryptoApiPlugin"
     public let jsName = "CryptoApi"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "echo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "generateKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "loadKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "sign", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "decrypt", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
-
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.resolve([
-            "value": implementation.echo(value)
-        ])
-    }
 
     @objc func generateKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""

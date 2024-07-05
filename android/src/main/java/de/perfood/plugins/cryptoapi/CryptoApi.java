@@ -4,11 +4,6 @@ import android.util.Log;
 
 public class CryptoApi {
 
-    public String echo(String value) {
-        Log.i("echo", value);
-        return value;
-    }
-
     public String generateKey(String tag, String algorithm) {
         Log.i("generateKey", tag);
         Log.i("generateKey", algorithm);
