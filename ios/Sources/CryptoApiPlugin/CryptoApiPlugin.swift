@@ -21,22 +21,22 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         let tag = call.getString("tag") ?? ""
         let algorithm = call.getString("algorithm") ?? ""
         call.resolve([
-            "publicKey": implementation.generateKey(tag, algorithm)
+            "publicKey": implementation.generateKey(tag, algorithm) ?? ""
         ])
     }
 
     @objc func loadKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
         call.resolve([
-            "publicKey": implementation.loadKey(tag)
+            "publicKey": implementation.loadKey(tag) ?? ""
         ])
     }
 
     @objc func sign(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
-        let data = call.getString("tag") ?? ""
+        let data = call.getString("data") ?? ""
         call.resolve([
-            "signature": implementation.sign(tag, data)
+            "signature": implementation.sign(tag, data) ?? ""
         ])
     }
 
@@ -46,7 +46,7 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         let initVector = call.getString("initVector") ?? ""
         let encryptedData = call.getString("encryptedData") ?? ""
         call.resolve([
-            "data": implementation.decrypt(tag, foreignPublicKey, initVector, encryptedData)
+            "data": implementation.decrypt(tag, foreignPublicKey, initVector, encryptedData) ?? ""
         ])
     }
 }
