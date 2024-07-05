@@ -44,11 +44,11 @@ public class CryptoApiPlugin extends Plugin {
     public void decrypt(PluginCall call) {
         String tag = call.getString("tag");
         String foreignPublicKey = call.getString("foreignPublicKey");
-        String iv = call.getString("iv");
+        String initVector = call.getString("initVector");
         String encryptedData = call.getString("encryptedData");
 
         JSObject ret = new JSObject();
-        ret.put("data", implementation.decrypt(tag, foreignPublicKey, iv, encryptedData));
+        ret.put("data", implementation.decrypt(tag, foreignPublicKey, initVector, encryptedData));
         call.resolve(ret);
     }
 }

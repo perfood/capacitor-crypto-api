@@ -12,7 +12,7 @@ import { arrayBufferToBase64, base64ToArrayBuffer } from './utils';
  * secretKeyApi --- ZA7N4GiZktJ7REOjlknqUF7iwXkVKAwhLNhC6EhoisM=
  * secretKeyApp --- ZA7N4GiZktJ7REOjlknqUF7iwXkVKAwhLNhC6EhoisM=
  * random       --- 4XayYy8+CI3MYvBR33nRyeNX47PJhG4uu00Cs9vL5AA=
- * iv           --- Kn05p+/47v3duVmrOBii7iX33OPqNVVYf9H1vCRGv1c=
+ * initVector   --- Kn05p+/47v3duVmrOBii7iX33OPqNVVYf9H1vCRGv1c=
  * challenge    --- PApKZ9emcr0jAm5pXQ9hF1N2L7UOqTXfTt7N2R0PrQBSTjH9N64unhGMhtQ7PpY0
  */
 const CRYPTO_API_ECDH_KEY_ALGORITHM = {
@@ -181,7 +181,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async decrypt(options: {
     tag: string;
     foreignPublicKey: string;
-    iv: string;
+    initVector: string;
     encryptedData: string;
   }): Promise<{ data: string }> {
     console.log('CryptoApi.decrypt', options);
@@ -234,7 +234,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       await crypto.subtle.decrypt(
         {
           name: CRYPTO_API_ECDH_SECRET_ALGORITHM.name,
-          iv: base64ToArrayBuffer(options.iv),
+          iv: base64ToArrayBuffer(options.initVector),
         },
         secretKey,
         base64ToArrayBuffer(options.encryptedData),

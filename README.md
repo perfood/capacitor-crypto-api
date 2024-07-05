@@ -89,17 +89,18 @@ Only ECDSA is supported.
 ### decrypt(...)
 
 ```typescript
-decrypt(options: { tag: string; foreignPublicKey: string; iv: string; encryptedData: string; }) => Promise<{ data: string; }>
+decrypt(options: { tag: string; foreignPublicKey: string; initVector: string; encryptedData: string; }) => Promise<{ data: string; }>
 ```
 
 Decrypts the data in the Secure Enclave (iOS) or StrongBox/TEE (Android).
-Uses the private-key associated with the tag, the foreign public-key and the iv provided.
+Uses the private-key associated with the tag, the foreign public-key
+and the initialization vector provided.
 
 Only ECDH is supported.
 
-| Param         | Type                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| **`options`** | <code>{ tag: string; foreignPublicKey: string; iv: string; encryptedData: string; }</code> |
+| Param         | Type                                                                                               |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ tag: string; foreignPublicKey: string; initVector: string; encryptedData: string; }</code> |
 
 **Returns:** <code>Promise&lt;{ data: string; }&gt;</code>
 

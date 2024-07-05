@@ -21,12 +21,12 @@ import Foundation
     @objc public func decrypt(
         _ tag: String,
         _ foreignPublicKey: String,
-        _ ivv: String,
+        _ initVector: String,
         _ encryptedData: String
     ) -> String {
         print(tag)
         print(foreignPublicKey)
-        print(ivv)
+        print(initVector)
         print(encryptedData)
         return tag
     }

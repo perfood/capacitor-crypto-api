@@ -21,10 +21,10 @@ public class CryptoApi {
         return tag;
     }
 
-    public String decrypt(String tag, String foreignPublicKey, String iv, String data) {
+    public String decrypt(String tag, String foreignPublicKey, String initVector, String data) {
         Log.i("decrypt", tag);
         Log.i("decrypt", foreignPublicKey);
-        Log.i("decrypt", iv);
+        Log.i("decrypt", initVector);
         Log.i("decrypt", data);
         return tag;
     }

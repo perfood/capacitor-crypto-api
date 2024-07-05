@@ -43,10 +43,10 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func decrypt(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
         let foreignPublicKey = call.getString("foreignPublicKey") ?? ""
-        let ivv = call.getString("iv") ?? ""
+        let initVector = call.getString("initVector") ?? ""
         let encryptedData = call.getString("encryptedData") ?? ""
         call.resolve([
-            "data": implementation.decrypt(tag, foreignPublicKey, ivv, encryptedData)
+            "data": implementation.decrypt(tag, foreignPublicKey, initVector, encryptedData)
         ])
     }
 }
