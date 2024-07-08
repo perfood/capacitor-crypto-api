@@ -98,8 +98,18 @@ import CryptoKit
             return nil
         }
 
-        let publicKeyNSData = NSData(data: publicKeyData as Data)
+        let ecHeader: [UInt8] = [
+            /* sequence          */ 0x30, 0x59,
+            /* |-> sequence      */ 0x30, 0x13,
+            /* |---> ecPublicKey */ 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,
+            /* |---> prime256v1  */ 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01,
+            /* |-> bit headers   */ 0x07, 0x03, 0x42, 0x00
+        ]
 
-        return publicKeyNSData.base64EncodedString()
+        var ecPublicKey = Data()
+        ecPublicKey.append(Data(ecHeader))
+        ecPublicKey.append(publicKeyData as Data)
+
+        return ecPublicKey.base64EncodedString()
     }
 }
