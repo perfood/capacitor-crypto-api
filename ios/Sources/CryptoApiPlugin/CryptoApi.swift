@@ -51,14 +51,19 @@ import CryptoKit
         }
 
         var error: Unmanaged<CFError>?
-        guard let signature = SecKeyCreateSignature(privateKey,
-                                                    .ecdsaSignatureMessageX962SHA256,
-                                                    data.data(using: .utf8)!  as CFData,
-                                                    &error) as Data? else {
-            return nil
+
+        if #available(iOS 17.0, *) {
+            guard let signature = SecKeyCreateSignature(privateKey,
+                                                        .ecdsaSignatureMessageRFC4754SHA256,
+                                                        data.data(using: .utf8)!  as CFData,
+                                                        &error) as Data? else {
+                return nil
+            }
+
+            return signature.base64EncodedString()
         }
 
-        return signature.base64EncodedString()
+        return nil
     }
 
     @objc public func decrypt(

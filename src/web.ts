@@ -1,63 +1,50 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { CryptoApiAlgorithm, CryptoApiPlugin } from './definitions';
+import type {
+  CryptoApiPlugin,
+  DecryptOptions,
+  DecryptResponse,
+  GenerateKeyOptions,
+  GenerateKeyResponse,
+  LoadKeyOptions,
+  LoadKeyResponse,
+  SignOptions,
+  SignResponse,
+} from './definitions';
 import { arrayBufferToBase64, base64ToArrayBuffer } from './utils';
 
 /**
- * ECDH fake data
- * privateKeyApi--- MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg5e58Wl6E8ljJy3Z5BJ6E5mCqjoJU+hIbFGaNIZMIaEihRANCAAQmHAJOw9xQJ8iEku1kmiE7eOfk9qFOZkoMjdEjCSuqsggXowxu6xdO2+8jZ+FvOQQVYxRc4lUYWufCPGtXtNux
- * publicKeyApi --- MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEJhwCTsPcUCfIhJLtZJohO3jn5PahTmZKDI3RIwkrqrIIF6MMbusXTtvvI2fhbzkEFWMUXOJVGFrnwjxrV7TbsQ==
- * privateKeyApp--- MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgdQtTbHTY5swFFR0kLc3XNr0TUEvpu/t55gJrxA76zOShRANCAASs4dWdu4XQQ98zfRHzcXPmGoX2kkSaWjlyy70zcUlmpwdY9hkK8rD5Y7JN4PuAThiCxzmlrNilsXHhNEuLqTW3
- * publicKeyApp --- MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAErOHVnbuF0EPfM30R83Fz5hqF9pJEmlo5csu9M3FJZqcHWPYZCvKw+WOyTeD7gE4Ygsc5pazYpbFx4TRLi6k1tw==
- * secretKeyApi --- ZA7N4GiZktJ7REOjlknqUF7iwXkVKAwhLNhC6EhoisM=
- * secretKeyApp --- ZA7N4GiZktJ7REOjlknqUF7iwXkVKAwhLNhC6EhoisM=
- * random       --- 4XayYy8+CI3MYvBR33nRyeNX47PJhG4uu00Cs9vL5AA=
- * initVector   --- Kn05p+/47v3duVmrOBii7iX33OPqNVVYf9H1vCRGv1c=
- * challenge    --- PApKZ9emcr0jAm5pXQ9hF1N2L7UOqTXfTt7N2R0PrQBSTjH9N64unhGMhtQ7PpY0
+ * ECDH key algorithm.
  */
 const CRYPTO_API_ECDH_KEY_ALGORITHM = {
   name: 'ECDH',
   namedCurve: 'P-256',
 };
-const CRYPTO_API_ECDH_PRIVATE_KEY =
-  'MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgdQtTbHTY5swFFR0kLc3XNr0TUEvpu/t55gJrxA76zOShRANCAASs4dWdu4XQQ98zfRHzcXPmGoX2kkSaWjlyy70zcUlmpwdY9hkK8rD5Y7JN4PuAThiCxzmlrNilsXHhNEuLqTW3';
-const CRYPTO_API_ECDH_PUBLIC_KEY =
-  'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAErOHVnbuF0EPfM30R83Fz5hqF9pJEmlo5csu9M3FJZqcHWPYZCvKw+WOyTeD7gE4Ygsc5pazYpbFx4TRLi6k1tw==';
+/**
+ * ECDH secret algorithm.
+ */
 const CRYPTO_API_ECDH_SECRET_ALGORITHM = {
   name: 'AES-GCM',
   length: 256,
 };
-const CRYPTO_API_ECDH_RANDOM = '4XayYy8+CI3MYvBR33nRyeNX47PJhG4uu00Cs9vL5AA=';
-const CRYPTO_API_ECDH_IV = 'Kn05p+/47v3duVmrOBii7iX33OPqNVVYf9H1vCRGv1c=';
 
 /**
- * ECDSA fake data
- * privateKey--- MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgE8kCrPIT4vLOuEY8vZ2ppmO/dL4IpMofJVl05+/cEJqhRANCAAQTOm3ZLqWs02ahnHkVuE0/K82MqE6Hddo4Vm8z5i9YpzbAIyb36mb/ooc/PREsHF75cqdcDHqVf/Mox6JGZYSO
- * publicKey --- MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEzpt2S6lrNNmoZx5FbhNPyvNjKhOh3XaOFZvM+YvWKc2wCMm9+pm/6KHPz0RLBxe+XKnXAx6lX/zKMeiRmWEjg==
- * random    --- kJAQkZkvtee9wUbg/atjL+4HD8NpW0+tnEkYwdePvxI=
- * signature --- AzeJzeAaWUJuCIFxugswCMrFmtykyrlIHnZNvuwwOjlrtb37Ga3GM0cQG3OSFl9cUulc+ixrx4Jm5aZaBRWHyQ==
+ * ECDSA key algorithm.
  */
 const CRYPTO_API_ECDSA_KEY_ALGORITHM = {
   name: 'ECDSA',
   namedCurve: 'P-256',
 };
-const CRYPTO_API_ECDSA_PRIVATE_KEY =
-  'MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgE8kCrPIT4vLOuEY8vZ2ppmO/dL4IpMofJVl05+/cEJqhRANCAAQTOm3ZLqWs02ahnHkVuE0/K82MqE6Hddo4Vm8z5i9YpzbAIyb36mb/ooc/PREsHF75cqdcDHqVf/Mox6JGZYSO';
-const CRYPTO_API_ECDSA_PUBLIC_KEY =
-  'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEzpt2S6lrNNmoZx5FbhNPyvNjKhOh3XaOFZvM+YvWKc2wCMm9+pm/6KHPz0RLBxe+XKnXAx6lX/zKMeiRmWEjg==';
+/**
+ * ECDSA sign algorithm.
+ */
 const CRYPTO_API_ECDSA_SIGN_ALGORITHM = {
   name: 'ECDSA',
   hash: { name: 'SHA-256' },
 };
-const CRYPTO_API_ECDSA_RANDOM = 'kJAQkZkvtee9wUbg/atjL+4HD8NpW0+tnEkYwdePvxI=';
-const CRYPTO_API_ECDSA_SIGNATURE =
-  'AzeJzeAaWUJuCIFxugswCMrFmtykyrlIHnZNvuwwOjlrtb37Ga3GM0cQG3OSFl9cUulc+ixrx4Jm5aZaBRWHyQ==';
 
 export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
-  async generateKey(options: {
-    tag: string;
-    algorithm: CryptoApiAlgorithm;
-  }): Promise<{ publicKey: string }> {
+  async generateKey(options: GenerateKeyOptions): Promise<GenerateKeyResponse> {
     console.log('CryptoApi.generateKey', options);
 
     if (options.algorithm !== 'ECDH' && options.algorithm !== 'ECDSA') {
@@ -65,30 +52,9 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     }
 
     if (window.location.protocol != 'https:') {
-      console.info(
-        `WebCrypto API only available in secure contexts (https).\n\nTo test this you must use\npublic-key: ${
-          options.algorithm === 'ECDH'
-            ? CRYPTO_API_ECDH_PUBLIC_KEY
-            : CRYPTO_API_ECDSA_PUBLIC_KEY
-        }`,
+      throw new Error(
+        'WebCrypto API is only available in secure contexts (https)',
       );
-
-      const keyPair = {
-        privateKey:
-          options.algorithm === 'ECDH'
-            ? CRYPTO_API_ECDH_PRIVATE_KEY
-            : CRYPTO_API_ECDSA_PRIVATE_KEY,
-        publicKey:
-          options.algorithm === 'ECDH'
-            ? CRYPTO_API_ECDH_PUBLIC_KEY
-            : CRYPTO_API_ECDSA_PUBLIC_KEY,
-      };
-
-      localStorage.setItem(options.tag, JSON.stringify(keyPair));
-
-      return {
-        publicKey: keyPair.publicKey,
-      };
     }
 
     const subtleKeyPair = await crypto.subtle.generateKey(
@@ -118,7 +84,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     };
   }
 
-  async loadKey(options: { tag: string }): Promise<{ publicKey: string }> {
+  async loadKey(options: LoadKeyOptions): Promise<LoadKeyResponse> {
     console.log('CryptoApi.loadKey', options);
 
     const item = localStorage.getItem(options.tag);
@@ -136,10 +102,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     };
   }
 
-  async sign(options: {
-    tag: string;
-    data: string;
-  }): Promise<{ signature: string }> {
+  async sign(options: SignOptions): Promise<SignResponse> {
     console.log('CryptoApi.sign', options);
 
     const item = localStorage.getItem(options.tag);
@@ -153,10 +116,9 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     }
 
     if (window.location.protocol != 'https:') {
-      console.info(
-        `WebCrypto API only available in secure contexts (https).\n\nTo test this you must verify with\npublic-key: ${CRYPTO_API_ECDSA_PUBLIC_KEY}\nsignature: ${CRYPTO_API_ECDSA_SIGNATURE}\ndata: ${CRYPTO_API_ECDSA_RANDOM}`,
+      throw new Error(
+        'WebCrypto API is only available in secure contexts (https)',
       );
-      return { signature: CRYPTO_API_ECDSA_SIGNATURE };
     }
 
     const privateKey = await crypto.subtle.importKey(
@@ -171,19 +133,14 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       await crypto.subtle.sign(
         CRYPTO_API_ECDSA_SIGN_ALGORITHM,
         privateKey,
-        base64ToArrayBuffer(options.data),
+        base64ToArrayBuffer(atob(options.data)),
       ),
     );
 
     return { signature };
   }
 
-  async decrypt(options: {
-    tag: string;
-    foreignPublicKey: string;
-    initVector: string;
-    encryptedData: string;
-  }): Promise<{ data: string }> {
+  async decrypt(options: DecryptOptions): Promise<DecryptResponse> {
     console.log('CryptoApi.decrypt', options);
 
     const item = localStorage.getItem(options.tag);
@@ -197,10 +154,9 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     }
 
     if (window.location.protocol != 'https:') {
-      console.info(
-        `WebCrypto API only available in secure contexts (https).\n\nTo test this you must encrypt with\npublic-key: ${CRYPTO_API_ECDH_PUBLIC_KEY}\niv: ${CRYPTO_API_ECDH_IV}\ndata: ${CRYPTO_API_ECDH_RANDOM}`,
+      throw new Error(
+        'WebCrypto API is only available in secure contexts (https)',
       );
-      return { data: CRYPTO_API_ECDH_RANDOM };
     }
 
     const privateKey = await crypto.subtle.importKey(
@@ -230,14 +186,16 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       ['encrypt', 'decrypt'],
     );
 
-    const data = arrayBufferToBase64(
-      await crypto.subtle.decrypt(
-        {
-          name: CRYPTO_API_ECDH_SECRET_ALGORITHM.name,
-          iv: base64ToArrayBuffer(options.initVector),
-        },
-        secretKey,
-        base64ToArrayBuffer(options.encryptedData),
+    const data = btoa(
+      arrayBufferToBase64(
+        await crypto.subtle.decrypt(
+          {
+            name: CRYPTO_API_ECDH_SECRET_ALGORITHM.name,
+            iv: base64ToArrayBuffer(options.initVector),
+          },
+          secretKey,
+          base64ToArrayBuffer(options.encryptedData),
+        ),
       ),
     );
 
