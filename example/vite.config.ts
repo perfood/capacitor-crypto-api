@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -7,4 +8,10 @@ export default defineConfig({
     minify: false,
     emptyOutDir: true,
   },
+  server: {
+    https: {
+      cert: fs.readFileSync('cert/cert.pem'),
+      key: fs.readFileSync('cert/key.pem'),
+    }
+  }
 });
