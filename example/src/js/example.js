@@ -59,9 +59,11 @@ window.testSignVerify = async () => {
       status.textContent = data.valid ? 'Valid' : 'Invalid';
     })
     .catch(error => {
+      verifySignature.textContent = '';
       status.textContent = error.statusText;
     });
   } catch (error) {
+    verifySignature.textContent = '';
     status.textContent = error;
   }
 };

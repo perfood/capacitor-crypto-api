@@ -10,7 +10,8 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "express": "node ./src/js/server.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",

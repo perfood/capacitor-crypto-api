@@ -14,8 +14,8 @@ app.use(express.json());
 https
   .createServer(
     {
-      key: fs.readFileSync('../../cert/key.pem'),
-      cert: fs.readFileSync('../../cert/cert.pem'),
+      key: fs.readFileSync('./cert/key.pem'),
+      cert: fs.readFileSync('./cert/cert.pem'),
     },
     app,
   )
