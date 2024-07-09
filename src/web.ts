@@ -133,7 +133,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       await crypto.subtle.sign(
         CRYPTO_API_ECDSA_SIGN_ALGORITHM,
         privateKey,
-        base64ToArrayBuffer(atob(options.data)),
+        base64ToArrayBuffer(btoa(options.data)),
       ),
     );
 

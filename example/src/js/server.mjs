@@ -61,7 +61,7 @@ app.post('/verify', async (req, res) => {
     },
     key,
     base64ToArrayBuffer(signature),
-    base64ToArrayBuffer(random),
+    base64ToArrayBuffer(btoa(random)),
   );
 
   if (!valid) {

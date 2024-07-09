@@ -32,7 +32,7 @@ window.testSignVerify = async () => {
   const status = document.getElementById('verifyStatus');
 
   // create a random
-  const random = btoa(String.fromCharCode(...new Uint8Array(crypto.getRandomValues(new Uint8Array(32)))));
+  const random = crypto.randomUUID();
 
   // sign the random
   try {
