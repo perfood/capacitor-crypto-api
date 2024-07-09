@@ -30,17 +30,13 @@ import CryptoKit
             return nil
         }
 
-        return getPublicKeyBase64(privateKey)
+        return getPublicKeyBase64(tag)
     }
 
     @objc public func loadKey(_ tag: String) -> String? {
         print("CryptoApi.loadKey", tag)
 
-        guard let privateKey = getPrivateKey(tag) else {
-            return nil
-        }
-
-        return getPublicKeyBase64(privateKey)
+        return getPublicKeyBase64(tag)
     }
 
     @objc public func sign(_ tag: String, _ data: String) -> String? {
@@ -93,7 +89,11 @@ import CryptoKit
         return privateKey as! SecKey
     }
 
-    @objc private func getPublicKeyBase64(_ privateKey: SecKey) -> String? {
+    @objc private func getPublicKeyBase64(_ tag: String) -> String? {
+        guard let privateKey = getPrivateKey(tag) else {
+            return nil
+        }
+
         guard let publicKey = SecKeyCopyPublicKey(privateKey) else {
             return nil
         }

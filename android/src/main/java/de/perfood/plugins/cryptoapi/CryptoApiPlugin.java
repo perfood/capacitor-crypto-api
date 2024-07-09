@@ -16,8 +16,12 @@ public class CryptoApiPlugin extends Plugin {
         String tag = call.getString("tag");
         String algorithm = call.getString("algorithm");
 
+        String publicKey = implementation.generateKey(tag, algorithm);
+
         JSObject ret = new JSObject();
-        ret.put("publicKey", implementation.generateKey(tag, algorithm));
+        if(publicKey != null) {
+            ret.put("publicKey", publicKey);
+        }
         call.resolve(ret);
     }
 
@@ -25,8 +29,12 @@ public class CryptoApiPlugin extends Plugin {
     public void loadKey(PluginCall call) {
         String tag = call.getString("tag");
 
+        String publicKey = implementation.loadKey(tag);
+
         JSObject ret = new JSObject();
-        ret.put("publicKey", implementation.loadKey(tag));
+        if(publicKey != null) {
+            ret.put("publicKey", publicKey);
+        }
         call.resolve(ret);
     }
 
@@ -35,8 +43,12 @@ public class CryptoApiPlugin extends Plugin {
         String tag = call.getString("tag");
         String data = call.getString("data");
 
+        String signature = implementation.sign(tag, data);
+
         JSObject ret = new JSObject();
-        ret.put("signature", implementation.sign(tag, data));
+        if(signature != null) {
+            ret.put("signature", signature);
+        }
         call.resolve(ret);
     }
 
@@ -47,8 +59,12 @@ public class CryptoApiPlugin extends Plugin {
         String initVector = call.getString("initVector");
         String encryptedData = call.getString("encryptedData");
 
+        String data = implementation.decrypt(tag, foreignPublicKey, initVector, encryptedData);
+
         JSObject ret = new JSObject();
-        ret.put("data", implementation.decrypt(tag, foreignPublicKey, initVector, encryptedData));
+        if(data != null) {
+            ret.put("data", data);
+        }
         call.resolve(ret);
     }
 }
