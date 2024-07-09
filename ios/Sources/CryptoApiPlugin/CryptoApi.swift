@@ -39,6 +39,18 @@ import CryptoKit
         return getPublicKeyBase64(tag)
     }
 
+    @objc public func deleteKey(_ tag: String) {
+        print("CryptoApi.loadKey", tag)
+
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassKey,
+            kSecAttrApplicationTag as String: tag.data(using: .utf8)!,
+            kSecAttrKeyType as String: kSecAttrKeyTypeEC
+        ]
+
+        SecItemDelete(query as CFDictionary)
+    }
+
     @objc public func sign(_ tag: String, _ data: String) -> String? {
         print("CryptoApi.sign", tag, data)
 

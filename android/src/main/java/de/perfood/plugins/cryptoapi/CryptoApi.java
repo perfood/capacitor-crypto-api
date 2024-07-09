@@ -16,6 +16,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
+import java.security.spec.ECGenParameterSpec;
 
 public class CryptoApi {
 
@@ -28,11 +29,14 @@ public class CryptoApi {
                 return publicKeyFound;
             }
 
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
-            kpg.initialize(
-                new KeyGenParameterSpec.Builder(tag, KeyProperties.PURPOSE_SIGN).setDigests(KeyProperties.DIGEST_SHA256).build()
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
+            keyPairGenerator.initialize(
+                new KeyGenParameterSpec.Builder(tag, KeyProperties.PURPOSE_SIGN)
+                    .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
+                    .setDigests(KeyProperties.DIGEST_SHA256)
+                    .build()
             );
-            kpg.generateKeyPair();
+            keyPairGenerator.generateKeyPair();
 
             return getPublicKeyBase64(tag);
         } catch (Error e) {
@@ -50,6 +54,16 @@ public class CryptoApi {
         Log.i("CryptoApi.loadKey", tag);
 
         return this.getPublicKeyBase64(tag);
+    }
+
+    public void deleteKey(String tag) {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+            keyStore.deleteEntry(tag);
+        } catch (Error e) {} catch (CertificateException e) {} catch (KeyStoreException e) {} catch (IOException e) {} catch (
+            NoSuchAlgorithmException e
+        ) {}
     }
 
     public String sign(String tag, String data) {

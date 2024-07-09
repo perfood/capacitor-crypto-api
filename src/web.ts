@@ -4,6 +4,7 @@ import type {
   CryptoApiPlugin,
   DecryptOptions,
   DecryptResponse,
+  DeleteKeyOptions,
   GenerateKeyOptions,
   GenerateKeyResponse,
   LoadKeyOptions,
@@ -100,6 +101,12 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     return {
       publicKey: keyPair.publicKey,
     };
+  }
+
+  async deleteKey(options: DeleteKeyOptions): Promise<void> {
+    console.log('CryptoApi.deleteKey', options);
+
+    localStorage.removeItem(options.tag);
   }
 
   async sign(options: SignOptions): Promise<SignResponse> {

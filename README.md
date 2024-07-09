@@ -15,6 +15,7 @@ npx cap sync
 
 * [`generateKey(...)`](#generatekey)
 * [`loadKey(...)`](#loadkey)
+* [`deleteKey(...)`](#deletekey)
 * [`sign(...)`](#sign)
 * [`decrypt(...)`](#decrypt)
 * [Interfaces](#interfaces)
@@ -59,6 +60,23 @@ Loads the public-key from the Secure Enclave (iOS) or StrongBox/TEE (Android).
 | **`options`** | <code><a href="#loadkeyoptions">LoadKeyOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#loadkeyresponse">LoadKeyResponse</a>&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
+### deleteKey(...)
+
+```typescript
+deleteKey(options: DeleteKeyOptions) => Promise<void>
+```
+
+Deletes the key-pair from the Secure Enclave (iOS) or StrongBox/TEE (Android).
+
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#deletekeyoptions">DeleteKeyOptions</a></code> |
 
 **Since:** 1.0.0
 
@@ -136,6 +154,13 @@ Only ECDH is supported.
 
 
 #### LoadKeyOptions
+
+| Prop      | Type                | Description       |
+| --------- | ------------------- | ----------------- |
+| **`tag`** | <code>string</code> | The key-pair tag. |
+
+
+#### DeleteKeyOptions
 
 | Prop      | Type                | Description       |
 | --------- | ------------------- | ----------------- |

@@ -19,7 +19,7 @@ public class CryptoApiPlugin extends Plugin {
         String publicKey = implementation.generateKey(tag, algorithm);
 
         JSObject ret = new JSObject();
-        if(publicKey != null) {
+        if (publicKey != null) {
             ret.put("publicKey", publicKey);
         }
         call.resolve(ret);
@@ -32,10 +32,19 @@ public class CryptoApiPlugin extends Plugin {
         String publicKey = implementation.loadKey(tag);
 
         JSObject ret = new JSObject();
-        if(publicKey != null) {
+        if (publicKey != null) {
             ret.put("publicKey", publicKey);
         }
         call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void deleteKey(PluginCall call) {
+        String tag = call.getString("tag");
+
+        implementation.deleteKey(tag);
+
+        call.resolve();
     }
 
     @PluginMethod
@@ -46,7 +55,7 @@ public class CryptoApiPlugin extends Plugin {
         String signature = implementation.sign(tag, data);
 
         JSObject ret = new JSObject();
-        if(signature != null) {
+        if (signature != null) {
             ret.put("signature", signature);
         }
         call.resolve(ret);
@@ -62,7 +71,7 @@ public class CryptoApiPlugin extends Plugin {
         String data = implementation.decrypt(tag, foreignPublicKey, initVector, encryptedData);
 
         JSObject ret = new JSObject();
-        if(data != null) {
+        if (data != null) {
             ret.put("data", data);
         }
         call.resolve(ret);

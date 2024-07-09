@@ -33,6 +33,13 @@ export interface LoadKeyResponse {
   publicKey: string;
 }
 
+export interface DeleteKeyOptions {
+  /**
+   * The key-pair tag.
+   */
+  tag: string;
+}
+
 export interface SignOptions {
   /**
    * The key-pair tag.
@@ -92,6 +99,13 @@ export interface CryptoApiPlugin {
    * @since 1.0.0
    */
   loadKey(options: LoadKeyOptions): Promise<LoadKeyResponse>;
+
+  /**
+   * Deletes the key-pair from the Secure Enclave (iOS) or StrongBox/TEE (Android).
+   * 
+   * @since 1.0.0
+   */
+  deleteKey(options: DeleteKeyOptions): Promise<void>;
 
   /**
    * Signs the data in the Secure Enclave (iOS) or StrongBox/TEE (Android).

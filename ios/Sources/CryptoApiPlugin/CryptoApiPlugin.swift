@@ -12,6 +12,7 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "generateKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "loadKey", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "deleteKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "sign", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "decrypt", returnType: CAPPluginReturnPromise)
     ]
@@ -44,6 +45,14 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve([
             "publicKey": publicKey
         ])
+    }
+
+    @objc func deleteKey(_ call: CAPPluginCall) {
+        let tag = call.getString("tag") ?? ""
+
+        implementation.deleteKey(tag)
+
+        call.resolve()
     }
 
     @objc func sign(_ call: CAPPluginCall) {
