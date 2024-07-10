@@ -36,7 +36,7 @@ import CryptoKit
         ]
 
         var error: Unmanaged<CFError>?
-        guard let privateKey = SecKeyCreateRandomKey(attributes as CFDictionary, &error) else {
+        guard SecKeyCreateRandomKey(attributes as CFDictionary, &error) != nil else {
             return nil
         }
 
