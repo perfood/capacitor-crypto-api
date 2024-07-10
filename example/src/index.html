@@ -2,46 +2,63 @@
 <html lang="en" dir="ltr" class="hydrated">
   <head>
     <meta charset="UTF-8" />
-    <title>Example Capacitor App</title>
+    <title>capacitor-crypto-api example</title>
     <meta
       name="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <meta name="format-detection" content="telephone=no" />
+    <style>
+      h1,
+      h2,
+      h3,
+      h4,
+      h5 {
+        margin-bottom: 4px;
+      }
+      code {
+        word-wrap: break-word;
+      }
+    </style>
   </head>
   <body>
     <main>
-      <h1>Capacitor Test Plugin Project</h1>
+      <h1>capacitor-crypto-api example</h1>
       <p>
         This project can be used to test out the functionality of your plugin.
         Nothing in the <em>example/</em> folder will be published to npm when
         using this template, so you can create away!
       </p>
 
-      <div style="padding: 8px;">
-        <div>
-          <label for="registerTag">Register Tag:</label>
-            <input type="text" id="registerTag" name="registerTag" value="test" />
-            <button onclick="registerTag()">Click Me!</button>
-        </div>
-        <div>
-          <label>Public Key</label>: <span id="publicKey"></span>
-        </div>
-      </div>
+      <h2>key-pair</h2>
 
-      <div style="padding: 8px; ">
-        <div>
-          <label for="signVerifyInput">Sign and Verify Tag:</label>
-          <input type="text" id="signVerifyInput" name="signVerifyInput" value="test" />
-          <button onclick="testSignVerify()">Click Me!</button>
-        </div>
-        <div>
-          <label>Signature</label>: <span id="verifySignature"></span>
-        </div>
-        <div>
-          <label>Status</label>: <span id="verifyStatus"></span>
-        </div>
-      </div>
+      <h3>tag</h3>
+      <input type="text" id="tag" name="tag" placeholder="tag" />
+      <button onclick="createKeyPair()">create / load key-pair</button>
+
+      <h3>public-key</h3>
+      <code id="publicKey"></code>
+      <button onclick="registerPublicKey()">register public-key with server</button>
+      <code id="registered"></code>
+
+      <h2>sign / verify</h2>
+
+      <h3>sign data</h3>
+      <input type="text" id="data" name="data" placeholder="data" />
+      <button onclick="createRandomData()">create random data</button>
+      <button onclick="sign()">sign data</button>
+
+      <h4>signature</h4>
+      <code id="signature"></code>
+
+      <h3>verify data</h3>
+      <button onclick="verify()">verify data</button>
+
+      <h4>verified local</h4>
+      <code id="verifiedLocal"></code>
+
+      <h4>verified server</h4>
+      <code id="verifiedServer"></code>
     </main>
 
     <script src="./js/example.js" type="module"></script>

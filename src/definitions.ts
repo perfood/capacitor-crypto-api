@@ -16,7 +16,7 @@ export interface GenerateKeyResponse {
   /**
    * The public-key in base64 format.
    */
-  publicKey: string;
+  publicKey?: string;
 }
 
 export interface LoadKeyOptions {
@@ -30,7 +30,7 @@ export interface LoadKeyResponse {
   /**
    * The public-key in base64 format.
    */
-  publicKey: string;
+  publicKey?: string;
 }
 
 export interface DeleteKeyOptions {
@@ -95,7 +95,7 @@ export interface DecryptResponse {
   /**
    * The decrypted data.
    */
-  data: string;
+  data?: string;
 }
 
 export interface CryptoApiPlugin {

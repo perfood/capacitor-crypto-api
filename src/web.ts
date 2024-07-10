@@ -54,14 +54,23 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async generateKey(options: GenerateKeyOptions): Promise<GenerateKeyResponse> {
     console.log('CryptoApi.generateKey', options);
 
-    if (options.algorithm !== 'ECDH' && options.algorithm !== 'ECDSA') {
-      throw new Error('Invalid algorithm');
-    }
-
     if (window.location.protocol != 'https:') {
       throw new Error(
         'WebCrypto API is only available in secure contexts (https)',
       );
+    }
+
+    if (options.algorithm !== 'ECDH' && options.algorithm !== 'ECDSA') {
+      throw new Error('Invalid algorithm');
+    }
+
+    const { publicKey: publicKeyFound } = await this.loadKey({
+      tag: options.tag,
+    });
+    if (publicKeyFound) {
+      return {
+        publicKey: publicKeyFound,
+      };
     }
 
     const subtleKeyPair = await crypto.subtle.generateKey(
@@ -96,12 +105,12 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
 
     const item = localStorage.getItem(options.tag);
     if (!item) {
-      throw new Error('Key not found');
+      return {};
     }
 
     const keyPair = JSON.parse(item);
     if (!keyPair.publicKey) {
-      throw new Error('Public key not found');
+      return {};
     }
 
     return {
@@ -118,6 +127,12 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async sign(options: SignOptions): Promise<SignResponse> {
     console.log('CryptoApi.sign', options);
 
+    if (window.location.protocol != 'https:') {
+      throw new Error(
+        'WebCrypto API is only available in secure contexts (https)',
+      );
+    }
+
     const item = localStorage.getItem(options.tag);
     if (!item) {
       throw new Error('Key not found');
@@ -126,12 +141,6 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     const keyPair = JSON.parse(item);
     if (!keyPair.privateKey) {
       throw new Error('Private key not found');
-    }
-
-    if (window.location.protocol != 'https:') {
-      throw new Error(
-        'WebCrypto API is only available in secure contexts (https)',
-      );
     }
 
     const privateKey = await crypto.subtle.importKey(
@@ -185,6 +194,12 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async decrypt(options: DecryptOptions): Promise<DecryptResponse> {
     console.log('CryptoApi.decrypt', options);
 
+    if (window.location.protocol != 'https:') {
+      throw new Error(
+        'WebCrypto API is only available in secure contexts (https)',
+      );
+    }
+
     const item = localStorage.getItem(options.tag);
     if (!item) {
       throw new Error('Key not found');
@@ -193,12 +208,6 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     const keyPair = JSON.parse(item);
     if (!keyPair.privateKey) {
       throw new Error('Private key not found');
-    }
-
-    if (window.location.protocol != 'https:') {
-      throw new Error(
-        'WebCrypto API is only available in secure contexts (https)',
-      );
     }
 
     const privateKey = await crypto.subtle.importKey(

@@ -37,8 +37,8 @@ app.post('/register', async (req, res) => {
 
 app.post('/verify', async (req, res) => {
   const {
-    signed: { signature },
-    random,
+    signature,
+    data,
     tag,
   } = req.body;
 
@@ -70,7 +70,7 @@ app.post('/verify', async (req, res) => {
     },
     key,
     derToP1363(base64ToArrayBuffer(signature)),
-    base64ToArrayBuffer(btoa(random)),
+    base64ToArrayBuffer(btoa(data)),
   );
 
   if (!valid) {

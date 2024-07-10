@@ -1,79 +1,99 @@
 import { CryptoApi } from '@perfood/capacitor-crypto-api';
 
-window.registerTag = async () => {
-  const inputValue = document.getElementById('registerTag').value;
-  
-  // generate a private key for given tag, and also the public key
+const window = globalThis.window;
+
+window.createKeyPair = async () => {
+  window.console.log('createKeyPair');
+  const tag = window.document.getElementById('tag').value;
+
+  if(!tag) {
+    return;
+  }
+
   const key = await CryptoApi.generateKey({
-    tag: inputValue,
+    tag,
     algorithm: 'ECDSA',
   });
 
-  // associate the public key with the tag on the server
-  await fetch('https://localhost:3001/register', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      tag: inputValue,
-      publicKey: key.publicKey,
-    }),
-  })
-  .then(response => response.ok ? response.json() : Promise.reject(response))
-  .then(async (data) => {
-    document.getElementById('publicKey').textContent = key.publicKey;
-  });
+  window.document.getElementById('publicKey').textContent = key.publicKey;
 };
 
-window.testSignVerify = async () => {
-  const inputValue = document.getElementById('signVerifyInput').value;
-  const verifySignature = document.getElementById('verifySignature');
-  const status = document.getElementById('verifyStatus');
+window.registerPublicKey = async () => {
+  window.console.log('registerPublicKey');
+  const tag = window.document.getElementById('tag').value;
+  const publicKey = window.document.getElementById('publicKey').textContent;
 
-  // create a random
-  const random = crypto.randomUUID();
-
-  // sign the random
-  try {
-    const signature = await CryptoApi.sign({
-      tag: inputValue,
-      data: random,
-    });
-    console.log('CryptoApi.sign', signature);
-    if (signature.signature) {
-      const signKey = await CryptoApi.loadKey({
-        tag: inputValue,
-      });
-      console.log(
-        'CryptoApi.verify',
-        await CryptoApi.verify({ foreignPublicKey: signKey.publicKey, data: random, signature: signature.signature }),
-      );
-    }
-
-    verifySignature.textContent = signature.signature;
-    
-    fetch('https://localhost:3001/verify', {
+  await window
+    .fetch('https://localhost:3001/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        tag: inputValue,
-        signed: signature,
-        random
+        tag,
+        publicKey,
       }),
     })
-    .then(response => response.ok ? response.json() : Promise.reject(response))
-    .then(async (data) => {
-      status.textContent = data.valid ? 'Valid' : 'Invalid';
-    })
-    .catch(error => {
-      verifySignature.textContent = '';
-      status.textContent = error.statusText;
+    .then(response =>
+      response.ok ? response.json() : Promise.reject(response),
+    )
+    .then(async data => {
+      window.document.getElementById('registered').textContent = 'registered';
     });
-  } catch (error) {
-    verifySignature.textContent = '';
-    status.textContent = error;
-  }
+};
+
+window.createRandomData = async () => {
+  window.console.log('createRandomData');
+  window.document.getElementById('data').value = window.crypto.randomUUID();
+};
+
+window.sign = async () => {
+  window.console.log('sign');
+  const tag = window.document.getElementById('tag').value;
+  const data = window.document.getElementById('data').value;
+
+  const signature = await CryptoApi.sign({
+    tag,
+    data,
+  });
+
+  window.document.getElementById('signature').textContent = signature.signature;
+};
+
+window.verify = async () => {
+  window.console.log('verify');
+  const tag = window.document.getElementById('tag').value;
+  const data = window.document.getElementById('data').value;
+  const signature = window.document.getElementById('signature').textContent;
+
+  const key = await CryptoApi.loadKey({
+    tag,
+  });
+
+  const valid = await CryptoApi.verify({
+    foreignPublicKey: key.publicKey,
+    data,
+    signature,
+  });
+
+  window.document.getElementById('verifiedLocal').textContent = valid;
+
+  window
+    .fetch('https://localhost:3001/verify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        tag,
+        data,
+        signature,
+      }),
+    })
+    .then(response =>
+      response.ok ? response.json() : Promise.reject(response),
+    )
+    .then(async data => {
+      window.document.getElementById('verifiedServer').textContent = data.valid;
+    });
 };
