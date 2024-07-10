@@ -6,7 +6,7 @@ window.createKeyPair = async () => {
   window.console.log('createKeyPair');
   const tag = window.document.getElementById('tag').value;
 
-  if(!tag) {
+  if (!tag) {
     return;
   }
 
