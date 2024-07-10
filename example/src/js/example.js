@@ -40,6 +40,16 @@ window.testSignVerify = async () => {
       tag: inputValue,
       data: random,
     });
+    console.log('CryptoApi.sign', signature);
+    if (signature.signature) {
+      const signKey = await CryptoApi.loadKey({
+        tag: inputValue,
+      });
+      console.log(
+        'CryptoApi.verify',
+        await CryptoApi.verify({ foreignPublicKey: signKey.publicKey, data: random, signature: signature.signature }),
+      );
+    }
 
     verifySignature.textContent = signature.signature;
     

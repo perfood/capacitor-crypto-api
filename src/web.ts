@@ -13,7 +13,12 @@ import type {
   SignResponse,
   VerifyOptions,
 } from './definitions';
-import { arrayBufferToBase64, base64ToArrayBuffer } from './utils';
+import {
+  arrayBufferToBase64,
+  base64ToArrayBuffer,
+  derToP1363,
+  p1363ToDer,
+} from './utils';
 
 /**
  * ECDH key algorithm.
@@ -138,10 +143,14 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     );
 
     const signature = arrayBufferToBase64(
-      await crypto.subtle.sign(
-        CRYPTO_API_ECDSA_SIGN_ALGORITHM,
-        privateKey,
-        base64ToArrayBuffer(btoa(options.data)),
+      p1363ToDer(
+        new Uint8Array(
+          await crypto.subtle.sign(
+            CRYPTO_API_ECDSA_SIGN_ALGORITHM,
+            privateKey,
+            base64ToArrayBuffer(btoa(options.data)),
+          ),
+        ),
       ),
     );
 
@@ -160,15 +169,15 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     const foreignPublicKey = await crypto.subtle.importKey(
       'spki',
       base64ToArrayBuffer(options.foreignPublicKey),
-      CRYPTO_API_ECDH_KEY_ALGORITHM,
+      CRYPTO_API_ECDSA_KEY_ALGORITHM,
       false,
-      [],
+      ['verify'],
     );
 
     return await crypto.subtle.verify(
       CRYPTO_API_ECDSA_SIGN_ALGORITHM,
       foreignPublicKey,
-      base64ToArrayBuffer(options.signature),
+      derToP1363(base64ToArrayBuffer(options.signature)),
       base64ToArrayBuffer(btoa(options.data)),
     );
   }

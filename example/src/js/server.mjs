@@ -1,9 +1,11 @@
+import { base64ToArrayBuffer, derToP1363 } from '@perfood/capacitor-crypto-api';
 import { atob, btoa } from 'buffer';
 import cors from 'cors';
 import { webcrypto } from 'crypto';
 import express from 'express';
 import fs from 'fs';
 import https from 'https';
+
 
 const app = express();
 const port = 3001;
@@ -34,33 +36,40 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/verify', async (req, res) => {
-  const { signed: { signature }, random, tag } = req.body;
+  const {
+    signed: { signature },
+    random,
+    tag,
+  } = req.body;
 
   const publicKey = store[tag];
-  
+
   if (!publicKey) {
     return res.status(400).json({ statusText: 'Public key not found' });
   }
 
-  const publicKeyBinary = Uint8Array.from(atob(publicKey), c => c.charCodeAt(0));
+  const publicKeyBinary = Uint8Array.from(atob(publicKey), c =>
+    c.charCodeAt(0),
+  );
 
   const key = await webcrypto.subtle.importKey(
     'spki',
     publicKeyBinary.buffer,
     {
       name: 'ECDSA',
-      namedCurve: 'P-256'
+      namedCurve: 'P-256',
     },
     true,
-    ['verify']
+    ['verify'],
   );
-  
-  const valid = await webcrypto.subtle.verify({
+
+  const valid = await webcrypto.subtle.verify(
+    {
       name: 'ECDSA',
       hash: 'SHA-256',
     },
     key,
-    base64ToArrayBuffer(signature),
+    derToP1363(base64ToArrayBuffer(signature)),
     base64ToArrayBuffer(btoa(random)),
   );
 
@@ -70,11 +79,3 @@ app.post('/verify', async (req, res) => {
 
   res.json({ valid: valid });
 });
-
-function base64ToArrayBuffer(base64) {
-  return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-}
-
-function arrayBufferToBase64(arrayBuffer) {
-  return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-}

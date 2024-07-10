@@ -7,4 +7,5 @@ const CryptoApi = registerPlugin<CryptoApiPlugin>('CryptoApi', {
 });
 
 export * from './definitions';
+export * from './utils';
 export { CryptoApi };
