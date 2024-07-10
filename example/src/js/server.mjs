@@ -1,5 +1,5 @@
 import { base64ToArrayBuffer, derToP1363 } from '@perfood/capacitor-crypto-api';
-import { atob, btoa } from 'buffer';
+import { btoa } from 'buffer';
 import cors from 'cors';
 import { webcrypto } from 'crypto';
 import express from 'express';
@@ -48,18 +48,14 @@ app.post('/verify', async (req, res) => {
     return res.status(400).json({ statusText: 'Public key not found' });
   }
 
-  const publicKeyBinary = Uint8Array.from(atob(publicKey), c =>
-    c.charCodeAt(0),
-  );
-
   const key = await webcrypto.subtle.importKey(
     'spki',
-    publicKeyBinary.buffer,
+    base64ToArrayBuffer(publicKey),
     {
       name: 'ECDSA',
       namedCurve: 'P-256',
     },
-    true,
+    false,
     ['verify'],
   );
 
