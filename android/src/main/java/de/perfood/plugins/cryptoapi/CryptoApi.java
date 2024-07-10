@@ -7,16 +7,19 @@ import android.util.Log;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
-import java.security.spec.ECGenParameterSpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 
 public class CryptoApi {
 
@@ -31,8 +34,8 @@ public class CryptoApi {
 
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
             keyPairGenerator.initialize(
-                new KeyGenParameterSpec.Builder(tag, KeyProperties.PURPOSE_SIGN)
-                    .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
+                new KeyGenParameterSpec.Builder(tag, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
+                    //.setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                     .setDigests(KeyProperties.DIGEST_SHA256)
                     .build()
             );
@@ -92,6 +95,32 @@ public class CryptoApi {
         }
     }
 
+    public boolean verify(String foreignPublicKeyBase64, String data, String signatureBase64) {
+        Log.i("CryptoApi.verify", foreignPublicKeyBase64 + " " + data + " " + signatureBase64);
+
+        try {
+            PublicKey foreignPublicKey = loadPublicKeyFromBase64(foreignPublicKeyBase64);
+
+            if (foreignPublicKey == null) {
+                return false;
+            }
+
+            Signature signature = Signature.getInstance("SHA256withECDSA");
+            signature.initVerify(foreignPublicKey);
+            signature.update(data.getBytes());
+
+            return signature.verify(Base64.decode(signatureBase64, Base64.DEFAULT));
+        } catch (Error e) {
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            return false;
+        } catch (SignatureException e) {
+            return false;
+        } catch (InvalidKeyException e) {
+            return false;
+        }
+    }
+
     public String decrypt(String tag, String foreignPublicKey, String initVector, String data) {
         Log.i("CryptoApi.decrypt", tag + " " + foreignPublicKey + " " + initVector + " " + data);
         return tag;
@@ -128,6 +157,19 @@ public class CryptoApi {
 
             return Base64.encodeToString(privateKeyEntry.getCertificate().getPublicKey().getEncoded(), Base64.DEFAULT);
         } catch (Error e) {
+            return null;
+        }
+    }
+
+    private PublicKey loadPublicKeyFromBase64(String publicKeyBase64) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_EC);
+            return keyFactory.generatePublic(new X509EncodedKeySpec(Base64.decode(publicKeyBase64, Base64.DEFAULT)));
+        } catch (Error e) {
+            return null;
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        } catch (InvalidKeySpecException e) {
             return null;
         }
     }

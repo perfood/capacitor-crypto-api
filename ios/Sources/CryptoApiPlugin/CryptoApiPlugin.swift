@@ -14,6 +14,7 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "loadKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "sign", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "verify", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "decrypt", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
@@ -67,6 +68,18 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
 
         call.resolve([
             "signature": signature
+        ])
+    }
+
+    @objc func verify(_ call: CAPPluginCall) {
+        let foreignPublicKey = call.getString("foreignPublicKey") ?? ""
+        let data = call.getString("data") ?? ""
+        let signature = call.getString("signature") ?? ""
+
+        let verified = implementation.verify(foreignPublicKey, data, signature)
+
+        call.resolve([
+            "verified": verified
         ])
     }
 

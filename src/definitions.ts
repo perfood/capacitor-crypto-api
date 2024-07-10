@@ -57,6 +57,21 @@ export interface SignResponse {
   signature?: string;
 }
 
+export interface VerifyOptions {
+  /**
+   * The foreign public-key in base64 format.
+   */
+  foreignPublicKey: string;
+  /**
+   * The signed data.
+   */
+  data: string;
+  /**
+   * The signature in base64 format.
+   */
+  signature: string;
+}
+
 export interface DecryptOptions {
   /**
    * The key-pair tag.
@@ -102,7 +117,7 @@ export interface CryptoApiPlugin {
 
   /**
    * Deletes the key-pair from the Secure Enclave (iOS) or StrongBox/TEE (Android).
-   * 
+   *
    * @since 1.0.0
    */
   deleteKey(options: DeleteKeyOptions): Promise<void>;
@@ -116,6 +131,15 @@ export interface CryptoApiPlugin {
    * @since 1.0.0
    */
   sign(options: SignOptions): Promise<SignResponse>;
+
+  /**
+   * Verifies the signature of the data with the foreign public-key.
+   * 
+   * Only ECDSA is supported.
+   * 
+   * @since 1.0.0
+   */
+  verify(options: VerifyOptions): Promise<boolean>;
 
   /**
    * Decrypts the data in the Secure Enclave (iOS) or StrongBox/TEE (Android).

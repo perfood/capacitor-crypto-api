@@ -62,6 +62,19 @@ public class CryptoApiPlugin extends Plugin {
     }
 
     @PluginMethod
+    public void verify(PluginCall call) {
+        String foreignPublicKey = call.getString("foreignPublicKey");
+        String data = call.getString("data");
+        String signature = call.getString("signature");
+
+        boolean verified = implementation.verify(foreignPublicKey, data, signature);
+
+        JSObject ret = new JSObject();
+        ret.put("verified", verified);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
     public void decrypt(PluginCall call) {
         String tag = call.getString("tag");
         String foreignPublicKey = call.getString("foreignPublicKey");

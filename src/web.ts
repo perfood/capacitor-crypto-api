@@ -11,6 +11,7 @@ import type {
   LoadKeyResponse,
   SignOptions,
   SignResponse,
+  VerifyOptions,
 } from './definitions';
 import { arrayBufferToBase64, base64ToArrayBuffer } from './utils';
 
@@ -145,6 +146,31 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     );
 
     return { signature };
+  }
+
+  async verify(options: VerifyOptions): Promise<boolean> {
+    console.log('CryptoApi.verify', options);
+
+    if (window.location.protocol != 'https:') {
+      throw new Error(
+        'WebCrypto API is only available in secure contexts (https)',
+      );
+    }
+
+    const foreignPublicKey = await crypto.subtle.importKey(
+      'spki',
+      base64ToArrayBuffer(options.foreignPublicKey),
+      CRYPTO_API_ECDH_KEY_ALGORITHM,
+      false,
+      [],
+    );
+
+    return await crypto.subtle.verify(
+      CRYPTO_API_ECDSA_SIGN_ALGORITHM,
+      foreignPublicKey,
+      base64ToArrayBuffer(options.signature),
+      base64ToArrayBuffer(btoa(options.data)),
+    );
   }
 
   async decrypt(options: DecryptOptions): Promise<DecryptResponse> {

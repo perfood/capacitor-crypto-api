@@ -2,6 +2,16 @@ import Foundation
 import CryptoKit
 
 @objc public class CryptoApi: NSObject {
+    struct Constants {
+        static let ECHeader = [UInt8]([
+            /* sequence          */ 0x30, 0x59,
+            /* |-> sequence      */ 0x30, 0x13,
+            /* |---> ecPublicKey */ 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,
+            /* |---> prime256v1  */ 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01,
+            /* |-> bit headers   */ 0x07, 0x03, 0x42, 0x00
+        ])
+    }
+
     @objc public func generateKey(_ tag: String, _ algorithm: String) -> String? {
         print("CryptoApi.generateKey", tag, algorithm)
 
@@ -60,18 +70,38 @@ import CryptoKit
 
         var error: Unmanaged<CFError>?
 
-        if #available(iOS 17.0, *) {
-            guard let signature = SecKeyCreateSignature(privateKey,
-                                                        .ecdsaSignatureMessageRFC4754SHA256,
-                                                        data.data(using: .utf8)!  as CFData,
-                                                        &error) as Data? else {
-                return nil
-            }
-
-            return signature.base64EncodedString()
+        guard let signature = SecKeyCreateSignature(privateKey,
+                                                    // .ecdsaSignatureMessageRFC4754SHA256,
+                                                    .ecdsaSignatureMessageX962SHA256,
+                                                    data.data(using: .utf8)! as CFData,
+                                                    &error) as Data? else {
+            return nil
         }
 
-        return nil
+        return signature.base64EncodedString()
+    }
+
+    @objc public func verify(_ foreignPublicKeyBase64: String, _ data: String, _ signatureBase64: String) -> Bool {
+        print("CryptoApi.verify", foreignPublicKeyBase64, data, signatureBase64)
+
+        guard let foreignPublicKey = loadPublicKeyFromBase64(foreignPublicKeyBase64) else {
+            return false
+        }
+
+        guard let signature = Data.init(base64Encoded: signatureBase64) else {
+            return false
+        }
+
+        var error: Unmanaged<CFError>?
+        guard SecKeyVerifySignature(foreignPublicKey,
+                                    .ecdsaSignatureMessageX962SHA256,
+                                    data.data(using: .utf8)! as CFData,
+                                    signature as CFData,
+                                    &error) else {
+            return false
+        }
+
+        return true
     }
 
     @objc public func decrypt(
@@ -115,18 +145,35 @@ import CryptoKit
             return nil
         }
 
-        let ecHeader: [UInt8] = [
-            /* sequence          */ 0x30, 0x59,
-            /* |-> sequence      */ 0x30, 0x13,
-            /* |---> ecPublicKey */ 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,
-            /* |---> prime256v1  */ 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01,
-            /* |-> bit headers   */ 0x07, 0x03, 0x42, 0x00
-        ]
-
         var ecPublicKey = Data()
-        ecPublicKey.append(Data(ecHeader))
+        ecPublicKey.append(Data(Constants.ECHeader))
         ecPublicKey.append(publicKeyData as Data)
 
         return ecPublicKey.base64EncodedString()
+    }
+
+    @objc private func loadPublicKeyFromBase64(_ publicKeyBase64: String) -> SecKey? {
+        guard let secKeyData = Data.init(base64Encoded: publicKeyBase64) else {
+            return nil
+        }
+
+        guard let secKeyHeaderRange = secKeyData.range(of: Data(Constants.ECHeader)) else {
+            return nil
+        }
+
+        let attributes: [String: Any] = [
+            kSecAttrKeyClass as String: kSecAttrKeyClassPublic,
+            kSecAttrKeyType as String: kSecAttrKeyTypeEC,
+            kSecAttrKeySizeInBits as String: 256
+        ]
+
+        var error: Unmanaged<CFError>?
+        guard let secKey = SecKeyCreateWithData(secKeyData.suffix(from: secKeyHeaderRange.upperBound) as CFData,
+                                                attributes as CFDictionary,
+                                                &error) else {
+            return nil
+        }
+
+        return secKey
     }
 }

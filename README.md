@@ -17,6 +17,7 @@ npx cap sync
 * [`loadKey(...)`](#loadkey)
 * [`deleteKey(...)`](#deletekey)
 * [`sign(...)`](#sign)
+* [`verify(...)`](#verify)
 * [`decrypt(...)`](#decrypt)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
@@ -105,6 +106,27 @@ Only ECDSA is supported.
 --------------------
 
 
+### verify(...)
+
+```typescript
+verify(options: VerifyOptions) => Promise<boolean>
+```
+
+Verifies the signature of the data with the foreign public-key.
+
+Only ECDSA is supported.
+
+| Param         | Type                                                    |
+| ------------- | ------------------------------------------------------- |
+| **`options`** | <code><a href="#verifyoptions">VerifyOptions</a></code> |
+
+**Returns:** <code>Promise&lt;boolean&gt;</code>
+
+**Since:** 1.0.0
+
+--------------------
+
+
 ### decrypt(...)
 
 ```typescript
@@ -180,6 +202,15 @@ Only ECDH is supported.
 | ---------- | ------------------- | ----------------- |
 | **`tag`**  | <code>string</code> | The key-pair tag. |
 | **`data`** | <code>string</code> | The data to sign. |
+
+
+#### VerifyOptions
+
+| Prop                   | Type                | Description                              |
+| ---------------------- | ------------------- | ---------------------------------------- |
+| **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format. |
+| **`data`**             | <code>string</code> | The signed data.                         |
+| **`signature`**        | <code>string</code> | The signature in base64 format.          |
 
 
 #### DecryptResponse
