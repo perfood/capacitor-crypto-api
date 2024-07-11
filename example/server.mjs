@@ -11,9 +11,10 @@ import express from 'express';
 import fs from 'fs';
 import https from 'https';
 
-const app = express();
+const hostname = 'localhost';
 const port = 3001;
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
@@ -113,6 +114,6 @@ https
     },
     app,
   )
-  .listen(port, () => {
-    console.log(`Server listening at https://localhost:${port}`);
+  .listen(port, hostname, () => {
+    console.log(`Server listening at https://${hostname}:${port}`);
   });

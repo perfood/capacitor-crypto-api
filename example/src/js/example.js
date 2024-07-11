@@ -51,7 +51,8 @@ window.registerPublicKey = async () => {
         : 'not registered';
     })
     .catch(error => {
-      document.getElementById('registered').textContent = error.statusText;
+      document.getElementById('registered').textContent =
+        error.statusText || error;
     });
 };
 
@@ -82,7 +83,7 @@ window.getChallenge = async () => {
       document.getElementById('challenge').value = data.challenge;
     })
     .catch(error => {
-      document.getElementById('challenge').value = error.statusText;
+      document.getElementById('challenge').value = error.statusText || error;
     });
 };
 
@@ -144,6 +145,7 @@ window.verify = async () => {
       document.getElementById('verifiedServer').textContent = data.valid;
     })
     .catch(error => {
-      document.getElementById('verifiedServer').textContent = error.statusText;
+      document.getElementById('verifiedServer').textContent =
+        error.statusText || error;
     });
 };
