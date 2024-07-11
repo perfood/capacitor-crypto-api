@@ -1,5 +1,30 @@
 # Running this example
 
+## Clone the repository
+
+```bash
+git clone https://github.com/perfood/capacitor-crypto-api.git
+cd capacitor-crypto-api
+```
+
+## Install depencencies
+
+```bash
+npm install
+```
+
+## Build the plugin
+
+```bash
+npm run verify
+```
+
+## Change directory to example
+
+```bash
+cd example
+```
+
 ## Install depencencies
 
 ```bash
