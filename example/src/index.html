@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="hydrated">
+  <head>
+    <meta charset="UTF-8" />
+    <title>capacitor-crypto-api example</title>
+    <meta
+      name="viewport"
+      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <style>
+      h1,
+      h2,
+      h3,
+      h4,
+      h5 {
+        margin-bottom: 4px;
+      }
+      code {
+        word-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>capacitor-crypto-api example</h1>
+      <p>
+        This example demonstrates a simple 2-factor-authentication mechanism.
+        The client creates a key-pair and registers the public-key with the
+        server. The server creates a challenge and sends it to the client. The
+        client signs the challenge with the private-key and sends the signed
+        data back to the server. The server can then verify the signature of the
+        data with the public-key and be sure that the data was signed by the
+        private-key.
+      </p>
+
+      <h2>key-pair</h2>
+
+      <h3>tag</h3>
+      <input type="text" id="tag" name="tag" placeholder="tag" />
+      <button onclick="createKeyPair()">create / load key-pair</button>
+
+      <h3>public-key</h3>
+      <code id="publicKey"></code>
+      <button onclick="registerPublicKey()">
+        register public-key with server
+      </button>
+      <code id="registered"></code>
+
+      <h2>sign / verify</h2>
+
+      <h3>sign challenge</h3>
+      <input
+        type="text"
+        id="challenge"
+        name="challenge"
+        placeholder="challenge"
+        readonly
+      />
+      <button onclick="getChallenge()">get challenge</button>
+      <button onclick="sign()">sign challenge</button>
+
+      <h4>signature</h4>
+      <code id="signature"></code>
+
+      <h3>verify challenge</h3>
+      <button onclick="verify()">verify challenge</button>
+
+      <h4>verified local</h4>
+      <code id="verifiedLocal"></code>
+
+      <h4>verified server</h4>
+      <code id="verifiedServer"></code>
+    </main>
+
+    <script src="./js/example.js" type="module"></script>
+  </body>
+</html>
