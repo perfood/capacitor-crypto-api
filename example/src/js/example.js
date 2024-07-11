@@ -10,6 +10,7 @@ window.createKeyPair = async () => {
   const tag = document.getElementById('tag').value;
 
   if (!tag) {
+    alert('Please enter a tag.');
     return;
   }
 

@@ -25,9 +25,13 @@
     <main>
       <h1>capacitor-crypto-api example</h1>
       <p>
-        This project can be used to test out the functionality of your plugin.
-        Nothing in the <em>example/</em> folder will be published to npm when
-        using this template, so you can create away!
+        This example demonstrates a simple 2-factor-authentication mechanism.
+        The client creates a key-pair and registers the public-key with the
+        server. The server creates a challenge and sends it to the client. The
+        client signs the challenge with the private-key and sends the signed
+        data back to the server. The server can then verify the signature of the
+        data with the public-key and be sure that the data was signed by the
+        private-key.
       </p>
 
       <h2>key-pair</h2>

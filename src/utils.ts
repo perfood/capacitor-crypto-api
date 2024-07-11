@@ -1,11 +1,20 @@
+/**
+ * Convert a base64 string to an ArrayBuffer.
+ */
 export function base64ToArrayBuffer(base64: string): Uint8Array {
   return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
 }
 
+/**
+ * Convert an ArrayBuffer to a base64 string.
+ */
 export function arrayBufferToBase64(arrayBuffer: ArrayBuffer): string {
   return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
 }
 
+/**
+ * Convert a raw (IEEE P1363) signature to an ASN.1 DER signature.
+ */
 export function p1363ToDer(sig: Uint8Array): Uint8Array {
   const signature = Array.from(sig, x =>
     ('00' + x.toString(16)).slice(-2),
@@ -29,6 +38,9 @@ export function p1363ToDer(sig: Uint8Array): Uint8Array {
   return new Uint8Array(match.map(h => parseInt(h, 16)));
 }
 
+/**
+ * Convert an ASN.1 DER signature to a raw (IEEE P1363) signature.
+ */
 export function derToP1363(sig: Uint8Array): Uint8Array {
   const signature = Array.from(sig, x =>
     ('00' + x.toString(16)).slice(-2),

@@ -1,6 +1,34 @@
 # @perfood/capacitor-crypto-api
 
-Description
+This is a capacitor plugin that provides a simple API to generate key-pairs in the Secure Enclave (iOS) or StrongBox/TEE (Android) and use them to sign and verify data.
+
+## Limitations of the Secure Enclave (iOS)
+
+> "Works only with NIST P-256 elliptic curve keys. These keys can only be used for creating and verifying cryptographic signatures, or for elliptic curve Diffie-Hellman key exchange (and by extension, symmetric encryption)." - [Apple Developer Documentation](https://developer.apple.com/documentation/security/certificate_key_and_trust_services/keys/protecting_keys_with_the_secure_enclave)
+
+Since the Secure Enclave only supports the NIST P-256 elliptic curve, only ECDSA is supported. ECDH is not supported, but may be supported in the future. PRs are welcome.
+
+## Format of the signature
+
+Secure Enclave (iOS) and StrongBox/TEE (Android) return the signature in ASN.1 DER format. The WebCrypto API returns the signature in raw (IEEE P1363) format.
+
+This plugin has the functions `derToP1363` and `p1363ToDer` to convert the signature from ASN.1 DER to raw (IEEE P1363) format and vice versa.
+
+## For development
+
+The plugin also uses the WebCrypto API to generate key-pairs in the browser and use them to sign and verify data. The key-pairs are stored in the browser's local storage.
+
+> WebCrypto API is only available in secure contexts (https)
+
+## Use Case
+
+This can be used to realize a 2-factor-authentication mechanism, where the private-key is stored in the Secure Enclave (iOS) or StrongBox/TEE (Android) and the public-key is stored on the server.
+
+The server creates a challenge and sends it to the client. The client signs the challenge with the private-key and sends the signed data back to the server.
+
+The server can then verify the signature of the data with the public-key and be sure that the data was signed by the private-key.
+
+There is an example in the [`example`](./example/README.md) directory.
 
 ## Install
 
