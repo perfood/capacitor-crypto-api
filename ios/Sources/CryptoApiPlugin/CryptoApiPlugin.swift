@@ -14,16 +14,14 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "loadKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "sign", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "verify", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "decrypt", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "verify", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
 
     @objc func generateKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
-        let algorithm = call.getString("algorithm") ?? ""
 
-        guard let publicKey = implementation.generateKey(tag, algorithm) else {
+        guard let publicKey = implementation.generateKey(tag) else {
             call.resolve([:])
 
             return
@@ -80,23 +78,6 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
 
         call.resolve([
             "verified": verified
-        ])
-    }
-
-    @objc func decrypt(_ call: CAPPluginCall) {
-        let tag = call.getString("tag") ?? ""
-        let foreignPublicKey = call.getString("foreignPublicKey") ?? ""
-        let initVector = call.getString("initVector") ?? ""
-        let encryptedData = call.getString("encryptedData") ?? ""
-
-        guard let data = implementation.decrypt(tag, foreignPublicKey, initVector, encryptedData) else {
-            call.resolve([:])
-
-            return
-        }
-
-        call.resolve([
-            "data": data
         ])
     }
 }

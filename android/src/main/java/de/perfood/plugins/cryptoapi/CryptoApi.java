@@ -18,13 +18,14 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
+import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
 public class CryptoApi {
 
-    public String generateKey(String tag, String algorithm) {
-        Log.i("CryptoApi.generateKey", tag + " " + algorithm);
+    public String generateKey(String tag) {
+        Log.i("CryptoApi.generateKey", tag);
 
         try {
             String publicKeyFound = this.loadKey(tag);
@@ -35,7 +36,7 @@ public class CryptoApi {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
             keyPairGenerator.initialize(
                 new KeyGenParameterSpec.Builder(tag, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                    //.setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
+                    .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                     .setDigests(KeyProperties.DIGEST_SHA256)
                     .build()
             );
@@ -119,11 +120,6 @@ public class CryptoApi {
         } catch (InvalidKeyException e) {
             return false;
         }
-    }
-
-    public String decrypt(String tag, String foreignPublicKey, String initVector, String data) {
-        Log.i("CryptoApi.decrypt", tag + " " + foreignPublicKey + " " + initVector + " " + data);
-        return tag;
     }
 
     private KeyStore.PrivateKeyEntry getPrivateKeyEntry(String tag) {

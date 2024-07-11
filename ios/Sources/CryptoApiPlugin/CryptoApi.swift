@@ -12,8 +12,8 @@ import CryptoKit
         ])
     }
 
-    @objc public func generateKey(_ tag: String, _ algorithm: String) -> String? {
-        print("CryptoApi.generateKey", tag, algorithm)
+    @objc public func generateKey(_ tag: String) -> String? {
+        print("CryptoApi.generateKey", tag)
 
         let publicKeyFound = loadKey(tag)
         if publicKeyFound != nil {
@@ -102,16 +102,6 @@ import CryptoKit
         }
 
         return true
-    }
-
-    @objc public func decrypt(
-        _ tag: String,
-        _ foreignPublicKey: String,
-        _ initVector: String,
-        _ encryptedData: String
-    ) -> String? {
-        print("CryptoApi.decrypt", tag, foreignPublicKey, initVector, encryptedData)
-        return tag
     }
 
     @objc private func getPrivateKey(_ tag: String) -> SecKey? {

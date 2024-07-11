@@ -2,8 +2,6 @@ import { WebPlugin } from '@capacitor/core';
 
 import type {
   CryptoApiPlugin,
-  DecryptOptions,
-  DecryptResponse,
   DeleteKeyOptions,
   GenerateKeyOptions,
   GenerateKeyResponse,
@@ -14,41 +12,15 @@ import type {
   VerifyOptions,
 } from './definitions';
 import {
+  CRYPTO_API_ECDSA_KEY_ALGORITHM,
+  CRYPTO_API_ECDSA_SIGN_ALGORITHM,
+} from './definitions';
+import {
   arrayBufferToBase64,
   base64ToArrayBuffer,
   derToP1363,
   p1363ToDer,
 } from './utils';
-
-/**
- * ECDH key algorithm.
- */
-const CRYPTO_API_ECDH_KEY_ALGORITHM = {
-  name: 'ECDH',
-  namedCurve: 'P-256',
-};
-/**
- * ECDH secret algorithm.
- */
-const CRYPTO_API_ECDH_SECRET_ALGORITHM = {
-  name: 'AES-GCM',
-  length: 256,
-};
-
-/**
- * ECDSA key algorithm.
- */
-const CRYPTO_API_ECDSA_KEY_ALGORITHM = {
-  name: 'ECDSA',
-  namedCurve: 'P-256',
-};
-/**
- * ECDSA sign algorithm.
- */
-const CRYPTO_API_ECDSA_SIGN_ALGORITHM = {
-  name: 'ECDSA',
-  hash: { name: 'SHA-256' },
-};
 
 export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async generateKey(options: GenerateKeyOptions): Promise<GenerateKeyResponse> {
@@ -58,10 +30,6 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       throw new Error(
         'WebCrypto API is only available in secure contexts (https)',
       );
-    }
-
-    if (options.algorithm !== 'ECDH' && options.algorithm !== 'ECDSA') {
-      throw new Error('Invalid algorithm');
     }
 
     const { publicKey: publicKeyFound } = await this.loadKey({
@@ -189,67 +157,5 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       derToP1363(base64ToArrayBuffer(options.signature)),
       base64ToArrayBuffer(btoa(options.data)),
     );
-  }
-
-  async decrypt(options: DecryptOptions): Promise<DecryptResponse> {
-    console.log('CryptoApi.decrypt', options);
-
-    if (window.location.protocol != 'https:') {
-      throw new Error(
-        'WebCrypto API is only available in secure contexts (https)',
-      );
-    }
-
-    const item = localStorage.getItem(options.tag);
-    if (!item) {
-      throw new Error('Key not found');
-    }
-
-    const keyPair = JSON.parse(item);
-    if (!keyPair.privateKey) {
-      throw new Error('Private key not found');
-    }
-
-    const privateKey = await crypto.subtle.importKey(
-      'pkcs8',
-      base64ToArrayBuffer(keyPair.privateKey),
-      CRYPTO_API_ECDH_KEY_ALGORITHM,
-      false,
-      ['deriveKey'],
-    );
-
-    const foreignPublicKey = await crypto.subtle.importKey(
-      'spki',
-      base64ToArrayBuffer(options.foreignPublicKey),
-      CRYPTO_API_ECDH_KEY_ALGORITHM,
-      false,
-      [],
-    );
-
-    const secretKey = await crypto.subtle.deriveKey(
-      {
-        name: CRYPTO_API_ECDH_KEY_ALGORITHM.name,
-        public: foreignPublicKey,
-      },
-      privateKey,
-      CRYPTO_API_ECDH_SECRET_ALGORITHM,
-      false,
-      ['encrypt', 'decrypt'],
-    );
-
-    const data = btoa(
-      arrayBufferToBase64(
-        await crypto.subtle.decrypt(
-          {
-            name: CRYPTO_API_ECDH_SECRET_ALGORITHM.name,
-            iv: base64ToArrayBuffer(options.initVector),
-          },
-          secretKey,
-          base64ToArrayBuffer(options.encryptedData),
-        ),
-      ),
-    );
-
-    return { data };
   }
 }

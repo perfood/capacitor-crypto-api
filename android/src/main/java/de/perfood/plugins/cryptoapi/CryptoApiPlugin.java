@@ -14,9 +14,8 @@ public class CryptoApiPlugin extends Plugin {
     @PluginMethod
     public void generateKey(PluginCall call) {
         String tag = call.getString("tag");
-        String algorithm = call.getString("algorithm");
 
-        String publicKey = implementation.generateKey(tag, algorithm);
+        String publicKey = implementation.generateKey(tag);
 
         JSObject ret = new JSObject();
         if (publicKey != null) {
@@ -71,22 +70,6 @@ public class CryptoApiPlugin extends Plugin {
 
         JSObject ret = new JSObject();
         ret.put("verified", verified);
-        call.resolve(ret);
-    }
-
-    @PluginMethod
-    public void decrypt(PluginCall call) {
-        String tag = call.getString("tag");
-        String foreignPublicKey = call.getString("foreignPublicKey");
-        String initVector = call.getString("initVector");
-        String encryptedData = call.getString("encryptedData");
-
-        String data = implementation.decrypt(tag, foreignPublicKey, initVector, encryptedData);
-
-        JSObject ret = new JSObject();
-        if (data != null) {
-            ret.put("data", data);
-        }
         call.resolve(ret);
     }
 }

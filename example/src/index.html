@@ -38,21 +38,29 @@
 
       <h3>public-key</h3>
       <code id="publicKey"></code>
-      <button onclick="registerPublicKey()">register public-key with server</button>
+      <button onclick="registerPublicKey()">
+        register public-key with server
+      </button>
       <code id="registered"></code>
 
       <h2>sign / verify</h2>
 
-      <h3>sign data</h3>
-      <input type="text" id="data" name="data" placeholder="data" />
-      <button onclick="createRandomData()">create random data</button>
-      <button onclick="sign()">sign data</button>
+      <h3>sign challenge</h3>
+      <input
+        type="text"
+        id="challenge"
+        name="challenge"
+        placeholder="challenge"
+        readonly
+      />
+      <button onclick="getChallenge()">get challenge</button>
+      <button onclick="sign()">sign challenge</button>
 
       <h4>signature</h4>
       <code id="signature"></code>
 
-      <h3>verify data</h3>
-      <button onclick="verify()">verify data</button>
+      <h3>verify challenge</h3>
+      <button onclick="verify()">verify challenge</button>
 
       <h4>verified local</h4>
       <code id="verifiedLocal"></code>

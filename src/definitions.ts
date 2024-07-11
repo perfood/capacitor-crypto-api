@@ -1,15 +1,23 @@
-export type CryptoApiAlgorithm = 'ECDH' | 'ECDSA';
+/**
+ * ECDSA key algorithm.
+ */
+export const CRYPTO_API_ECDSA_KEY_ALGORITHM = {
+  name: 'ECDSA',
+  namedCurve: 'P-256',
+};
+/**
+ * ECDSA sign algorithm.
+ */
+export const CRYPTO_API_ECDSA_SIGN_ALGORITHM = {
+  name: 'ECDSA',
+  hash: { name: 'SHA-256' },
+};
 
 export interface GenerateKeyOptions {
   /**
    * The key-pair tag.
    */
   tag: string;
-  /**
-   * The algorithm to use for the key-pair.
-   * Only ECDH (encryption/decryption) and ECDSA (signing/verifying) is supported.
-   */
-  algorithm: CryptoApiAlgorithm;
 }
 
 export interface GenerateKeyResponse {
@@ -72,32 +80,6 @@ export interface VerifyOptions {
   signature: string;
 }
 
-export interface DecryptOptions {
-  /**
-   * The key-pair tag.
-   */
-  tag: string;
-  /**
-   * The foreign public-key in base64 format.
-   */
-  foreignPublicKey: string;
-  /**
-   * The initialization vector in base64 format.
-   */
-  initVector: string;
-  /**
-   * The encrypted data in base64 format.
-   */
-  encryptedData: string;
-}
-
-export interface DecryptResponse {
-  /**
-   * The decrypted data.
-   */
-  data?: string;
-}
-
 export interface CryptoApiPlugin {
   /**
    * Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),
@@ -134,21 +116,10 @@ export interface CryptoApiPlugin {
 
   /**
    * Verifies the signature of the data with the foreign public-key.
-   * 
+   *
    * Only ECDSA is supported.
-   * 
+   *
    * @since 1.0.0
    */
   verify(options: VerifyOptions): Promise<boolean>;
-
-  /**
-   * Decrypts the data in the Secure Enclave (iOS) or StrongBox/TEE (Android).
-   * Uses the private-key associated with the tag, the foreign public-key
-   * and the initialization vector provided.
-   *
-   * Only ECDH is supported.
-   *
-   * @since 1.0.0
-   */
-  decrypt(options: DecryptOptions): Promise<DecryptResponse>;
 }
