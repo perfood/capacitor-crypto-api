@@ -80,7 +80,7 @@ app.post('/response', async (req, res) => {
     return res.status(404).json('Public key not found');
   }
 
-  const valid = await webcrypto.subtle.verify(
+  const verified = await webcrypto.subtle.verify(
     CRYPTO_API_ECDSA_SIGN_ALGORITHM,
     await webcrypto.subtle.importKey(
       'spki',
@@ -93,14 +93,14 @@ app.post('/response', async (req, res) => {
     base64ToArrayBuffer(btoa(challenge)),
   );
 
-  if (!valid) {
+  if (!verified) {
     return res.status(403).json('Invalid signature');
   }
 
   delete challenges[challenge];
   console.log('challenges', challenges);
 
-  res.json({ valid });
+  res.json({ verified });
 });
 
 /**

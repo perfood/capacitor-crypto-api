@@ -120,12 +120,12 @@ window.verify = async () => {
   });
 
   // Verify locally.
-  const valid = await CryptoApi.verify({
+  const verify = await CryptoApi.verify({
     foreignPublicKey: key.publicKey,
     data: challenge,
     signature,
   });
-  document.getElementById('verifiedLocal').textContent = valid;
+  document.getElementById('verifiedLocal').textContent = verify.verified;
 
   // Verify with the api.
   fetch(`${API_URL}/response`, {
@@ -142,7 +142,7 @@ window.verify = async () => {
       response.ok ? response.json() : Promise.reject(response),
     )
     .then(data => {
-      document.getElementById('verifiedServer').textContent = data.valid;
+      document.getElementById('verifiedServer').textContent = data.verified;
     })
     .catch(error => {
       document.getElementById('verifiedServer').textContent =
