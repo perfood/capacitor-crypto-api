@@ -135,7 +135,7 @@ Only ECDSA is supported.
 ### verify(...)
 
 ```typescript
-verify(options: VerifyOptions) => Promise<boolean>
+verify(options: VerifyOptions) => Promise<VerifyResponse>
 ```
 
 Verifies the signature of the data with the foreign public-key.
@@ -146,7 +146,7 @@ Only ECDSA is supported.
 | ------------- | ------------------------------------------------------- |
 | **`options`** | <code><a href="#verifyoptions">VerifyOptions</a></code> |
 
-**Returns:** <code>Promise&lt;boolean&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#verifyresponse">VerifyResponse</a>&gt;</code>
 
 **Since:** 1.0.0
 
@@ -204,6 +204,13 @@ Only ECDSA is supported.
 | ---------- | ------------------- | ----------------- |
 | **`tag`**  | <code>string</code> | The key-pair tag. |
 | **`data`** | <code>string</code> | The data to sign. |
+
+
+#### VerifyResponse
+
+| Prop           | Type                 | Description                        |
+| -------------- | -------------------- | ---------------------------------- |
+| **`verified`** | <code>boolean</code> | Whether the signature is verified. |
 
 
 #### VerifyOptions

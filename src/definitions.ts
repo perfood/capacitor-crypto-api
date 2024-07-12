@@ -80,6 +80,13 @@ export interface VerifyOptions {
   signature: string;
 }
 
+export interface VerifyResponse {
+  /**
+   * Whether the signature is verified.
+   */
+  verified: boolean;
+}
+
 export interface CryptoApiPlugin {
   /**
    * Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),
@@ -121,5 +128,5 @@ export interface CryptoApiPlugin {
    *
    * @since 1.0.0
    */
-  verify(options: VerifyOptions): Promise<boolean>;
+  verify(options: VerifyOptions): Promise<VerifyResponse>;
 }

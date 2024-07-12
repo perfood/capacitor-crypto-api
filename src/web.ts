@@ -10,6 +10,7 @@ import type {
   SignOptions,
   SignResponse,
   VerifyOptions,
+  VerifyResponse,
 } from './definitions';
 import {
   CRYPTO_API_ECDSA_KEY_ALGORITHM,
@@ -134,7 +135,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     return { signature };
   }
 
-  async verify(options: VerifyOptions): Promise<boolean> {
+  async verify(options: VerifyOptions): Promise<VerifyResponse> {
     console.log('CryptoApi.verify', options);
 
     if (window.location.protocol != 'https:') {
@@ -151,11 +152,13 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       ['verify'],
     );
 
-    return await crypto.subtle.verify(
+    const verified = await crypto.subtle.verify(
       CRYPTO_API_ECDSA_SIGN_ALGORITHM,
       foreignPublicKey,
       derToP1363(base64ToArrayBuffer(options.signature)),
       base64ToArrayBuffer(btoa(options.data)),
     );
+
+    return { verified };
   }
 }
