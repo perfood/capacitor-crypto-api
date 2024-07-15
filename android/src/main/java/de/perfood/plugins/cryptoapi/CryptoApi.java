@@ -21,8 +21,45 @@ import java.security.cert.CertificateException;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CryptoApi {
+
+    public List<String> list() {
+        Log.i("CryptoApi.list", "null");
+
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+
+            ArrayList<String> list = new ArrayList();
+
+            for (String tag : Collections.list(keyStore.aliases())) {
+                if (keyStore.entryInstanceOf(tag, KeyStore.PrivateKeyEntry.class)) {
+                    KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(tag, null);
+                    if (privateKeyEntry.getPrivateKey().getAlgorithm() == KeyProperties.KEY_ALGORITHM_EC) {
+                        list.add(tag);
+                    }
+                }
+            }
+
+            return list;
+        } catch (Error e) {
+            return Collections.emptyList();
+        } catch (CertificateException e) {
+            return Collections.emptyList();
+        } catch (KeyStoreException e) {
+            return Collections.emptyList();
+        } catch (IOException e) {
+            return Collections.emptyList();
+        } catch (NoSuchAlgorithmException e) {
+            return Collections.emptyList();
+        } catch (UnrecoverableEntryException e) {
+            return Collections.emptyList();
+        }
+    }
 
     public String generateKey(String tag) {
         Log.i("CryptoApi.generateKey", tag);

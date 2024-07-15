@@ -3,6 +3,15 @@ import { CryptoApi } from '@perfood/capacitor-crypto-api';
 const API_URL = 'https://localhost:3001';
 
 /**
+ * Loads the key-pair tags.
+ */
+window.list = async () => {
+  console.log('list');
+  const list = await CryptoApi.list();
+  document.getElementById('list').textContent = JSON.stringify(list.list);
+};
+
+/**
  * Creates a key pair for the tag.
  */
 window.createKeyPair = async () => {

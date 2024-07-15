@@ -12,6 +12,37 @@ import CryptoKit
         ])
     }
 
+    @objc public func list() -> [String] {
+        print("CryptoApi.list")
+
+        var list = [String]()
+
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassKey,
+            kSecReturnAttributes as String: true,
+            kSecMatchLimit as String: kSecMatchLimitAll
+        ]
+
+        var result: AnyObject?
+
+        let lastResultCode = withUnsafeMutablePointer(to: &result) {
+            SecItemCopyMatching(query as CFDictionary, UnsafeMutablePointer($0))
+        }
+
+        if lastResultCode == noErr {
+            let array = result as? [[String: Any]]
+
+            for item in array! {
+                if let atag = item[kSecAttrApplicationTag as String] as? Data,
+                   let tag = String(data: atag, encoding: .utf8) {
+                    list.append(tag)
+                }
+            }
+        }
+
+        return list
+    }
+
     @objc public func generateKey(_ tag: String) -> String? {
         print("CryptoApi.generateKey", tag)
 

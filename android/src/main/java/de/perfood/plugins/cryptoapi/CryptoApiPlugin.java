@@ -1,15 +1,28 @@
 package de.perfood.plugins.cryptoapi;
 
+import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import java.util.List;
 
 @CapacitorPlugin(name = "CryptoApi")
 public class CryptoApiPlugin extends Plugin {
 
     private CryptoApi implementation = new CryptoApi();
+
+    @PluginMethod
+    public void list(PluginCall call) {
+        List<String> list = implementation.list();
+
+        JSObject ret = new JSObject();
+        if (list != null) {
+            ret.put("list", new JSArray(list));
+        }
+        call.resolve(ret);
+    }
 
     @PluginMethod
     public void generateKey(PluginCall call) {

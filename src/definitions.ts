@@ -13,6 +13,13 @@ export const CRYPTO_API_ECDSA_SIGN_ALGORITHM = {
   hash: { name: 'SHA-256' },
 };
 
+export interface ListResponse {
+  /**
+   * The key-pair tags.
+   */
+  list: string[];
+}
+
 export interface GenerateKeyOptions {
   /**
    * The key-pair tag.
@@ -88,6 +95,11 @@ export interface VerifyResponse {
 }
 
 export interface CryptoApiPlugin {
+  /**
+   * Returns all key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+   */
+  list(): Promise<ListResponse>;
+
   /**
    * Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),
    * tags it for alter referencing and returns the public-key only,

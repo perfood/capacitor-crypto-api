@@ -5,6 +5,7 @@ import type {
   DeleteKeyOptions,
   GenerateKeyOptions,
   GenerateKeyResponse,
+  ListResponse,
   LoadKeyOptions,
   LoadKeyResponse,
   SignOptions,
@@ -23,7 +24,19 @@ import {
   p1363ToDer,
 } from './utils';
 
+const STORAGE_PREFIX = 'CryptoApiWeb:';
+
 export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
+  async list(): Promise<ListResponse> {
+    console.log('CryptoApi.list');
+
+    return {
+      list: Object.keys(localStorage)
+        .filter(key => key.startsWith(STORAGE_PREFIX))
+        .map(key => key.replace(STORAGE_PREFIX, '')),
+    };
+  }
+
   async generateKey(options: GenerateKeyOptions): Promise<GenerateKeyResponse> {
     console.log('CryptoApi.generateKey', options);
 
@@ -62,7 +75,10 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       publicKey: publicKeyBase64,
     };
 
-    localStorage.setItem(options.tag, JSON.stringify(keyPair));
+    localStorage.setItem(
+      `${STORAGE_PREFIX}${options.tag}`,
+      JSON.stringify(keyPair),
+    );
 
     return {
       publicKey: keyPair.publicKey,
@@ -72,7 +88,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async loadKey(options: LoadKeyOptions): Promise<LoadKeyResponse> {
     console.log('CryptoApi.loadKey', options);
 
-    const item = localStorage.getItem(options.tag);
+    const item = localStorage.getItem(`${STORAGE_PREFIX}${options.tag}`);
     if (!item) {
       return {};
     }
@@ -90,7 +106,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async deleteKey(options: DeleteKeyOptions): Promise<void> {
     console.log('CryptoApi.deleteKey', options);
 
-    localStorage.removeItem(options.tag);
+    localStorage.removeItem(`${STORAGE_PREFIX}${options.tag}`);
   }
 
   async sign(options: SignOptions): Promise<SignResponse> {
@@ -102,7 +118,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       );
     }
 
-    const item = localStorage.getItem(options.tag);
+    const item = localStorage.getItem(`${STORAGE_PREFIX}${options.tag}`);
     if (!item) {
       throw new Error('Key not found');
     }

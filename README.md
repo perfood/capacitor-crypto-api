@@ -41,6 +41,7 @@ npx cap sync
 
 <docgen-index>
 
+* [`list()`](#list)
 * [`generateKey(...)`](#generatekey)
 * [`loadKey(...)`](#loadkey)
 * [`deleteKey(...)`](#deletekey)
@@ -52,6 +53,19 @@ npx cap sync
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
+
+### list()
+
+```typescript
+list() => Promise<ListResponse>
+```
+
+Returns all key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+
+**Returns:** <code>Promise&lt;<a href="#listresponse">ListResponse</a>&gt;</code>
+
+--------------------
+
 
 ### generateKey(...)
 
@@ -154,6 +168,13 @@ Only ECDSA is supported.
 
 
 ### Interfaces
+
+
+#### ListResponse
+
+| Prop       | Type                  | Description        |
+| ---------- | --------------------- | ------------------ |
+| **`list`** | <code>string[]</code> | The key-pair tags. |
 
 
 #### GenerateKeyResponse
