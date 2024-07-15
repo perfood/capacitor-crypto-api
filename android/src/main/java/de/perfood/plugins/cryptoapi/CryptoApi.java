@@ -27,7 +27,7 @@ import java.util.List;
 
 public class CryptoApi {
 
-    public static String LabelECDSA = "CryptoApiECDSA";
+    public static String LabelECDSA = "CryptoApiECDSA:";
 
     public List<String> list() {
         Log.i("CryptoApi.list", "null");
@@ -40,7 +40,7 @@ public class CryptoApi {
 
             for (String tag : Collections.list(keyStore.aliases())) {
                 if (tag.startsWith(CryptoApi.LabelECDSA) && keyStore.entryInstanceOf(tag, KeyStore.PrivateKeyEntry.class)) {
-                    list.add(tag);
+                    list.add(tag.replace(CryptoApi.LabelECDSA, ""));
                 }
             }
 
@@ -69,7 +69,7 @@ public class CryptoApi {
 
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
             keyPairGenerator.initialize(
-                new KeyGenParameterSpec.Builder(tag, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
+                new KeyGenParameterSpec.Builder(CryptoApi.LabelECDSA + tag, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
                     .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                     .setDigests(KeyProperties.DIGEST_SHA256)
                     .build()
@@ -98,7 +98,7 @@ public class CryptoApi {
         try {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
-            keyStore.deleteEntry(tag);
+            keyStore.deleteEntry(CryptoApi.LabelECDSA + tag);
         } catch (Error e) {} catch (CertificateException e) {} catch (KeyStoreException e) {} catch (IOException e) {} catch (
             NoSuchAlgorithmException e
         ) {}
@@ -161,7 +161,7 @@ public class CryptoApi {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
 
-            return (KeyStore.PrivateKeyEntry) keyStore.getEntry(tag, null);
+            return (KeyStore.PrivateKeyEntry) keyStore.getEntry(CryptoApi.LabelECDSA + tag, null);
         } catch (Error e) {
             return null;
         } catch (UnrecoverableEntryException e) {
