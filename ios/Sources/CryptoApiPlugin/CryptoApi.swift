@@ -10,6 +10,7 @@ import CryptoKit
             /* |---> prime256v1  */ 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01,
             /* |-> bit headers   */ 0x07, 0x03, 0x42, 0x00
         ])
+        static let LabelECDSA = "CryptoApiECDSA"
     }
 
     @objc public func list() -> [String] {
@@ -19,24 +20,29 @@ import CryptoKit
 
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,
+            kSecAttrLabel as String: Constants.LabelECDSA,
+            kSecAttrKeyType as String: kSecAttrKeyTypeEC,
             kSecReturnAttributes as String: true,
             kSecMatchLimit as String: kSecMatchLimitAll
         ]
 
         var result: AnyObject?
-
-        let lastResultCode = withUnsafeMutablePointer(to: &result) {
-            SecItemCopyMatching(query as CFDictionary, UnsafeMutablePointer($0))
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        guard status == errSecSuccess else {
+            return list
         }
 
-        if lastResultCode == noErr {
-            let array = result as? [[String: Any]]
+        guard let array = result as? [[String: Any]] else {
+            return list
+        }
 
-            for item in array! {
-                if let atag = item[kSecAttrApplicationTag as String] as? Data,
-                   let tag = String(data: atag, encoding: .utf8) {
-                    list.append(tag)
-                }
+        for item in array {
+            guard let aTag = item[kSecAttrApplicationTag as String] as? Data else {
+                continue
+            }
+
+            if let tag = String(data: aTag, encoding: .utf8) {
+                list.append(tag)
             }
         }
 
@@ -58,6 +64,7 @@ import CryptoKit
             kSecPrivateKeyAttrs as String: [
                 kSecAttrIsPermanent as String: true,
                 kSecAttrApplicationTag as String: tag.data(using: .utf8)!,
+                kSecAttrLabel as String: Constants.LabelECDSA,
                 kSecAttrAccessControl as String: SecAccessControlCreateWithFlags(
                     kCFAllocatorDefault,
                     kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
@@ -102,7 +109,6 @@ import CryptoKit
         var error: Unmanaged<CFError>?
 
         guard let signature = SecKeyCreateSignature(privateKey,
-                                                    // .ecdsaSignatureMessageRFC4754SHA256,
                                                     .ecdsaSignatureMessageX962SHA256,
                                                     data.data(using: .utf8)! as CFData,
                                                     &error) as Data? else {
@@ -139,6 +145,7 @@ import CryptoKit
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: tag.data(using: .utf8)!,
+            kSecAttrLabel as String: Constants.LabelECDSA,
             kSecAttrKeyType as String: kSecAttrKeyTypeEC,
             kSecReturnRef as String: true
         ]

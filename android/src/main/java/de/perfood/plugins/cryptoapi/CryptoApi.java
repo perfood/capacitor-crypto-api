@@ -27,6 +27,8 @@ import java.util.List;
 
 public class CryptoApi {
 
+    public static String LabelECDSA = "CryptoApiECDSA";
+
     public List<String> list() {
         Log.i("CryptoApi.list", "null");
 
@@ -37,11 +39,8 @@ public class CryptoApi {
             ArrayList<String> list = new ArrayList();
 
             for (String tag : Collections.list(keyStore.aliases())) {
-                if (keyStore.entryInstanceOf(tag, KeyStore.PrivateKeyEntry.class)) {
-                    KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(tag, null);
-                    if (privateKeyEntry.getPrivateKey().getAlgorithm() == KeyProperties.KEY_ALGORITHM_EC) {
-                        list.add(tag);
-                    }
+                if (tag.startsWith(CryptoApi.LabelECDSA) && keyStore.entryInstanceOf(tag, KeyStore.PrivateKeyEntry.class)) {
+                    list.add(tag);
                 }
             }
 
@@ -55,8 +54,6 @@ public class CryptoApi {
         } catch (IOException e) {
             return Collections.emptyList();
         } catch (NoSuchAlgorithmException e) {
-            return Collections.emptyList();
-        } catch (UnrecoverableEntryException e) {
             return Collections.emptyList();
         }
     }

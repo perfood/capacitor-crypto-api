@@ -24,7 +24,7 @@ import {
   p1363ToDer,
 } from './utils';
 
-const STORAGE_PREFIX = 'CryptoApiWeb:';
+const LabelECDSA = 'CryptoApiECDSA:';
 
 export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async list(): Promise<ListResponse> {
@@ -32,8 +32,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
 
     return {
       list: Object.keys(localStorage)
-        .filter(key => key.startsWith(STORAGE_PREFIX))
-        .map(key => key.replace(STORAGE_PREFIX, '')),
+        .filter(key => key.startsWith(LabelECDSA))
+        .map(key => key.replace(LabelECDSA, '')),
     };
   }
 
@@ -76,7 +76,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     };
 
     localStorage.setItem(
-      `${STORAGE_PREFIX}${options.tag}`,
+      `${LabelECDSA}${options.tag}`,
       JSON.stringify(keyPair),
     );
 
@@ -88,7 +88,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async loadKey(options: LoadKeyOptions): Promise<LoadKeyResponse> {
     console.log('CryptoApi.loadKey', options);
 
-    const item = localStorage.getItem(`${STORAGE_PREFIX}${options.tag}`);
+    const item = localStorage.getItem(`${LabelECDSA}${options.tag}`);
     if (!item) {
       return {};
     }
@@ -106,7 +106,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async deleteKey(options: DeleteKeyOptions): Promise<void> {
     console.log('CryptoApi.deleteKey', options);
 
-    localStorage.removeItem(`${STORAGE_PREFIX}${options.tag}`);
+    localStorage.removeItem(`${LabelECDSA}${options.tag}`);
   }
 
   async sign(options: SignOptions): Promise<SignResponse> {
@@ -118,7 +118,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       );
     }
 
-    const item = localStorage.getItem(`${STORAGE_PREFIX}${options.tag}`);
+    const item = localStorage.getItem(`${LabelECDSA}${options.tag}`);
     if (!item) {
       throw new Error('Key not found');
     }
