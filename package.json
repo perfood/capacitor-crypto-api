@@ -1,6 +1,6 @@
 {
   "name": "@perfood/capacitor-crypto-api",
-  "version": "0.0.1",
+  "version": "1.0.0-0",
   "description": "Capacitor plugin that uses Secure Enclave (iOS) or StrongBox/TEE (Android) to generate key-pairs and sign data.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
