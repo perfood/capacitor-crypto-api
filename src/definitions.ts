@@ -13,6 +13,13 @@ export const CRYPTO_API_ECDSA_SIGN_ALGORITHM = {
   hash: { name: 'SHA-256' },
 };
 
+
+export const CRYPTO_API_AES_GCM_ALGORITHM = "AES-GCM";
+
+export const CRYPTO_API_ECDH_ALGORITHM = "ECDH";
+
+export const SECRET_KEY_LENGHT = 256;
+
 export interface ListResponse {
   /**
    * The key-pair tags.
@@ -141,4 +148,19 @@ export interface CryptoApiPlugin {
    * @since 1.0.0
    */
   verify(options: VerifyOptions): Promise<VerifyResponse>;
+
+  /**
+   * Derive a Shared Secret with ECDH (Elliptic Curve Diffie-Hellman).
+   */
+  deriveSecret(privateKey: CryptoKey, publicKey: CryptoKey): Promise<CryptoKey>;
+
+  /**
+   * Encrypt data with AES-GCM.
+   */
+  encrypt(secret: CryptoKey, data: string): Promise<Uint8Array>;
+  
+  /**
+   * Decrypt data with AES-GCM.
+   */
+  decrypt(secret: CryptoKey, encryptedData: Uint8Array): Promise<string>;
 }

@@ -14,8 +14,11 @@ import type {
   VerifyResponse,
 } from './definitions';
 import {
+  CRYPTO_API_AES_GCM_ALGORITHM,
+  CRYPTO_API_ECDH_ALGORITHM,
   CRYPTO_API_ECDSA_KEY_ALGORITHM,
   CRYPTO_API_ECDSA_SIGN_ALGORITHM,
+  SECRET_KEY_LENGHT,
 } from './definitions';
 import {
   arrayBufferToBase64,
@@ -176,5 +179,54 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     );
 
     return { verified };
+  }
+
+  async deriveSecret(privateKey: CryptoKey, publicKey: CryptoKey): Promise<CryptoKey> {
+    const sharedSecret = await crypto.subtle.deriveKey(
+        {
+            name: CRYPTO_API_ECDH_ALGORITHM,
+            public: publicKey,
+        },
+        privateKey,
+        {
+          name: CRYPTO_API_AES_GCM_ALGORITHM,
+          length: SECRET_KEY_LENGHT, 
+        },
+        false,
+        ["encrypt", "decrypt"]
+    );
+    return sharedSecret;
+  }
+
+  async encrypt(secret: CryptoKey, data: string): Promise<Uint8Array> {
+    const iv = crypto.getRandomValues(new Uint8Array(12)); 
+    const arrayBuffer = base64ToArrayBuffer(data); 
+
+    const encryptedData = await crypto.subtle.encrypt(
+        {
+            name: CRYPTO_API_AES_GCM_ALGORITHM,
+            iv: iv,
+        },
+        secret,
+        arrayBuffer
+    );
+
+    return new Uint8Array([...iv, ...new Uint8Array(encryptedData)]); // combine IV and encrypted data
+  }
+
+  async decrypt(secret: CryptoKey, encryptedData: Uint8Array): Promise<string> {
+    const iv = encryptedData.slice(0, 12); 
+    const data = encryptedData.slice(12);
+
+    const decryptedData = await crypto.subtle.decrypt(
+        {
+            name:CRYPTO_API_AES_GCM_ALGORITHM,
+            iv: iv,
+        },
+        secret,
+        data
+    );
+
+    return arrayBufferToBase64(decryptedData);
   }
 }
