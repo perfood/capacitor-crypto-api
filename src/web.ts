@@ -18,6 +18,7 @@ import {
   CRYPTO_API_ECDH_ALGORITHM,
   CRYPTO_API_ECDSA_KEY_ALGORITHM,
   CRYPTO_API_ECDSA_SIGN_ALGORITHM,
+  IV_LENGTH,
   SECRET_KEY_LENGHT,
 } from './definitions';
 import {
@@ -199,7 +200,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   }
 
   async encrypt(secret: CryptoKey, data: string): Promise<Uint8Array> {
-    const iv = crypto.getRandomValues(new Uint8Array(12)); 
+    const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH)); 
     const arrayBuffer = base64ToArrayBuffer(data); 
 
     const encryptedData = await crypto.subtle.encrypt(
@@ -215,8 +216,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   }
 
   async decrypt(secret: CryptoKey, encryptedData: Uint8Array): Promise<string> {
-    const iv = encryptedData.slice(0, 12); 
-    const data = encryptedData.slice(12);
+    const iv = encryptedData.slice(0, IV_LENGTH); 
+    const data = encryptedData.slice(IV_LENGTH);
 
     const decryptedData = await crypto.subtle.decrypt(
         {

@@ -20,6 +20,8 @@ export const CRYPTO_API_ECDH_ALGORITHM = "ECDH";
 
 export const SECRET_KEY_LENGHT = 256;
 
+export const IV_LENGTH = 12;
+
 export interface ListResponse {
   /**
    * The key-pair tags.
