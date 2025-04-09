@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { CryptoApi } from '@perfood/capacitor-crypto-api';
 
 const API_URL = 'https://localhost:3001';
@@ -51,17 +52,12 @@ window.registerPublicKey = async () => {
       publicKey,
     }),
   })
-    .then(response =>
-      response.ok ? response.json() : Promise.reject(response),
-    )
-    .then(data => {
-      document.getElementById('registered').textContent = data.success
-        ? 'registered'
-        : 'not registered';
+    .then((response) => (response.ok ? response.json() : Promise.reject(response)))
+    .then((data) => {
+      document.getElementById('registered').textContent = data.success ? 'registered' : 'not registered';
     })
-    .catch(error => {
-      document.getElementById('registered').textContent =
-        error.statusText || error;
+    .catch((error) => {
+      document.getElementById('registered').textContent = error.statusText || error;
     });
 };
 
@@ -85,13 +81,11 @@ window.getChallenge = async () => {
       tag,
     }),
   })
-    .then(response =>
-      response.ok ? response.json() : Promise.reject(response),
-    )
-    .then(data => {
+    .then((response) => (response.ok ? response.json() : Promise.reject(response)))
+    .then((data) => {
       document.getElementById('challenge').value = data.challenge;
     })
-    .catch(error => {
+    .catch((error) => {
       document.getElementById('challenge').value = error.statusText || error;
     });
 };
@@ -147,14 +141,11 @@ window.verify = async () => {
       signature,
     }),
   })
-    .then(response =>
-      response.ok ? response.json() : Promise.reject(response),
-    )
-    .then(data => {
+    .then((response) => (response.ok ? response.json() : Promise.reject(response)))
+    .then((data) => {
       document.getElementById('verifiedServer').textContent = data.verified;
     })
-    .catch(error => {
-      document.getElementById('verifiedServer').textContent =
-        error.statusText || error;
+    .catch((error) => {
+      document.getElementById('verifiedServer').textContent = error.statusText || error;
     });
 };

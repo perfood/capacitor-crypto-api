@@ -13,16 +13,8 @@ import type {
   VerifyOptions,
   VerifyResponse,
 } from './definitions';
-import {
-  CRYPTO_API_ECDSA_KEY_ALGORITHM,
-  CRYPTO_API_ECDSA_SIGN_ALGORITHM,
-} from './definitions';
-import {
-  arrayBufferToBase64,
-  base64ToArrayBuffer,
-  derToP1363,
-  p1363ToDer,
-} from './utils';
+import { CRYPTO_API_ECDSA_KEY_ALGORITHM, CRYPTO_API_ECDSA_SIGN_ALGORITHM } from './definitions';
+import { arrayBufferToBase64, base64ToArrayBuffer, derToP1363, p1363ToDer } from './utils';
 
 const LabelECDSA = 'CryptoApiECDSA:';
 
@@ -32,8 +24,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
 
     return {
       list: Object.keys(localStorage)
-        .filter(key => key.startsWith(LabelECDSA))
-        .map(key => key.replace(LabelECDSA, '')),
+        .filter((key) => key.startsWith(LabelECDSA))
+        .map((key) => key.replace(LabelECDSA, '')),
     };
   }
 
@@ -41,9 +33,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     console.log('CryptoApi.generateKey', options);
 
     if (window.location.protocol != 'https:') {
-      throw new Error(
-        'WebCrypto API is only available in secure contexts (https)',
-      );
+      throw new Error('WebCrypto API is only available in secure contexts (https)');
     }
 
     const { publicKey: publicKeyFound } = await this.loadKey({
@@ -55,11 +45,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       };
     }
 
-    const subtleKeyPair = await crypto.subtle.generateKey(
-      CRYPTO_API_ECDSA_KEY_ALGORITHM,
-      true,
-      ['sign', 'verify'],
-    );
+    const subtleKeyPair = await crypto.subtle.generateKey(CRYPTO_API_ECDSA_KEY_ALGORITHM, true, ['sign', 'verify']);
 
     const privateKey = subtleKeyPair.privateKey;
     const publicKey = subtleKeyPair.publicKey;
@@ -75,10 +61,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       publicKey: publicKeyBase64,
     };
 
-    localStorage.setItem(
-      `${LabelECDSA}${options.tag}`,
-      JSON.stringify(keyPair),
-    );
+    localStorage.setItem(`${LabelECDSA}${options.tag}`, JSON.stringify(keyPair));
 
     return {
       publicKey: keyPair.publicKey,
@@ -113,9 +96,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     console.log('CryptoApi.sign', options);
 
     if (window.location.protocol != 'https:') {
-      throw new Error(
-        'WebCrypto API is only available in secure contexts (https)',
-      );
+      throw new Error('WebCrypto API is only available in secure contexts (https)');
     }
 
     const item = localStorage.getItem(`${LabelECDSA}${options.tag}`);
@@ -155,9 +136,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     console.log('CryptoApi.verify', options);
 
     if (window.location.protocol != 'https:') {
-      throw new Error(
-        'WebCrypto API is only available in secure contexts (https)',
-      );
+      throw new Error('WebCrypto API is only available in secure contexts (https)');
     }
 
     const foreignPublicKey = await crypto.subtle.importKey(

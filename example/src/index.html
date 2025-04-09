@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" dir="ltr" class="hydrated">
   <head>
     <meta charset="UTF-8" />
@@ -25,13 +25,10 @@
     <main>
       <h1>capacitor-crypto-api example</h1>
       <p>
-        This example demonstrates a simple 2-factor-authentication mechanism.
-        The client creates a key-pair and registers the public-key with the
-        server. The server creates a challenge and sends it to the client. The
-        client signs the challenge with the private-key and sends the signed
-        data back to the server. The server can then verify the signature of the
-        data with the public-key and be sure that the data was signed by the
-        private-key.
+        This example demonstrates a simple 2-factor-authentication mechanism. The client creates a key-pair and
+        registers the public-key with the server. The server creates a challenge and sends it to the client. The client
+        signs the challenge with the private-key and sends the signed data back to the server. The server can then
+        verify the signature of the data with the public-key and be sure that the data was signed by the private-key.
       </p>
 
       <h2>key-pairs</h2>
@@ -46,21 +43,13 @@
 
       <h3>public-key</h3>
       <code id="publicKey"></code>
-      <button onclick="registerPublicKey()">
-        register public-key with server
-      </button>
+      <button onclick="registerPublicKey()">register public-key with server</button>
       <code id="registered"></code>
 
       <h2>sign / verify</h2>
 
       <h3>sign challenge</h3>
-      <input
-        type="text"
-        id="challenge"
-        name="challenge"
-        placeholder="challenge"
-        readonly
-      />
+      <input type="text" id="challenge" name="challenge" placeholder="challenge" readonly />
       <button onclick="getChallenge()">get challenge</button>
       <button onclick="sign()">sign challenge</button>
 
