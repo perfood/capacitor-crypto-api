@@ -2,7 +2,11 @@ import { WebPlugin } from '@capacitor/core';
 
 import type {
   CryptoApiPlugin,
+  DecryptOptions,
+  DecryptResponse,
   DeleteKeyOptions,
+  EncryptOptions,
+  EncryptResponse,
   GenerateKeyOptions,
   GenerateKeyResponse,
   ListResponse,
@@ -11,7 +15,7 @@ import type {
   SignOptions,
   SignResponse,
   VerifyOptions,
-  VerifyResponse,
+  VerifyResponse
 } from './definitions';
 import {
   CRYPTO_API_AES_GCM_ALGORITHM,
@@ -19,6 +23,8 @@ import {
   CRYPTO_API_ECDSA_KEY_ALGORITHM,
   CRYPTO_API_ECDSA_SIGN_ALGORITHM,
   IV_LENGTH,
+  PRIVATE_KEY_FORMAT,
+  PUBLIC_KEY_FORMAT,
   SECRET_KEY_LENGHT,
 } from './definitions';
 import {
@@ -68,8 +74,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     const privateKey = subtleKeyPair.privateKey;
     const publicKey = subtleKeyPair.publicKey;
 
-    const privateKeyPkcs8 = await crypto.subtle.exportKey('pkcs8', privateKey);
-    const publicKeySpki = await crypto.subtle.exportKey('spki', publicKey);
+    const privateKeyPkcs8 = await crypto.subtle.exportKey(PRIVATE_KEY_FORMAT, privateKey);
+    const publicKeySpki = await crypto.subtle.exportKey(PUBLIC_KEY_FORMAT, publicKey);
 
     const privateKeyBase64 = arrayBufferToBase64(privateKeyPkcs8);
     const publicKeyBase64 = arrayBufferToBase64(publicKeySpki);
@@ -132,13 +138,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       throw new Error('Private key not found');
     }
 
-    const privateKey = await crypto.subtle.importKey(
-      'pkcs8',
-      base64ToArrayBuffer(keyPair.privateKey),
-      CRYPTO_API_ECDSA_KEY_ALGORITHM,
-      false,
-      ['sign'],
-    );
+    const privateKey = await this.importKey(PRIVATE_KEY_FORMAT, keyPair.privateKey, ['sign'])
 
     const signature = arrayBufferToBase64(
       p1363ToDer(
@@ -164,13 +164,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       );
     }
 
-    const foreignPublicKey = await crypto.subtle.importKey(
-      'spki',
-      base64ToArrayBuffer(options.foreignPublicKey),
-      CRYPTO_API_ECDSA_KEY_ALGORITHM,
-      false,
-      ['verify'],
-    );
+    const foreignPublicKey = await this.importKey(PUBLIC_KEY_FORMAT, options.foreignPublicKey, ['verify']);
 
     const verified = await crypto.subtle.verify(
       CRYPTO_API_ECDSA_SIGN_ALGORITHM,
@@ -182,7 +176,65 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     return { verified };
   }
 
-  async deriveSecret(privateKey: CryptoKey, publicKey: CryptoKey): Promise<CryptoKey> {
+  async encrypt(options: EncryptOptions): Promise<EncryptResponse> {
+    const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH)); 
+    const arrayBuffer = base64ToArrayBuffer(options.data); 
+    const secretKey = await this.deriveSecret(options.tag)
+
+    const encryptedData = await crypto.subtle.encrypt(
+        {
+            name: CRYPTO_API_AES_GCM_ALGORITHM,
+            iv: iv,
+        },
+        secretKey,
+        arrayBuffer
+    );
+
+    const encrypted = JSON.stringify({
+      iv, 
+      encryptedData: encryptedData
+    })
+
+    return { encrypted }
+  }
+
+  async decrypt(options: DecryptOptions): Promise<DecryptResponse> {
+    const data = JSON.parse(options.data)
+    const secretKey = await this.deriveSecret(options.tag)
+
+    const decryptedData = await crypto.subtle.decrypt(
+        {
+            name:CRYPTO_API_AES_GCM_ALGORITHM,
+            iv: data.iv,
+        },
+        secretKey,
+        data.encryptedData
+    );
+    const decrypted = arrayBufferToBase64(decryptedData);
+
+    return { decrypted }
+  }
+
+  private async importKey(format: "pkcs8" | "spki", privateKeyBase64: string, keyUsages: KeyUsage[]): Promise<CryptoKey> {
+    const keyData = base64ToArrayBuffer(privateKeyBase64);
+    return crypto.subtle.importKey(
+      format, 
+      keyData,
+      CRYPTO_API_ECDSA_KEY_ALGORITHM,
+      false,
+      keyUsages
+    );
+  }
+
+  private async deriveSecret(tag: string): Promise<CryptoKey> {
+    const item = localStorage.getItem(`${LabelECDSA}${tag}`);
+    if (!item) {
+      throw new Error('Key not found');
+    }
+    const keyPair = JSON.parse(item);
+    const privateKey = await this.importKey(PRIVATE_KEY_FORMAT, keyPair.privateKey, ['deriveKey']);
+    const publicKey = await this.importKey(PUBLIC_KEY_FORMAT, keyPair.publicKey, ['deriveKey']);
+
     const sharedSecret = await crypto.subtle.deriveKey(
         {
             name: CRYPTO_API_ECDH_ALGORITHM,
@@ -193,41 +245,9 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
           name: CRYPTO_API_AES_GCM_ALGORITHM,
           length: SECRET_KEY_LENGHT, 
         },
-        false,
+        true,
         ["encrypt", "decrypt"]
     );
     return sharedSecret;
-  }
-
-  async encrypt(secret: CryptoKey, data: string): Promise<Uint8Array> {
-    const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH)); 
-    const arrayBuffer = base64ToArrayBuffer(data); 
-
-    const encryptedData = await crypto.subtle.encrypt(
-        {
-            name: CRYPTO_API_AES_GCM_ALGORITHM,
-            iv: iv,
-        },
-        secret,
-        arrayBuffer
-    );
-
-    return new Uint8Array([...iv, ...new Uint8Array(encryptedData)]); // combine IV and encrypted data
-  }
-
-  async decrypt(secret: CryptoKey, encryptedData: Uint8Array): Promise<string> {
-    const iv = encryptedData.slice(0, IV_LENGTH); 
-    const data = encryptedData.slice(IV_LENGTH);
-
-    const decryptedData = await crypto.subtle.decrypt(
-        {
-            name:CRYPTO_API_AES_GCM_ALGORITHM,
-            iv: iv,
-        },
-        secret,
-        data
-    );
-
-    return arrayBufferToBase64(decryptedData);
   }
 }

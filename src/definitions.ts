@@ -14,6 +14,10 @@ export const CRYPTO_API_ECDSA_SIGN_ALGORITHM = {
 };
 
 
+export const PRIVATE_KEY_FORMAT = "pkcs8";
+
+export const PUBLIC_KEY_FORMAT = "spki";
+
 export const CRYPTO_API_AES_GCM_ALGORITHM = "AES-GCM";
 
 export const CRYPTO_API_ECDH_ALGORITHM = "ECDH";
@@ -103,6 +107,43 @@ export interface VerifyResponse {
   verified: boolean;
 }
 
+export interface EncryptOptions {
+  /**
+   * The key-pair tag.
+   */
+  tag: string;
+  /**
+   * The data to be encrypted.
+   */
+  data: string;
+}
+
+export interface EncryptResponse {
+  /**
+   * JSON string which includes iv and encrypted data.
+   */
+  encrypted: string;
+}
+
+export interface DecryptOptions {
+  /**
+   * The key-pair tag.
+   */
+  tag: string;
+  /**
+   * The encrypted data to be decrypted.
+   */
+  data: string;
+}
+
+export interface DecryptResponse {
+  /**
+   * Decrypted data.
+   */
+  decrypted: string;
+}
+
+
 export interface CryptoApiPlugin {
   /**
    * Returns all key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
@@ -152,17 +193,12 @@ export interface CryptoApiPlugin {
   verify(options: VerifyOptions): Promise<VerifyResponse>;
 
   /**
-   * Derive a Shared Secret with ECDH (Elliptic Curve Diffie-Hellman).
-   */
-  deriveSecret(privateKey: CryptoKey, publicKey: CryptoKey): Promise<CryptoKey>;
-
-  /**
    * Encrypt data with AES-GCM.
    */
-  encrypt(secret: CryptoKey, data: string): Promise<Uint8Array>;
+  encrypt(options: EncryptOptions): Promise<EncryptResponse>;
   
   /**
    * Decrypt data with AES-GCM.
    */
-  decrypt(secret: CryptoKey, encryptedData: Uint8Array): Promise<string>;
+  decrypt(options: DecryptOptions): Promise<DecryptResponse>;
 }
