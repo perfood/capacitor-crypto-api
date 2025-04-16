@@ -9,6 +9,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
+import java.security.KeyAgreement;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -28,6 +29,10 @@ import java.util.List;
 public class CryptoApi {
 
     public static String LabelECDSA = "CryptoApiECDSA:";
+    private static final String AES_MODE = "AES/GCM/NoPadding";
+    private static final int IV_LENGTH = 12; // 96 bits for GCM
+    private static final int GCM_TAG_LENGTH = 128; // bits
+
 
     public List<String> list() {
         Log.i("CryptoApi.list", "null");
@@ -156,6 +161,78 @@ public class CryptoApi {
         }
     }
 
+    public String encrypt(String base64Data, String tag) {
+        Log.i("CryptoApi.encrypt", base64Data + " " + tag);
+
+        try {
+            SecretKey secretKey = this.deriveSecret(tag);
+
+            byte[] iv = new byte[IV_LENGTH];
+            SecureRandom secureRandom = new SecureRandom();
+            secureRandom.nextBytes(iv);
+
+            byte[] plaintext = Base64.getDecoder().decode(base64Data);
+            Cipher cipher = Cipher.getInstance(AES_MODE);
+            GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec);
+            byte[] encrypted = cipher.doFinal(plaintext);
+
+            JSONObject result = new JSONObject();
+            result.put("iv", Base64.encodeToString(iv, Base64.DEFAULT));
+            result.put("encryptedData", Base64.encodeToString(encrypted, Base64.DEFAULT));
+            
+            return result.toString();
+        } catch (NoSuchAlgorithmException e) {
+            Log.e("CryptoApi.encrypt", "NoSuchAlgorithmException", e);
+        } catch (InvalidKeyException e) {
+            Log.e("CryptoApi.encrypt", "InvalidKeyException", e);
+        } catch (InvalidAlgorithmParameterException e) {
+            Log.e("CryptoApi.encrypt", "InvalidAlgorithmParameterException", e);
+        } catch (JSONException e) {
+            Log.e("CryptoApi.encrypt", "JSONException", e);
+        } catch (Exception e) {
+            Log.e("CryptoApi.encrypt", "Unexpected exception", e);
+        } 
+
+        return null;
+    }
+
+    public String decrypt(String encryptedJson, String tag) {
+        Log.i("CryptoApi.decrypt", encryptedJson + " " + tag);
+
+        try {
+            SecretKey secretKey = this.deriveSecret(tag);
+
+            JSONObject json = new JSONObject(encryptedJson);
+            String ivBase64 = json.getString("iv");
+            String encryptedDataBase64 = json.getString("encryptedData");
+
+            byte[] iv = Base64.getDecoder().decode(ivBase64);
+            byte[] encryptedData = Base64.getDecoder().decode(encryptedDataBase64);
+
+            Cipher cipher = Cipher.getInstance(AES_MODE);
+            GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec);
+            byte[] decryptedBytes = cipher.doFinal(encryptedData);
+
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
+
+        } catch (NoSuchAlgorithmException e) {
+            Log.e("CryptoApi.decrypt", "NoSuchAlgorithmException", e);
+        } catch (InvalidKeyException e) {
+            Log.e("CryptoApi.decrypt", "InvalidKeyException", e);
+        } catch (InvalidAlgorithmParameterException e) {
+            Log.e("CryptoApi.decrypt", "InvalidAlgorithmParameterException", e);
+        } catch (JSONException e) {
+            Log.e("CryptoApi.decrypt", "JSONException", e);
+        } catch (Exception e) {
+            Log.e("CryptoApi.decrypt", "Unexpected exception", e);
+        }
+
+        return null;
+    }
+
+
     private KeyStore.PrivateKeyEntry getPrivateKeyEntry(String tag) {
         try {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
@@ -202,5 +279,33 @@ public class CryptoApi {
         } catch (InvalidKeySpecException e) {
             return null;
         }
+    }
+
+    private SecretKey deriveSecret(String tag) {
+        Log.i("CryptoApi.deriveSecret", publicKeyBase64 + " " + privateKeyBase64);
+
+        try {
+            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag);
+            PublicKey publicKey = entry.getCertificate().getPublicKey();
+            PublicKey privateKey = entry.getPrivateKey();
+
+            KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH");
+            keyAgreement.init(privateKey);
+            keyAgreement.doPhase(publicKey, true);
+
+            byte[] sharedSecret = keyAgreement.generateSecret();
+            byte[] rawKey = Arrays.copyOf(sharedSecret, 32); // 256-bit key
+            SecretKey secretKey = new SecretKeySpec(rawKey, "AES");
+
+            return secretKey;
+        } catch (NoSuchAlgorithmException e) {
+            Log.e("CryptoApi.deriveSecret", "NoSuchAlgorithmException", e);
+        } catch (InvalidKeyException e) {
+            Log.e("CryptoApi.deriveSecret", "InvalidKeyException", e);
+        } catch (Exception e) {
+            Log.e("CryptoApi.deriveSecret", "Unexpected exception", e);
+        }
+
+        return null;
     }
 }

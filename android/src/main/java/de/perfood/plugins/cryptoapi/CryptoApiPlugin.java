@@ -85,4 +85,29 @@ public class CryptoApiPlugin extends Plugin {
         ret.put("verified", verified);
         call.resolve(ret);
     }
+
+    @PluginMethod
+    public void encrypt(PluginCall call) {
+        String data = call.getString("data");
+        String tag = call.getString("tag");
+
+        String encrypted = implementation.encrypt(data, tag);
+
+        JSObject ret = new JSObject();
+        ret.put("encrypted", encrypted);
+        call.resolve(ret);
+    }  
+
+    @PluginMethod
+    public void decrypt(PluginCall call) {
+        String data = call.getString("data");
+        String tag = call.getString("tag");
+
+        String decrypted = implementation.decrypt(data, tag);
+
+        JSObject ret = new JSObject();
+        ret.put("decrypted", decrypted);
+        call.resolve(ret);
+    }  
+
 }
