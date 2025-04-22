@@ -191,16 +191,27 @@ import CryptoKit
         return String(data: decryptedData, encoding: .utf8)
     }
 
-    @objc private func deriveSecret(_ tag: String) -> SymmetricKey {
-        guard let secPrivateKey = getPrivateKey(tag) else {
-            return nil
-        }
-        
-        guard let publicKeyData = getPublicKeyData(tag) else {
-            return nil
+    @objc private func deriveSecret(_ tag: String) -> SymmetricKey? {
+        guard let secPrivateKey = getPrivateKey(tag),
+            let publicKeyData = getPublicKeyData(tag) else {
+
+            generateKey(tag: tag)
+
+            // Try again
+            guard let secPrivateKey = getPrivateKey(tag),
+                let publicKeyData = getPublicKeyData(tag) else {
+                print("CryptoApi.deriveSecret: Key generation failed or keys still missing for tag: \(tag)")
+                return nil
+            }
+
+            return try deriveSecretFromRawKeys(privateKeyData: secPrivateKey, publicKeyData: publicKeyData)
         }
 
-        let privateKey = try P256.KeyAgreement.PrivateKey(rawRepresentation: secPrivateKey)
+        return try deriveSecretFromRawKeys(privateKeyData: secPrivateKey, publicKeyData: publicKeyData)
+    }
+
+    @objc private func deriveSecretFromRawKeys(privateKeyData: Data, publicKeyData: Data) throws -> SymmetricKey {
+        let privateKey = try P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
         let remotePublicKey = try P256.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
 
         let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: remotePublicKey)
