@@ -286,8 +286,15 @@ public class CryptoApi {
 
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag);
-            PublicKey publicKey = entry.getCertificate().getPublicKey();
-            PublicKey privateKey = entry.getPrivateKey();
+
+            if (privateKeyEntry == null) {
+                Log.i("CryptoApi.deriveSecret", "No private key entry found for tag. Generating new one...");
+                this.generateKey(tag);
+                privateKeyEntry = this.getPrivateKeyEntry(tag);
+            }
+
+            PrivateKey privateKey = privateKeyEntry.getPrivateKey();
+            PublicKey publicKey = privateKeyEntry.getCertificate().getPublicKey();
 
             KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH");
             keyAgreement.init(privateKey);
@@ -295,9 +302,8 @@ public class CryptoApi {
 
             byte[] sharedSecret = keyAgreement.generateSecret();
             byte[] rawKey = Arrays.copyOf(sharedSecret, 32); // 256-bit key
-            SecretKey secretKey = new SecretKeySpec(rawKey, "AES");
 
-            return secretKey;
+            return new SecretKeySpec(rawKey, "AES");
         } catch (NoSuchAlgorithmException e) {
             Log.e("CryptoApi.deriveSecret", "NoSuchAlgorithmException", e);
         } catch (InvalidKeyException e) {
