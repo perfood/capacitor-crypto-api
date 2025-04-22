@@ -177,6 +177,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   }
 
   async encrypt(options: EncryptOptions): Promise<EncryptResponse> {
+    console.log('CryptoApi.encrypt', options);
+
     const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH)); 
     const arrayBuffer = base64ToArrayBuffer(options.data); 
     const secretKey = await this.deriveSecret(options.tag)
@@ -199,6 +201,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   }
 
   async decrypt(options: DecryptOptions): Promise<DecryptResponse> {
+    console.log('CryptoApi.decrypt', options);
+
     const data = JSON.parse(options.data)
     const secretKey = await this.deriveSecret(options.tag)
 
@@ -227,9 +231,14 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   }
 
   private async deriveSecret(tag: string): Promise<CryptoKey> {
-    const item = localStorage.getItem(`${LabelECDSA}${tag}`);
+    let item = localStorage.getItem(`${LabelECDSA}${tag}`);
     if (!item) {
-      throw new Error('Key not found');
+      await this.generateKey({tag})
+      item = localStorage.getItem(`${LabelECDSA}${tag}`);
+
+      if(!item){
+        throw new Error('CryptoApi.deriveSecret - Failed to generate new key pair.');
+      }
     }
     const keyPair = JSON.parse(item);
     const privateKey = await this.importKey(PRIVATE_KEY_FORMAT, keyPair.privateKey, ['deriveKey']);
