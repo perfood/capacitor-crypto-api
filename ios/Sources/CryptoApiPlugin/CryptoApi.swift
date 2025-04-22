@@ -141,6 +141,80 @@ import CryptoKit
         return true
     }
 
+    @objc private func encrypt(base64Data: String, tag: String) -> String? {
+        print("CryptoApi.encrypt", base64Data, tag)
+
+        let symmetricKey = deriveSecret(tag)
+
+        guard let plaintextData = Data(base64Encoded: base64Data) else {
+            print("CryptoApi.encrypt: Invalid base64 input")
+            return nil
+        }
+
+        let iv = AES.GCM.Nonce()
+        let sealedBox = try AES.GCM.seal(plaintextData, using: symmetricKey, nonce: iv)
+        let resultDict: [String: String] = [
+            "iv": iv.withUnsafeBytes { Data($0).base64EncodedString() },
+            "encryptedData": sealedBox.ciphertext.base64EncodedString() + sealedBox.tag.base64EncodedString()
+        ]
+        let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
+
+        return String(data: jsonData, encoding: .utf8)
+    }
+
+    @objc private func decrypt(encryptedJson: String, tag: String) -> String? {
+        print("CryptoApi.decrypt: \(encryptedJson) \(tag)")
+
+        guard let jsonData = encryptedJson.data(using: .utf8),
+            let json = try JSONSerialization.jsonObject(with: jsonData) as? [String: String],
+            let ivBase64 = json["iv"],
+            let combinedBase64 = json["encryptedData"],
+            let ivData = Data(base64Encoded: ivBase64),
+            let combinedData = Data(base64Encoded: combinedBase64) else {
+            print("CryptoApi.decrypt: Failed to parse JSON or Base64 decode")
+            return nil
+        }
+
+        let tagLength = 16
+        guard combinedData.count > tagLength else {
+            print("CryptoApi.decrypt: Combined data too short")
+            return nil
+        }
+        let ciphertext = combinedData.prefix(combinedData.count - tagLength)
+        let tag = combinedData.suffix(tagLength)
+
+        let symmetricKey = try deriveSecret(tag)
+        let nonce = try AES.GCM.Nonce(data: ivData)
+        let sealedBox = try AES.GCM.SealedBox(nonce, ciphertext, tag)
+        let decryptedData = try AES.GCM.open(sealedBox, using: symmetricKey)
+
+        return String(data: decryptedData, encoding: .utf8)
+    }
+
+    @objc private func deriveSecret(_ tag: String) -> SymmetricKey {
+        guard let secPrivateKey = getPrivateKey(tag) else {
+            return nil
+        }
+        
+        guard let publicKeyData = getPublicKeyData(tag) else {
+            return nil
+        }
+
+        let privateKey = try P256.KeyAgreement.PrivateKey(rawRepresentation: secPrivateKey)
+        let remotePublicKey = try P256.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
+
+        let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: remotePublicKey)
+        let symmetricKey = sharedSecret.hkdfDerivedSymmetricKey(
+            using: SHA256.self,
+            salt: Data(),
+            sharedInfo: Data(),
+            outputByteCount: 32
+        )
+
+        return symmetricKey
+    }
+
+
     @objc private func getPrivateKey(_ tag: String) -> SecKey? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,
@@ -160,6 +234,18 @@ import CryptoKit
     }
 
     @objc private func getPublicKeyBase64(_ tag: String) -> String? {
+        guard let publicKeyData = getPublicKeyData(tag) else {
+            return nil
+        }
+        
+        var ecPublicKey = Data()
+        ecPublicKey.append(Data(Constants.ECHeader))
+        ecPublicKey.append(publicKeyData)
+
+        return ecPublicKey.base64EncodedString()
+    }
+
+    @objc private func getPublicKeyData(_ tag: String) -> Data? {
         guard let privateKey = getPrivateKey(tag) else {
             return nil
         }
@@ -173,11 +259,7 @@ import CryptoKit
             return nil
         }
 
-        var ecPublicKey = Data()
-        ecPublicKey.append(Data(Constants.ECHeader))
-        ecPublicKey.append(publicKeyData as Data)
-
-        return ecPublicKey.base64EncodedString()
+       return publicKeyData as Data;
     }
 
     @objc private func loadPublicKeyFromBase64(_ publicKeyBase64: String) -> SecKey? {

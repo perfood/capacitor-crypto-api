@@ -89,4 +89,26 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
             "verified": verified
         ])
     }
+
+    @objc func encrypt(_ call: CAPPluginCall) {
+        let data = call.getString("data") ?? ""
+        let tag = call.getString("tag") ?? ""
+
+        let encrypted = implementation.encrypt(data, tag)
+
+        call.resolve([
+            "encrypted": encrypted
+        ])
+    }
+
+    @objc func decrypt(_ call: CAPPluginCall) {
+        let data = call.getString("data") ?? ""
+        let tag = call.getString("tag") ?? ""
+
+        let decrypted = implementation.decrypt(data, tag)
+
+        call.resolve([
+            "decrypted": decrypted
+        ])
+    }
 }
