@@ -13,6 +13,14 @@ export const CRYPTO_API_ECDSA_SIGN_ALGORITHM = {
   hash: { name: 'SHA-256' },
 };
 
+/**
+ * ECDH key algorithm.
+ */
+export const CRYPTO_API_ECDH_KEY_ALGORITHM = {
+  name: 'ECDH',
+  namedCurve: 'P-256',
+};
+
 
 export const PRIVATE_KEY_FORMAT = "pkcs8";
 
@@ -38,6 +46,10 @@ export interface GenerateKeyOptions {
    * The key-pair tag.
    */
   tag: string;
+  /**
+   * The elliptic curve algorithm
+   */
+  algorithm: "ecdsa" | "ecdh";
 }
 
 export interface GenerateKeyResponse {
@@ -52,6 +64,10 @@ export interface LoadKeyOptions {
    * The key-pair tag.
    */
   tag: string;
+  /**
+   * Key label.
+   */
+  label: string;
 }
 
 export interface LoadKeyResponse {
@@ -66,6 +82,10 @@ export interface DeleteKeyOptions {
    * The key-pair tag.
    */
   tag: string;
+  /**
+   * Key label.
+   */
+  label: string;
 }
 
 export interface SignOptions {

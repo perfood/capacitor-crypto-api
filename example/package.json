@@ -15,9 +15,9 @@
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
-    "@capacitor/core": "latest",
+    "@capacitor/core": "^6.0.0",
     "@capacitor/ios": "^6.0.0",
-    "@capacitor/splash-screen": "latest",
+    "@capacitor/splash-screen": "^6.0.0",
     "@perfood/capacitor-crypto-api": "file:..",
     "cors": "^2.8.5",
     "express": "^4.19.2"

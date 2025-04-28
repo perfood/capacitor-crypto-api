@@ -19,6 +19,7 @@ import type {
 } from './definitions';
 import {
   CRYPTO_API_AES_GCM_ALGORITHM,
+  CRYPTO_API_ECDH_KEY_ALGORITHM,
   CRYPTO_API_ECDH_ALGORITHM,
   CRYPTO_API_ECDSA_KEY_ALGORITHM,
   CRYPTO_API_ECDSA_SIGN_ALGORITHM,
@@ -35,6 +36,7 @@ import {
 } from './utils';
 
 const LabelECDSA = 'CryptoApiECDSA:';
+const LabelECDH = 'CryptoApiECDH:';
 
 export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async list(): Promise<ListResponse> {
@@ -56,8 +58,11 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       );
     }
 
+    const label = options.algorithm === "ecdsa" ? LabelECDSA : LabelECDH;
+
     const { publicKey: publicKeyFound } = await this.loadKey({
       tag: options.tag,
+      label
     });
     if (publicKeyFound) {
       return {
@@ -65,10 +70,13 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       };
     }
 
+    const algorithm = options.algorithm === "ecdsa" ? CRYPTO_API_ECDSA_KEY_ALGORITHM : CRYPTO_API_ECDH_KEY_ALGORITHM;
+    const keyUsages: KeyUsage[] = options.algorithm === 'ecdsa' ? ['sign', 'verify'] : ['deriveKey'];
+
     const subtleKeyPair = await crypto.subtle.generateKey(
-      CRYPTO_API_ECDSA_KEY_ALGORITHM,
+      algorithm,
       true,
-      ['sign', 'verify'],
+      keyUsages
     );
 
     const privateKey = subtleKeyPair.privateKey;
@@ -86,7 +94,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     };
 
     localStorage.setItem(
-      `${LabelECDSA}${options.tag}`,
+      `${label}${options.tag}`,
       JSON.stringify(keyPair),
     );
 
@@ -98,7 +106,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async loadKey(options: LoadKeyOptions): Promise<LoadKeyResponse> {
     console.log('CryptoApi.loadKey', options);
 
-    const item = localStorage.getItem(`${LabelECDSA}${options.tag}`);
+    const item = localStorage.getItem(`${options.label}${options.tag}`);
     if (!item) {
       return {};
     }
@@ -116,7 +124,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async deleteKey(options: DeleteKeyOptions): Promise<void> {
     console.log('CryptoApi.deleteKey', options);
 
-    localStorage.removeItem(`${LabelECDSA}${options.tag}`);
+    localStorage.removeItem(`${options.label}${options.tag}`);
   }
 
   async sign(options: SignOptions): Promise<SignResponse> {
@@ -138,7 +146,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       throw new Error('Private key not found');
     }
 
-    const privateKey = await this.importKey(PRIVATE_KEY_FORMAT, keyPair.privateKey, ['sign'])
+    const privateKey = await this.importKey("ecdsa", PRIVATE_KEY_FORMAT, keyPair.privateKey, ['sign'])
 
     const signature = arrayBufferToBase64(
       p1363ToDer(
@@ -164,7 +172,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       );
     }
 
-    const foreignPublicKey = await this.importKey(PUBLIC_KEY_FORMAT, options.foreignPublicKey, ['verify']);
+    const foreignPublicKey = await this.importKey("ecdsa", PUBLIC_KEY_FORMAT, options.foreignPublicKey, ['verify']);
 
     const verified = await crypto.subtle.verify(
       CRYPTO_API_ECDSA_SIGN_ALGORITHM,
@@ -180,69 +188,71 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     console.log('CryptoApi.encrypt', options);
 
     const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH)); 
-    const arrayBuffer = base64ToArrayBuffer(options.data); 
-    const secretKey = await this.deriveSecret(options.tag)
+    const arrayBuffer = new TextEncoder().encode(options.data); 
+    const secretKey = await this.deriveSecret(options.tag);
 
     const encryptedData = await crypto.subtle.encrypt(
         {
             name: CRYPTO_API_AES_GCM_ALGORITHM,
-            iv: iv,
+            iv,
         },
         secretKey,
         arrayBuffer
     );
 
     const encrypted = JSON.stringify({
-      iv, 
-      encryptedData: encryptedData
-    })
+      iv: arrayBufferToBase64(iv), 
+      encryptedData: arrayBufferToBase64(encryptedData)
+    });
 
-    return { encrypted }
+    return { encrypted };
   }
 
   async decrypt(options: DecryptOptions): Promise<DecryptResponse> {
     console.log('CryptoApi.decrypt', options);
 
-    const data = JSON.parse(options.data)
-    const secretKey = await this.deriveSecret(options.tag)
+    const data = JSON.parse(options.data);
+    const secretKey = await this.deriveSecret(options.tag);
 
     const decryptedData = await crypto.subtle.decrypt(
         {
             name:CRYPTO_API_AES_GCM_ALGORITHM,
-            iv: data.iv,
+            iv: base64ToArrayBuffer(data.iv),
         },
         secretKey,
-        data.encryptedData
+        base64ToArrayBuffer(data.encryptedData)
     );
-    const decrypted = arrayBufferToBase64(decryptedData);
+    const decrypted = new TextDecoder().decode(decryptedData);
 
-    return { decrypted }
+    return { decrypted };
   }
 
-  private async importKey(format: "pkcs8" | "spki", privateKeyBase64: string, keyUsages: KeyUsage[]): Promise<CryptoKey> {
+  private async importKey(algorithm: "ecdsa" | "ecdh", format: "pkcs8" | "spki", privateKeyBase64: string, keyUsages: KeyUsage[]): Promise<CryptoKey> {
     const keyData = base64ToArrayBuffer(privateKeyBase64);
+    const keyAlgorithm = algorithm == "ecdsa" ? CRYPTO_API_ECDSA_KEY_ALGORITHM : CRYPTO_API_ECDH_KEY_ALGORITHM
     return crypto.subtle.importKey(
       format, 
       keyData,
-      CRYPTO_API_ECDSA_KEY_ALGORITHM,
+      keyAlgorithm,
       false,
       keyUsages
     );
   }
 
   private async deriveSecret(tag: string): Promise<CryptoKey> {
-    let item = localStorage.getItem(`${LabelECDSA}${tag}`);
+    let item = localStorage.getItem(`${LabelECDH}${tag}`);
+    console.log("CryptoApi.deriveSecret - item", item)
     if (!item) {
-      await this.generateKey({tag})
-      item = localStorage.getItem(`${LabelECDSA}${tag}`);
+      await this.generateKey({tag, algorithm: "ecdh"})
+      item = localStorage.getItem(`${LabelECDH}${tag}`);
 
       if(!item){
         throw new Error('CryptoApi.deriveSecret - Failed to generate new key pair.');
       }
     }
     const keyPair = JSON.parse(item);
-    const privateKey = await this.importKey(PRIVATE_KEY_FORMAT, keyPair.privateKey, ['deriveKey']);
-    const publicKey = await this.importKey(PUBLIC_KEY_FORMAT, keyPair.publicKey, ['deriveKey']);
+    const privateKey = await this.importKey("ecdh", PRIVATE_KEY_FORMAT, keyPair.privateKey, ['deriveKey']);
+    const publicKey = await this.importKey("ecdh", PUBLIC_KEY_FORMAT, keyPair.publicKey, []);
 
     const sharedSecret = await crypto.subtle.deriveKey(
         {

@@ -158,3 +158,42 @@ window.verify = async () => {
         error.statusText || error;
     });
 };
+
+/**
+ * Encrypt a text.
+ */
+window.encrypt = async () => {
+  console.log('encrypt');
+  const tag = document.getElementById('tag').value;
+  const encrypt = document.getElementById('encryptText').value;
+
+  if (!encrypt) {
+    return;
+  }
+  const result = await CryptoApi.encrypt({
+    tag,
+    data: encrypt,
+  });
+
+  document.getElementById('encrypted').textContent = result.encrypted;
+};
+
+/**
+ * Decrypt a text.
+ */
+window.decrypt = async () => {
+  console.log('decrypt');
+  const tag = document.getElementById('tag').value;
+  const encrypted = document.getElementById('encrypted').textContent;
+
+  if (!encrypted) {
+    return;
+  }
+
+  const result = await CryptoApi.decrypt({
+    tag,
+    data: encrypted,
+  });
+
+  document.getElementById('decrypted').textContent = result.decrypted;
+};
