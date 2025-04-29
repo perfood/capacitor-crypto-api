@@ -251,18 +251,18 @@ Decrypt data with AES-GCM.
 
 #### LoadKeyOptions
 
-| Prop        | Type                | Description       |
-| ----------- | ------------------- | ----------------- |
-| **`tag`**   | <code>string</code> | The key-pair tag. |
-| **`label`** | <code>string</code> | Key label.        |
+| Prop            | Type                           | Description                                              |
+| --------------- | ------------------------------ | -------------------------------------------------------- |
+| **`tag`**       | <code>string</code>            | The key-pair tag.                                        |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code> | The elliptic curve algorithm was used to create the key. |
 
 
 #### DeleteKeyOptions
 
-| Prop        | Type                | Description       |
-| ----------- | ------------------- | ----------------- |
-| **`tag`**   | <code>string</code> | The key-pair tag. |
-| **`label`** | <code>string</code> | Key label.        |
+| Prop            | Type                           | Description                                              |
+| --------------- | ------------------------------ | -------------------------------------------------------- |
+| **`tag`**       | <code>string</code>            | The key-pair tag.                                        |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code> | The elliptic curve algorithm was used to create the key. |
 
 
 #### SignResponse

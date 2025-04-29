@@ -68,11 +68,10 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       );
     }
 
-    const label = options.algorithm === "ecdsa" ? LabelECDSA : LabelECDH;
 
     const { publicKey: publicKeyFound } = await this.loadKey({
       tag: options.tag,
-      label
+      algorithm: options.algorithm
     });
     if (publicKeyFound) {
       return {
@@ -103,6 +102,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       publicKey: publicKeyBase64,
     };
 
+    const label = this.getLabel(options.algorithm);
     localStorage.setItem(
       `${label}${options.tag}`,
       JSON.stringify(keyPair),
@@ -116,7 +116,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async loadKey(options: LoadKeyOptions): Promise<LoadKeyResponse> {
     console.log('CryptoApi.loadKey', options);
 
-    const item = localStorage.getItem(`${options.label}${options.tag}`);
+    const label = this.getLabel(options.algorithm);
+    const item = localStorage.getItem(`${label}${options.tag}`);
     if (!item) {
       return {};
     }
@@ -134,7 +135,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async deleteKey(options: DeleteKeyOptions): Promise<void> {
     console.log('CryptoApi.deleteKey', options);
 
-    localStorage.removeItem(`${options.label}${options.tag}`);
+    const label = this.getLabel(options.algorithm);
+    localStorage.removeItem(`${label}${options.tag}`);
   }
 
   async sign(options: SignOptions): Promise<SignResponse> {
@@ -278,5 +280,9 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
         ["encrypt", "decrypt"]
     );
     return sharedSecret;
+  }
+
+  private getLabel(algorithm: "ecdsa" | "ecdh"): string {
+    return algorithm === "ecdsa" ? LabelECDSA : LabelECDH;
   }
 }

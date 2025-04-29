@@ -65,9 +65,9 @@ export interface LoadKeyOptions {
    */
   tag: string;
   /**
-   * Key label.
+   * The elliptic curve algorithm was used to create the key.
    */
-  label: string;
+  algorithm: "ecdsa" | "ecdh";
 }
 
 export interface LoadKeyResponse {
@@ -83,9 +83,9 @@ export interface DeleteKeyOptions {
    */
   tag: string;
   /**
-   * Key label.
+   * The elliptic curve algorithm was used to create the key.
    */
-  label: string;
+  algorithm: "ecdsa" | "ecdh";
 }
 
 export interface SignOptions {
