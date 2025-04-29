@@ -41,7 +41,8 @@ npx cap sync
 
 <docgen-index>
 
-* [`list()`](#list)
+* [`getECDSATags()`](#getecdsatags)
+* [`getECDHTags()`](#getecdhtags)
 * [`generateKey(...)`](#generatekey)
 * [`loadKey(...)`](#loadkey)
 * [`deleteKey(...)`](#deletekey)
@@ -56,15 +57,28 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### list()
+### getECDSATags()
 
 ```typescript
-list() => Promise<ListResponse>
+getECDSATags() => Promise<GetTagResponse>
 ```
 
-Returns all key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
 
-**Returns:** <code>Promise&lt;<a href="#listresponse">ListResponse</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#gettagresponse">GetTagResponse</a>&gt;</code>
+
+--------------------
+
+
+### getECDHTags()
+
+```typescript
+getECDHTags() => Promise<GetTagResponse>
+```
+
+Returns all ECDH key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+
+**Returns:** <code>Promise&lt;<a href="#gettagresponse">GetTagResponse</a>&gt;</code>
 
 --------------------
 
@@ -206,11 +220,11 @@ Decrypt data with AES-GCM.
 ### Interfaces
 
 
-#### ListResponse
+#### GetTagResponse
 
 | Prop       | Type                  | Description        |
 | ---------- | --------------------- | ------------------ |
-| **`list`** | <code>string[]</code> | The key-pair tags. |
+| **`tags`** | <code>string[]</code> | The key-pair tags. |
 
 
 #### GenerateKeyResponse

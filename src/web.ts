@@ -9,7 +9,7 @@ import type {
   EncryptResponse,
   GenerateKeyOptions,
   GenerateKeyResponse,
-  ListResponse,
+  GetTagsResponse,
   LoadKeyOptions,
   LoadKeyResponse,
   SignOptions,
@@ -39,14 +39,24 @@ const LabelECDSA = 'CryptoApiECDSA:';
 const LabelECDH = 'CryptoApiECDH:';
 
 export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
-  async list(): Promise<ListResponse> {
-    console.log('CryptoApi.list');
+  async getECDSATags(): Promise<GetTagsResponse>{
+    console.log('CryptoApi.getECDSATags');
 
     return {
-      list: Object.keys(localStorage)
-        .filter(key => key.startsWith(LabelECDSA))
-        .map(key => key.replace(LabelECDSA, '')),
-    };
+      tags: Object.keys(localStorage)
+      .filter(key => key.startsWith(LabelECDSA))
+      .map(key => key.replace(LabelECDSA, '')),
+    }
+  }
+
+  async getECDHTags(): Promise<GetTagsResponse>{
+    console.log('CryptoApi.getECDHTags');
+
+    return {
+      tags: Object.keys(localStorage)
+      .filter(key => key.startsWith(LabelECDH))
+      .map(key => key.replace(LabelECDH, '')),
+    }
   }
 
   async generateKey(options: GenerateKeyOptions): Promise<GenerateKeyResponse> {

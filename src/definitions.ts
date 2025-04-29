@@ -34,11 +34,11 @@ export const SECRET_KEY_LENGHT = 256;
 
 export const IV_LENGTH = 12;
 
-export interface ListResponse {
+export interface GetTagsResponse {
   /**
    * The key-pair tags.
    */
-  list: string[];
+  tags: string[];
 }
 
 export interface GenerateKeyOptions {
@@ -166,9 +166,14 @@ export interface DecryptResponse {
 
 export interface CryptoApiPlugin {
   /**
-   * Returns all key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+   * Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
    */
-  list(): Promise<ListResponse>;
+  getECDSATags(): Promise<GetTagsResponse>;
+
+  /**
+   * Returns all ECDH key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+   */
+  getECDHTags(): Promise<GetTagsResponse>;
 
   /**
    * Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),

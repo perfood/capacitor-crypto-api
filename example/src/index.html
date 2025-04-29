@@ -23,74 +23,86 @@
   </head>
   <body>
     <main>
-      <h1>capacitor-crypto-api example</h1>
-      <p>
-        This example demonstrates a simple 2-factor-authentication mechanism.
-        The client creates a key-pair and registers the public-key with the
-        server. The server creates a challenge and sends it to the client. The
-        client signs the challenge with the private-key and sends the signed
-        data back to the server. The server can then verify the signature of the
-        data with the public-key and be sure that the data was signed by the
-        private-key.
-      </p>
+      <form name="crypto" onsubmit="event.preventDefault()">
+        <h1>capacitor-crypto-api example</h1>
+        <p>
+          This example demonstrates a simple 2-factor-authentication mechanism.
+          The client creates a key-pair and registers the public-key with the
+          server. The server creates a challenge and sends it to the client. The
+          client signs the challenge with the private-key and sends the signed
+          data back to the server. The server can then verify the signature of the
+          data with the public-key and be sure that the data was signed by the
+          private-key.
+        </p>
 
-      <h2>key-pairs</h2>
-      <button onclick="list()">load key-pairs</button>
-      <code id="list"></code>
+        <h3>tag</h3>
+        <input type="text" id="tag" name="tag" placeholder="tag" />
 
-      <h2>key-pair</h2>
+        <h2>Get key-pair tags</h2>
+        <h3>ECDSA</h3>
+        <button onclick="getECDSATags()">load ECDSA key-pair tags</button>
+        <code id="ECDSATags"></code>
+        <h3>ECDH</h3>
+        <button onclick="getECDHTags()">load ECDH key-pair tags</button>
+        <code id="ECDHTags"></code>
 
-      <h3>tag</h3>
-      <input type="text" id="tag" name="tag" placeholder="tag" />
-      <button onclick="createKeyPair()">create / load key-pair</button>
+        <h2>key-pair</h2>
 
-      <h3>public-key</h3>
-      <code id="publicKey"></code>
-      <button onclick="registerPublicKey()">
-        register public-key with server
-      </button>
-      <code id="registered"></code>
+        <h3>Create/Load</h3>
+        <input type="radio" id="ecdsa" name="algorithm" value="ecdsa">
+        <label for="ecdsa">ECDSA</label><br>
+        <input type="radio" id="ecdh" name="algorithm" value="ecdh">
+        <label for="ecdh">ECDH</label><br>
+        <button onclick="createKeyPair()">create / load key-pair</button>
 
-      <h2>sign / verify</h2>
+        <h3>Register public-key</h3>
+        <code id="publicKey"></code>
+        <button onclick="registerPublicKey()">
+          register public-key with server
+        </button>
+        <code id="registered"></code>
 
-      <h3>sign challenge</h3>
-      <input
-        type="text"
-        id="challenge"
-        name="challenge"
-        placeholder="challenge"
-        readonly
-      />
-      <button onclick="getChallenge()">get challenge</button>
-      <button onclick="sign()">sign challenge</button>
+        <h2>sign / verify</h2>
 
-      <h4>signature</h4>
-      <code id="signature"></code>
+        <h3>sign challenge</h3>
+        <input
+          type="text"
+          id="challenge"
+          name="challenge"
+          placeholder="challenge"
+          readonly
+        />
+        <button onclick="getChallenge()">get challenge</button>
+        <button onclick="sign()">sign challenge</button>
 
-      <h3>verify challenge</h3>
-      <button onclick="verify()">verify challenge</button>
+        <h4>signature</h4>
+        <code id="signature"></code>
 
-      <h4>verified local</h4>
-      <code id="verifiedLocal"></code>
+        <h3>verify challenge</h3>
+        <button onclick="verify()">verify challenge</button>
 
-      <h4>verified server</h4>
-      <code id="verifiedServer"></code>
+        <h4>verified local</h4>
+        <code id="verifiedLocal"></code>
 
-      <h2>encyrpt / decrypt</h2>
+        <h4>verified server</h4>
+        <code id="verifiedServer"></code>
 
-      <h3>encrypt</h3>
-      <input
-        type="text"
-        id="encryptText"
-        name="encryptText"
-        placeholder="encryptText"
-      />
-      <button onclick="encrypt()">encrypt</button>
-      <code id="encrypted"></code>
+        <h2>encyrpt / decrypt</h2>
 
-      <h3>decrypt</h3>
-      <button onclick="decrypt()">decrypt</button>
-      <code id="decrypted"></code>
+        <h3>encrypt</h3>
+        <input
+          type="text"
+          id="encryptText"
+          name="encryptText"
+          placeholder="encryptText"
+        />
+        <button onclick="encrypt()">encrypt</button>
+        <code id="encrypted"></code>
+
+        <h3>decrypt</h3>
+        <button onclick="decrypt()">decrypt</button>
+        <code id="decrypted"></code>
+      </form>
     </main>
 
     <script src="./js/example.js" type="module"></script>
