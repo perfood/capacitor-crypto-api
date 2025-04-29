@@ -60,12 +60,12 @@ npx cap sync
 ### getECDSATags()
 
 ```typescript
-getECDSATags() => Promise<GetTagResponse>
+getECDSATags() => Promise<GetTagsResponse>
 ```
 
 Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
 
-**Returns:** <code>Promise&lt;<a href="#gettagresponse">GetTagResponse</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#gettagsresponse">GetTagsResponse</a>&gt;</code>
 
 --------------------
 
@@ -73,12 +73,12 @@ Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) o
 ### getECDHTags()
 
 ```typescript
-getECDHTags() => Promise<GetTagResponse>
+getECDHTags() => Promise<GetTagsResponse>
 ```
 
 Returns all ECDH key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
 
-**Returns:** <code>Promise&lt;<a href="#gettagresponse">GetTagResponse</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#gettagsresponse">GetTagsResponse</a>&gt;</code>
 
 --------------------
 
@@ -220,7 +220,7 @@ Decrypt data with AES-GCM.
 ### Interfaces
 
 
-#### GetTagResponse
+#### GetTagsResponse
 
 | Prop       | Type                  | Description        |
 | ---------- | --------------------- | ------------------ |
