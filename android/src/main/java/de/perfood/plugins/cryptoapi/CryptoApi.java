@@ -1,20 +1,25 @@
 package de.perfood.plugins.cryptoapi;
 
+import org.json.JSONObject;
+import org.json.JSONException;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.util.Log;
+import java.util.Arrays;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
-import java.security.KeyAgreement;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableEntryException;
@@ -25,27 +30,34 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.crypto.KeyAgreement;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.Cipher;
+import javax.crypto.spec.GCMParameterSpec;
 
 public class CryptoApi {
 
     public static String LabelECDSA = "CryptoApiECDSA:";
+    public static String LabelECDH = "CryptoApiECDH:";
     private static final String AES_MODE = "AES/GCM/NoPadding";
     private static final int IV_LENGTH = 12; // 96 bits for GCM
     private static final int GCM_TAG_LENGTH = 128; // bits
 
 
-    public List<String> list() {
-        Log.i("CryptoApi.list", "null");
+    public List<String> getTags(String algorithm) {
+        Log.i("CryptoApi.getTags", algorithm);
 
         try {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
 
             ArrayList<String> list = new ArrayList();
+            String label = algorithm.equalsIgnoreCase("ecdsa") ? CryptoApi.LabelECDSA : CryptoApi.LabelECDH;
 
             for (String tag : Collections.list(keyStore.aliases())) {
-                if (tag.startsWith(CryptoApi.LabelECDSA) && keyStore.entryInstanceOf(tag, KeyStore.PrivateKeyEntry.class)) {
-                    list.add(tag.replace(CryptoApi.LabelECDSA, ""));
+                if (tag.startsWith(label) && keyStore.entryInstanceOf(tag, KeyStore.PrivateKeyEntry.class)) {
+                    list.add(tag.replace(label, ""));
                 }
             }
 
@@ -63,25 +75,34 @@ public class CryptoApi {
         }
     }
 
-    public String generateKey(String tag) {
-        Log.i("CryptoApi.generateKey", tag);
+    public String generateKey(String tag, String algorithm) {
+        Log.i("CryptoApi.generateKey", tag + " " + algorithm);
 
         try {
-            String publicKeyFound = this.loadKey(tag);
+            String publicKeyFound = this.loadKey(tag, algorithm);
             if (publicKeyFound != null) {
                 return publicKeyFound;
             }
 
+            String label = this.getLabel(algorithm);
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
-            keyPairGenerator.initialize(
-                new KeyGenParameterSpec.Builder(CryptoApi.LabelECDSA + tag, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                    .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
-                    .setDigests(KeyProperties.DIGEST_SHA256)
-                    .build()
-            );
+
+            int purpose = algorithm.equalsIgnoreCase("ecdsa")
+                    ? KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY
+                    : KeyProperties.PURPOSE_AGREE_KEY;
+
+            KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(label + tag, purpose)
+                .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"));
+
+            // Only set digests if it's ECDSA
+            if (algorithm.equalsIgnoreCase("ecdsa")) {
+                builder.setDigests(KeyProperties.DIGEST_SHA256);
+            }
+
+            keyPairGenerator.initialize(builder.build());
             keyPairGenerator.generateKeyPair();
 
-            return getPublicKeyBase64(tag);
+            return getPublicKeyBase64(tag, algorithm);
         } catch (Error e) {
             return null;
         } catch (InvalidAlgorithmParameterException e) {
@@ -93,17 +114,20 @@ public class CryptoApi {
         }
     }
 
-    public String loadKey(String tag) {
-        Log.i("CryptoApi.loadKey", tag);
+    public String loadKey(String tag, String algorithm) {
+        Log.i("CryptoApi.loadKey", tag + " " + algorithm);
 
-        return this.getPublicKeyBase64(tag);
+        return this.getPublicKeyBase64(tag, algorithm);
     }
 
-    public void deleteKey(String tag) {
+    public void deleteKey(String tag, String algorithm) {
+        Log.i("CryptoApi.deleteKey", tag + " " + algorithm);
+
         try {
+            String label = this.getLabel(algorithm);
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
-            keyStore.deleteEntry(CryptoApi.LabelECDSA + tag);
+            keyStore.deleteEntry(label + tag);
         } catch (Error e) {} catch (CertificateException e) {} catch (KeyStoreException e) {} catch (IOException e) {} catch (
             NoSuchAlgorithmException e
         ) {}
@@ -113,7 +137,7 @@ public class CryptoApi {
         Log.i("CryptoApi.sign", tag + " " + data);
 
         try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag);
+            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDSA);
 
             if (privateKeyEntry == null) {
                 return null;
@@ -171,7 +195,7 @@ public class CryptoApi {
             SecureRandom secureRandom = new SecureRandom();
             secureRandom.nextBytes(iv);
 
-            byte[] plaintext = Base64.getDecoder().decode(base64Data);
+            byte[] plaintext = Base64.decode(base64Data, Base64.DEFAULT);
             Cipher cipher = Cipher.getInstance(AES_MODE);
             GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec);
@@ -207,8 +231,8 @@ public class CryptoApi {
             String ivBase64 = json.getString("iv");
             String encryptedDataBase64 = json.getString("encryptedData");
 
-            byte[] iv = Base64.getDecoder().decode(ivBase64);
-            byte[] encryptedData = Base64.getDecoder().decode(encryptedDataBase64);
+            byte[] iv = Base64.decode(ivBase64, Base64.DEFAULT);
+            byte[] encryptedData = Base64.decode(encryptedDataBase64, Base64.DEFAULT);
 
             Cipher cipher = Cipher.getInstance(AES_MODE);
             GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
@@ -233,12 +257,12 @@ public class CryptoApi {
     }
 
 
-    private KeyStore.PrivateKeyEntry getPrivateKeyEntry(String tag) {
+    private KeyStore.PrivateKeyEntry getPrivateKeyEntry(String tag, String label) {
         try {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
 
-            return (KeyStore.PrivateKeyEntry) keyStore.getEntry(CryptoApi.LabelECDSA + tag, null);
+            return (KeyStore.PrivateKeyEntry) keyStore.getEntry(label + tag, null);
         } catch (Error e) {
             return null;
         } catch (UnrecoverableEntryException e) {
@@ -254,9 +278,10 @@ public class CryptoApi {
         }
     }
 
-    private String getPublicKeyBase64(String tag) {
+    private String getPublicKeyBase64(String tag, String algorithm) {
         try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag);
+            String label = this.getLabel(algorithm);
+            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, label);
 
             if (privateKeyEntry == null) {
                 return null;
@@ -282,15 +307,15 @@ public class CryptoApi {
     }
 
     private SecretKey deriveSecret(String tag) {
-        Log.i("CryptoApi.deriveSecret", publicKeyBase64 + " " + privateKeyBase64);
+        Log.i("CryptoApi.deriveSecret", tag);
 
         try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag);
+            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDH);
 
             if (privateKeyEntry == null) {
                 Log.i("CryptoApi.deriveSecret", "No private key entry found for tag. Generating new one...");
-                this.generateKey(tag);
-                privateKeyEntry = this.getPrivateKeyEntry(tag);
+                this.generateKey(tag, "ecdh");
+                privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDH);
             }
 
             PrivateKey privateKey = privateKeyEntry.getPrivateKey();
@@ -313,5 +338,9 @@ public class CryptoApi {
         }
 
         return null;
+    }
+
+    private String getLabel(String algorithm) {
+        return algorithm.equalsIgnoreCase("ecdsa") ? CryptoApi.LabelECDSA : CryptoApi.LabelECDH;
     }
 }
