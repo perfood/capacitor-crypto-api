@@ -29,20 +29,13 @@ import CryptoKit
 
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
-        guard status == errSecSuccess else {
-            return list
-        }
-
-        guard let array = result as? [[String: Any]] else {
+        guard status == errSecSuccess, let array = result as? [[String: Any]] else {
             return list
         }
 
         for item in array {
-            guard let aTag = item[kSecAttrApplicationTag as String] as? Data else {
-                continue
-            }
-
-            if let tag = String(data: aTag, encoding: .utf8) {
+            if let aTag = item[kSecAttrApplicationTag as String] as? Data,
+               let tag = String(data: aTag, encoding: .utf8) {
                 list.append(tag)
             }
         }
@@ -90,27 +83,24 @@ import CryptoKit
 
     @objc public func deleteKey(_ tag: String, _ algorithm: String) {
         print("CryptoApi.deleteKey", tag, algorithm)
-        let label = getLabel(algorithm)
 
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: tag.data(using: .utf8)!,
-            kSecAttrLabel as String: label,
+            kSecAttrLabel as String: getLabel(algorithm),
             kSecAttrKeyType as String: kSecAttrKeyTypeEC
         ]
-
         SecItemDelete(query as CFDictionary)
     }
 
     @objc public func sign(_ tag: String, _ data: String) -> String? {
         print("CryptoApi.sign", tag, data)
 
-        guard let privateKey = getPrivateKey(tag, algorithm) else {
+        guard let privateKey = getPrivateKey(tag, "ecdsa") else {
             return nil
         }
 
         var error: Unmanaged<CFError>?
-
         guard let signature = SecKeyCreateSignature(privateKey,
                                                     .ecdsaSignatureMessageX962SHA256,
                                                     data.data(using: .utf8)! as CFData,
@@ -124,112 +114,107 @@ import CryptoKit
     @objc public func verify(_ foreignPublicKeyBase64: String, _ data: String, _ signatureBase64: String) -> Bool {
         print("CryptoApi.verify", foreignPublicKeyBase64, data, signatureBase64)
 
-        guard let foreignPublicKey = loadPublicKeyFromBase64(foreignPublicKeyBase64) else {
-            return false
-        }
-
-        guard let signature = Data.init(base64Encoded: signatureBase64) else {
+        guard let foreignPublicKey = loadPublicKeyFromBase64(foreignPublicKeyBase64),
+              let signature = Data(base64Encoded: signatureBase64) else {
             return false
         }
 
         var error: Unmanaged<CFError>?
-        guard SecKeyVerifySignature(foreignPublicKey,
-                                    .ecdsaSignatureMessageX962SHA256,
-                                    data.data(using: .utf8)! as CFData,
-                                    signature as CFData,
-                                    &error) else {
-            return false
-        }
-
-        return true
+        return SecKeyVerifySignature(foreignPublicKey,
+                                     .ecdsaSignatureMessageX962SHA256,
+                                     data.data(using: .utf8)! as CFData,
+                                     signature as CFData,
+                                     &error)
     }
 
     @objc public func encrypt(_ data: String, _ tag: String) -> String? {
         print("CryptoApi.encrypt", data, tag)
 
-        let symmetricKey = deriveSecret(tag)
-
-        guard let plaintextData = Data(base64Encoded: data) else {
-            print("CryptoApi.encrypt: Invalid base64 input")
+        guard let symmetricKey = deriveSecret(tag),
+              let plaintextData = Data(base64Encoded: data) else {
             return nil
         }
 
-        let iv = AES.GCM.Nonce()
-        let sealedBox = AES.GCM.seal(plaintextData, using: symmetricKey, nonce: iv)
-        let resultDict: [String: String] = [
-            "iv": iv.withUnsafeBytes { Data($0).base64EncodedString() },
-            "encryptedData": sealedBox.ciphertext.base64EncodedString() + sealedBox.tag.base64EncodedString()
-        ]
-        let jsonData = JSONSerialization.data(withJSONObject: resultDict, options: [])
+        do {
+            let iv = try AES.GCM.Nonce()
+            let sealedBox = try AES.GCM.seal(plaintextData, using: symmetricKey, nonce: iv)
 
-        return String(data: jsonData, encoding: .utf8)
+            let resultDict: [String: String] = [
+                "iv": Data(iv).base64EncodedString(),
+                "encryptedData": (sealedBox.ciphertext + sealedBox.tag).base64EncodedString()
+            ]
+            let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
+            return String(data: jsonData, encoding: .utf8)
+        } catch {
+            print("CryptoApi.encrypt failed:", error)
+            return nil
+        }
     }
 
     @objc public func decrypt(_ data: String, _ tag: String) -> String? {
         print("CryptoApi.decrypt: \(data) \(tag)")
 
         guard let jsonData = data.data(using: .utf8),
-            let json = JSONSerialization.jsonObject(with: jsonData) as? [String: String],
-            let ivBase64 = json["iv"],
-            let combinedBase64 = json["encryptedData"],
-            let ivData = Data(base64Encoded: ivBase64),
-            let combinedData = Data(base64Encoded: combinedBase64) else {
-            print("CryptoApi.decrypt: Failed to parse JSON or Base64 decode")
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: String],
+              let ivBase64 = json["iv"],
+              let combinedBase64 = json["encryptedData"],
+              let ivData = Data(base64Encoded: ivBase64),
+              let combinedData = Data(base64Encoded: combinedBase64),
+              let symmetricKey = deriveSecret(tag),
+              let nonce = try? AES.GCM.Nonce(data: ivData) else {
             return nil
         }
 
         let tagLength = 16
-        guard combinedData.count > tagLength else {
-            print("CryptoApi.decrypt: Combined data too short")
-            return nil
-        }
+        guard combinedData.count > tagLength else { return nil }
+
         let ciphertext = combinedData.prefix(combinedData.count - tagLength)
         let tag = combinedData.suffix(tagLength)
 
-        let symmetricKey = deriveSecret(tag)
-        let nonce = AES.GCM.Nonce(data: ivData)
-        let sealedBox = AES.GCM.SealedBox(nonce, ciphertext, tag)
-        let decryptedData = AES.GCM.open(sealedBox, using: symmetricKey)
-
-        return String(data: decryptedData, encoding: .utf8)
+        do {
+            let sealedBox = try AES.GCM.SealedBox(nonce, ciphertext, tag)
+            let decryptedData = try AES.GCM.open(sealedBox, using: symmetricKey)
+            return String(data: decryptedData, encoding: .utf8)
+        } catch {
+            print("CryptoApi.decrypt failed:", error)
+            return nil
+        }
     }
 
-    @objc private func deriveSecret(_ tag: String) -> Data? {
+    private func deriveSecret(_ tag: String) -> SymmetricKey? {
         guard let secPrivateKey = getPrivateKey(tag, "ecdh"),
-            let publicKeyData = getPublicKeyData(tag, "ecdh") else {
-
-            generateKey(tag, "ecdh")
-
-            // Try again
+              let publicKeyData = getPublicKeyData(tag, "ecdh"),
+              let privateKeyData = SecKeyCopyExternalRepresentation(secPrivateKey, nil) as Data? else {
+            _ = generateKey(tag, "ecdh")
             guard let secPrivateKey = getPrivateKey(tag, "ecdh"),
-                let publicKeyData = getPublicKeyData(tag, "ecdh") else {
-                print("CryptoApi.deriveSecret: Key generation failed or keys still missing for tag: \(tag)")
+                  let publicKeyData = getPublicKeyData(tag, "ecdh"),
+                  let privateKeyData = SecKeyCopyExternalRepresentation(secPrivateKey, nil) as Data? else {
                 return nil
             }
-
-            return deriveSecretFromRawKeys(secPrivateKey, publicKeyData) as Data
+            return deriveSecretFromRawKeys(privateKeyData, publicKeyData)
         }
 
-        return deriveSecretFromRawKeys(secPrivateKey, publicKeyData) as Data
+        return deriveSecretFromRawKeys(privateKeyData, publicKeyData)
     }
 
-    @objc private func deriveSecretFromRawKeys(_ privateKeyData: Data, _ publicKeyData: Data) -> Data? {
-        let privateKey = P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
-        let remotePublicKey = P256.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
-
-        let sharedSecret = privateKey.sharedSecretFromKeyAgreement(with: remotePublicKey) 
-        let symmetricKey = sharedSecret.hkdfDerivedSymmetricKey(
-            using: SHA256.self,
-            salt: Data(),
-            sharedInfo: Data(),
-            outputByteCount: 32
-        )
-
-        return symmetricKey
+    private func deriveSecretFromRawKeys(_ privateKeyData: Data, _ publicKeyData: Data) -> SymmetricKey? {
+        do {
+            let privateKey = try P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
+            let remotePublicKey = try P256.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
+            let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: remotePublicKey)
+            return sharedSecret.hkdfDerivedSymmetricKey(
+                using: SHA256.self,
+                salt: Data(),
+                sharedInfo: Data(),
+                outputByteCount: 32
+            )
+        } catch {
+            print("Key derivation failed:", error)
+            return nil
+        }
     }
 
-
-    @objc private func getPrivateKey(_ tag: String, _ algorithm: String) -> SecKey? {
+    private func getPrivateKey(_ tag: String, _ algorithm: String) -> SecKey? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: tag.data(using: .utf8)!,
@@ -244,46 +229,37 @@ import CryptoKit
             return nil
         }
 
-        return privateKey as SecKey
+        return privateKey as! SecKey
     }
 
-    @objc private func getPublicKeyBase64(_ tag: String, _ algorithm: String) -> String? {
+    private func getPublicKeyBase64(_ tag: String, _ algorithm: String) -> String? {
         guard let publicKeyData = getPublicKeyData(tag, algorithm) else {
             return nil
         }
-        
-        var ecPublicKey = Data()
-        ecPublicKey.append(Data(Constants.ECHeader))
+
+        var ecPublicKey = Data(Constants.ECHeader)
         ecPublicKey.append(publicKeyData)
 
         return ecPublicKey.base64EncodedString()
     }
 
-    @objc private func getPublicKeyData(_ tag: String, _ algorithm: String) -> Data? {
-        guard let privateKey = getPrivateKey(tag, algorithm) else {
+    private func getPublicKeyData(_ tag: String, _ algorithm: String) -> Data? {
+        guard let privateKey = getPrivateKey(tag, algorithm),
+              let publicKey = SecKeyCopyPublicKey(privateKey),
+              let publicKeyData = SecKeyCopyExternalRepresentation(publicKey, nil) as Data? else {
             return nil
         }
 
-        guard let publicKey = SecKeyCopyPublicKey(privateKey) else {
-            return nil
-        }
-
-        var error: Unmanaged<CFError>?
-        guard let publicKeyData = SecKeyCopyExternalRepresentation(publicKey, &error) else {
-            return nil
-        }
-
-       return publicKeyData as Data;
+        return publicKeyData
     }
 
-    @objc private func loadPublicKeyFromBase64(_ publicKeyBase64: String) -> SecKey? {
-        guard let secKeyData = Data.init(base64Encoded: publicKeyBase64) else {
+    private func loadPublicKeyFromBase64(_ publicKeyBase64: String) -> SecKey? {
+        guard let secKeyData = Data(base64Encoded: publicKeyBase64),
+              let secKeyHeaderRange = secKeyData.range(of: Data(Constants.ECHeader)) else {
             return nil
         }
 
-        guard let secKeyHeaderRange = secKeyData.range(of: Data(Constants.ECHeader)) else {
-            return nil
-        }
+        let publicKeyData = secKeyData.suffix(from: secKeyHeaderRange.upperBound)
 
         let attributes: [String: Any] = [
             kSecAttrKeyClass as String: kSecAttrKeyClassPublic,
@@ -291,18 +267,10 @@ import CryptoKit
             kSecAttrKeySizeInBits as String: 256
         ]
 
-        var error: Unmanaged<CFError>?
-        guard let secKey = SecKeyCreateWithData(secKeyData.suffix(from: secKeyHeaderRange.upperBound) as CFData,
-                                                attributes as CFDictionary,
-                                                &error) else {
-            return nil
-        }
-
-        return secKey
+        return SecKeyCreateWithData(publicKeyData as CFData, attributes as CFDictionary, nil)
     }
 
-    @objc private func getLabel(_ algorithm: String) -> String? {
+    private func getLabel(_ algorithm: String) -> String {
         return algorithm.lowercased() == "ecdsa" ? Constants.LabelECDSA : Constants.LabelECDH
-
     }
 }
