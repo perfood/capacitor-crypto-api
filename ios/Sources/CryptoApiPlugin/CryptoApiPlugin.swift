@@ -10,7 +10,7 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "CryptoApiPlugin"
     public let jsName = "CryptoApi"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "list", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getECDSATags", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "generateKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "loadKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteKey", returnType: CAPPluginReturnPromise),
@@ -19,18 +19,27 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     ]
     private let implementation = CryptoApi()
 
-    @objc func list(_ call: CAPPluginCall) {
-        let list = implementation.list()
+    @objc func getECDSATags(_ call: CAPPluginCall) {
+        let tags = implementation.getTags("ecdsa")
 
         call.resolve([
-            "list": list
+            "tags": tags
+        ])
+    }
+
+    @objc func getECDHTags(_ call: CAPPluginCall) {
+        let tags = implementation.getTags("ecdh")
+
+        call.resolve([
+            "tags": tags
         ])
     }
 
     @objc func generateKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
+        let algorithm = call.getString("algorithm") ?? ""
 
-        guard let publicKey = implementation.generateKey(tag) else {
+        guard let publicKey = implementation.generateKey(tag, algorithm) else {
             call.resolve([:])
 
             return
@@ -43,8 +52,9 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func loadKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
+        let algorithm = call.getString("algorithm") ?? ""
 
-        guard let publicKey = implementation.loadKey(tag) else {
+        guard let publicKey = implementation.loadKey(tag, algorithm) else {
             call.resolve([:])
 
             return
@@ -57,8 +67,9 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func deleteKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
+        let algorithm = call.getString("algorithm") ?? ""
 
-        implementation.deleteKey(tag)
+        implementation.deleteKey(tag, algorithm)
 
         call.resolve()
     }
