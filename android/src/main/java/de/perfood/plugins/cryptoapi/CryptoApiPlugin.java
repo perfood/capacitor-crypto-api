@@ -24,6 +24,7 @@ public class CryptoApiPlugin extends Plugin {
         call.resolve(ret);
     }
 
+    @PluginMethod
     public void getECDHTags(PluginCall call) {
         List<String> tags = implementation.getTags("ecdh");
 

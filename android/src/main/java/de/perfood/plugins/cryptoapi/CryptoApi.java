@@ -53,7 +53,7 @@ public class CryptoApi {
             keyStore.load(null);
 
             ArrayList<String> list = new ArrayList();
-            String label = algorithm.equalsIgnoreCase("ecdsa") ? CryptoApi.LabelECDSA : CryptoApi.LabelECDH;
+            String label = this.getLabel(algorithm);
 
             for (String tag : Collections.list(keyStore.aliases())) {
                 if (tag.startsWith(label) && keyStore.entryInstanceOf(tag, KeyStore.PrivateKeyEntry.class)) {
@@ -195,7 +195,7 @@ public class CryptoApi {
             SecureRandom secureRandom = new SecureRandom();
             secureRandom.nextBytes(iv);
 
-            byte[] plaintext = Base64.decode(base64Data, Base64.DEFAULT);
+            byte[] plaintext = base64Data.getBytes(StandardCharsets.UTF_8);
             Cipher cipher = Cipher.getInstance(AES_MODE);
             GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec);
