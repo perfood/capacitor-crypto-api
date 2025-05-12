@@ -41,12 +41,15 @@ npx cap sync
 
 <docgen-index>
 
-* [`list()`](#list)
+* [`getECDSATags()`](#getecdsatags)
+* [`getECDHTags()`](#getecdhtags)
 * [`generateKey(...)`](#generatekey)
 * [`loadKey(...)`](#loadkey)
 * [`deleteKey(...)`](#deletekey)
 * [`sign(...)`](#sign)
 * [`verify(...)`](#verify)
+* [`encrypt(...)`](#encrypt)
+* [`decrypt(...)`](#decrypt)
 * [Interfaces](#interfaces)
 
 </docgen-index>
@@ -54,15 +57,28 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### list()
+### getECDSATags()
 
 ```typescript
-list() => Promise<ListResponse>
+getECDSATags() => Promise<GetTagsResponse>
 ```
 
-Returns all key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
 
-**Returns:** <code>Promise&lt;<a href="#listresponse">ListResponse</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#gettagsresponse">GetTagsResponse</a>&gt;</code>
+
+--------------------
+
+
+### getECDHTags()
+
+```typescript
+getECDHTags() => Promise<GetTagsResponse>
+```
+
+Returns all ECDH key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+
+**Returns:** <code>Promise&lt;<a href="#gettagsresponse">GetTagsResponse</a>&gt;</code>
 
 --------------------
 
@@ -167,14 +183,48 @@ Only ECDSA is supported.
 --------------------
 
 
+### encrypt(...)
+
+```typescript
+encrypt(options: EncryptOptions) => Promise<EncryptResponse>
+```
+
+Encrypt data with AES-GCM.
+
+| Param         | Type                                                      |
+| ------------- | --------------------------------------------------------- |
+| **`options`** | <code><a href="#encryptoptions">EncryptOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#encryptresponse">EncryptResponse</a>&gt;</code>
+
+--------------------
+
+
+### decrypt(...)
+
+```typescript
+decrypt(options: DecryptOptions) => Promise<DecryptResponse>
+```
+
+Decrypt data with AES-GCM.
+
+| Param         | Type                                                      |
+| ------------- | --------------------------------------------------------- |
+| **`options`** | <code><a href="#decryptoptions">DecryptOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#decryptresponse">DecryptResponse</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
-#### ListResponse
+#### GetTagsResponse
 
 | Prop       | Type                  | Description        |
 | ---------- | --------------------- | ------------------ |
-| **`list`** | <code>string[]</code> | The key-pair tags. |
+| **`tags`** | <code>string[]</code> | The key-pair tags. |
 
 
 #### GenerateKeyResponse
@@ -186,9 +236,10 @@ Only ECDSA is supported.
 
 #### GenerateKeyOptions
 
-| Prop      | Type                | Description       |
-| --------- | ------------------- | ----------------- |
-| **`tag`** | <code>string</code> | The key-pair tag. |
+| Prop            | Type                           | Description                  |
+| --------------- | ------------------------------ | ---------------------------- |
+| **`tag`**       | <code>string</code>            | The key-pair tag.            |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code> | The elliptic curve algorithm |
 
 
 #### LoadKeyResponse
@@ -200,16 +251,18 @@ Only ECDSA is supported.
 
 #### LoadKeyOptions
 
-| Prop      | Type                | Description       |
-| --------- | ------------------- | ----------------- |
-| **`tag`** | <code>string</code> | The key-pair tag. |
+| Prop            | Type                           | Description                                              |
+| --------------- | ------------------------------ | -------------------------------------------------------- |
+| **`tag`**       | <code>string</code>            | The key-pair tag.                                        |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code> | The elliptic curve algorithm was used to create the key. |
 
 
 #### DeleteKeyOptions
 
-| Prop      | Type                | Description       |
-| --------- | ------------------- | ----------------- |
-| **`tag`** | <code>string</code> | The key-pair tag. |
+| Prop            | Type                           | Description                                              |
+| --------------- | ------------------------------ | -------------------------------------------------------- |
+| **`tag`**       | <code>string</code>            | The key-pair tag.                                        |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code> | The elliptic curve algorithm was used to create the key. |
 
 
 #### SignResponse
@@ -241,5 +294,35 @@ Only ECDSA is supported.
 | **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format. |
 | **`data`**             | <code>string</code> | The signed data.                         |
 | **`signature`**        | <code>string</code> | The signature in base64 format.          |
+
+
+#### EncryptResponse
+
+| Prop            | Type                | Description                                       |
+| --------------- | ------------------- | ------------------------------------------------- |
+| **`encrypted`** | <code>string</code> | JSON string which includes iv and encrypted data. |
+
+
+#### EncryptOptions
+
+| Prop       | Type                | Description               |
+| ---------- | ------------------- | ------------------------- |
+| **`tag`**  | <code>string</code> | The key-pair tag.         |
+| **`data`** | <code>string</code> | The data to be encrypted. |
+
+
+#### DecryptResponse
+
+| Prop            | Type                | Description     |
+| --------------- | ------------------- | --------------- |
+| **`decrypted`** | <code>string</code> | Decrypted data. |
+
+
+#### DecryptOptions
+
+| Prop       | Type                | Description                         |
+| ---------- | ------------------- | ----------------------------------- |
+| **`tag`**  | <code>string</code> | The key-pair tag.                   |
+| **`data`** | <code>string</code> | The encrypted data to be decrypted. |
 
 </docgen-api>

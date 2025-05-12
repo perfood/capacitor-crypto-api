@@ -14,12 +14,23 @@ public class CryptoApiPlugin extends Plugin {
     private CryptoApi implementation = new CryptoApi();
 
     @PluginMethod
-    public void list(PluginCall call) {
-        List<String> list = implementation.list();
+    public void getECDSATags(PluginCall call) {
+        List<String> tags = implementation.getTags("ecdsa");
 
         JSObject ret = new JSObject();
-        if (list != null) {
-            ret.put("list", new JSArray(list));
+        if (tags != null) {
+            ret.put("tags", new JSArray(tags));
+        }
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void getECDHTags(PluginCall call) {
+        List<String> tags = implementation.getTags("ecdh");
+
+        JSObject ret = new JSObject();
+        if (tags != null) {
+            ret.put("tags", new JSArray(tags));
         }
         call.resolve(ret);
     }
@@ -27,8 +38,9 @@ public class CryptoApiPlugin extends Plugin {
     @PluginMethod
     public void generateKey(PluginCall call) {
         String tag = call.getString("tag");
+        String algorithm = call.getString("algorithm");
 
-        String publicKey = implementation.generateKey(tag);
+        String publicKey = implementation.generateKey(tag, algorithm);
 
         JSObject ret = new JSObject();
         if (publicKey != null) {
@@ -40,8 +52,9 @@ public class CryptoApiPlugin extends Plugin {
     @PluginMethod
     public void loadKey(PluginCall call) {
         String tag = call.getString("tag");
+        String algorithm = call.getString("algorithm");
 
-        String publicKey = implementation.loadKey(tag);
+        String publicKey = implementation.loadKey(tag, algorithm);
 
         JSObject ret = new JSObject();
         if (publicKey != null) {
@@ -53,8 +66,9 @@ public class CryptoApiPlugin extends Plugin {
     @PluginMethod
     public void deleteKey(PluginCall call) {
         String tag = call.getString("tag");
+        String algorithm = call.getString("algorithm");
 
-        implementation.deleteKey(tag);
+        implementation.deleteKey(tag, algorithm);
 
         call.resolve();
     }
@@ -83,6 +97,30 @@ public class CryptoApiPlugin extends Plugin {
 
         JSObject ret = new JSObject();
         ret.put("verified", verified);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void encrypt(PluginCall call) {
+        String data = call.getString("data");
+        String tag = call.getString("tag");
+
+        String encrypted = implementation.encrypt(data, tag);
+
+        JSObject ret = new JSObject();
+        ret.put("encrypted", encrypted);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void decrypt(PluginCall call) {
+        String data = call.getString("data");
+        String tag = call.getString("tag");
+
+        String decrypted = implementation.decrypt(data, tag);
+
+        JSObject ret = new JSObject();
+        ret.put("decrypted", decrypted);
         call.resolve(ret);
     }
 }
