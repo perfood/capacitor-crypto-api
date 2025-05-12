@@ -105,7 +105,11 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         let data = call.getString("data") ?? ""
         let tag = call.getString("tag") ?? ""
 
-        let encrypted = implementation.encrypt(data, tag)
+        guard let encrypted = implementation.encrypt(data, tag) else {
+            call.resolve([:])
+
+            return
+        }
 
         call.resolve([
             "encrypted": encrypted
@@ -116,7 +120,11 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         let data = call.getString("data") ?? ""
         let tag = call.getString("tag") ?? ""
 
-        let decrypted = implementation.decrypt(data, tag)
+        guard let decrypted = implementation.decrypt(data, tag) else {
+            call.resolve([:])
+
+            return
+        }
 
         call.resolve([
             "decrypted": decrypted

@@ -136,7 +136,7 @@ import CryptoKit
         }
 
         do {
-            let iv = try AES.GCM.Nonce()
+            let iv = AES.GCM.Nonce()
             let sealedBox = try AES.GCM.seal(plaintextData, using: symmetricKey, nonce: iv)
 
             let resultDict: [String: String] = [
@@ -172,7 +172,7 @@ import CryptoKit
         let tag = combinedData.suffix(tagLength)
 
         do {
-            let sealedBox = try AES.GCM.SealedBox(nonce, ciphertext, tag)
+            let sealedBox = try AES.GCM.SealedBox(nonce: nonce, ciphertext: ciphertext, tag: tag)
             let decryptedData = try AES.GCM.open(sealedBox, using: symmetricKey)
             return String(data: decryptedData, encoding: .utf8)
         } catch {
@@ -229,7 +229,7 @@ import CryptoKit
             return nil
         }
 
-        return privateKey as! SecKey
+        return (privateKey as! SecKey)
     }
 
     private func getPublicKeyBase64(_ tag: String, _ algorithm: String) -> String? {
