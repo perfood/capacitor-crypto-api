@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import {
   CRYPTO_API_ECDSA_KEY_ALGORITHM,
   CRYPTO_API_ECDSA_SIGN_ALGORITHM,

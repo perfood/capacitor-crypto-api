@@ -110,7 +110,7 @@ public class CryptoApiPlugin extends Plugin {
         JSObject ret = new JSObject();
         ret.put("encrypted", encrypted);
         call.resolve(ret);
-    }  
+    }
 
     @PluginMethod
     public void decrypt(PluginCall call) {
@@ -122,6 +122,5 @@ public class CryptoApiPlugin extends Plugin {
         JSObject ret = new JSObject();
         ret.put("decrypted", decrypted);
         call.resolve(ret);
-    }  
-
+    }
 }

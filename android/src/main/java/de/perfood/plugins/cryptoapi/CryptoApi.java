@@ -1,12 +1,9 @@
 package de.perfood.plugins.cryptoapi;
 
-import org.json.JSONObject;
-import org.json.JSONException;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.util.Log;
-import java.util.Arrays;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
@@ -17,8 +14,8 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PublicKey;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
@@ -28,13 +25,16 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.crypto.Cipher;
 import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CryptoApi {
 
@@ -43,7 +43,6 @@ public class CryptoApi {
     private static final String AES_MODE = "AES/GCM/NoPadding";
     private static final int IV_LENGTH = 12; // 96 bits for GCM
     private static final int GCM_TAG_LENGTH = 128; // bits
-
 
     public List<String> getTags(String algorithm) {
         Log.i("CryptoApi.getTags", algorithm);
@@ -88,11 +87,12 @@ public class CryptoApi {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
 
             int purpose = algorithm.equalsIgnoreCase("ecdsa")
-                    ? KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY
-                    : KeyProperties.PURPOSE_AGREE_KEY;
+                ? KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY
+                : KeyProperties.PURPOSE_AGREE_KEY;
 
-            KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(label + tag, purpose)
-                .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"));
+            KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(label + tag, purpose).setAlgorithmParameterSpec(
+                new ECGenParameterSpec("secp256r1")
+            );
 
             // Only set digests if it's ECDSA
             if (algorithm.equalsIgnoreCase("ecdsa")) {
@@ -204,7 +204,7 @@ public class CryptoApi {
             JSONObject result = new JSONObject();
             result.put("iv", Base64.encodeToString(iv, Base64.DEFAULT));
             result.put("encryptedData", Base64.encodeToString(encrypted, Base64.DEFAULT));
-            
+
             return result.toString();
         } catch (NoSuchAlgorithmException e) {
             Log.e("CryptoApi.encrypt", "NoSuchAlgorithmException", e);
@@ -216,7 +216,7 @@ public class CryptoApi {
             Log.e("CryptoApi.encrypt", "JSONException", e);
         } catch (Exception e) {
             Log.e("CryptoApi.encrypt", "Unexpected exception", e);
-        } 
+        }
 
         return null;
     }
@@ -240,7 +240,6 @@ public class CryptoApi {
             byte[] decryptedBytes = cipher.doFinal(encryptedData);
 
             return new String(decryptedBytes, StandardCharsets.UTF_8);
-
         } catch (NoSuchAlgorithmException e) {
             Log.e("CryptoApi.decrypt", "NoSuchAlgorithmException", e);
         } catch (InvalidKeyException e) {
@@ -255,7 +254,6 @@ public class CryptoApi {
 
         return null;
     }
-
 
     private KeyStore.PrivateKeyEntry getPrivateKeyEntry(String tag, String label) {
         try {

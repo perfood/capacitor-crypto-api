@@ -21,14 +21,13 @@ export const CRYPTO_API_ECDH_KEY_ALGORITHM = {
   namedCurve: 'P-256',
 };
 
+export const PRIVATE_KEY_FORMAT = 'pkcs8';
 
-export const PRIVATE_KEY_FORMAT = "pkcs8";
+export const PUBLIC_KEY_FORMAT = 'spki';
 
-export const PUBLIC_KEY_FORMAT = "spki";
+export const CRYPTO_API_AES_GCM_ALGORITHM = 'AES-GCM';
 
-export const CRYPTO_API_AES_GCM_ALGORITHM = "AES-GCM";
-
-export const CRYPTO_API_ECDH_ALGORITHM = "ECDH";
+export const CRYPTO_API_ECDH_ALGORITHM = 'ECDH';
 
 export const SECRET_KEY_LENGHT = 256;
 
@@ -49,7 +48,7 @@ export interface GenerateKeyOptions {
   /**
    * The elliptic curve algorithm
    */
-  algorithm: "ecdsa" | "ecdh";
+  algorithm: 'ecdsa' | 'ecdh';
 }
 
 export interface GenerateKeyResponse {
@@ -67,7 +66,7 @@ export interface LoadKeyOptions {
   /**
    * The elliptic curve algorithm was used to create the key.
    */
-  algorithm: "ecdsa" | "ecdh";
+  algorithm: 'ecdsa' | 'ecdh';
 }
 
 export interface LoadKeyResponse {
@@ -85,7 +84,7 @@ export interface DeleteKeyOptions {
   /**
    * The elliptic curve algorithm was used to create the key.
    */
-  algorithm: "ecdsa" | "ecdh";
+  algorithm: 'ecdsa' | 'ecdh';
 }
 
 export interface SignOptions {
@@ -163,7 +162,6 @@ export interface DecryptResponse {
   decrypted: string;
 }
 
-
 export interface CryptoApiPlugin {
   /**
    * Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
@@ -221,7 +219,7 @@ export interface CryptoApiPlugin {
    * Encrypt data with AES-GCM.
    */
   encrypt(options: EncryptOptions): Promise<EncryptResponse>;
-  
+
   /**
    * Decrypt data with AES-GCM.
    */
