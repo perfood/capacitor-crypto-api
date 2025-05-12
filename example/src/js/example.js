@@ -3,12 +3,21 @@ import { CryptoApi } from '@perfood/capacitor-crypto-api';
 const API_URL = 'https://localhost:3001';
 
 /**
- * Loads the key-pair tags.
+ * Loads the ECDSA key-pair tags.
  */
-window.list = async () => {
-  console.log('list');
-  const list = await CryptoApi.list();
-  document.getElementById('list').textContent = JSON.stringify(list.list);
+window.getECDSATags = async () => {
+  console.log('getECDSATags');
+  const result = await CryptoApi.getECDSATags();
+  document.getElementById('ECDSATags').textContent = JSON.stringify(result.tags);
+};
+
+/**
+ * Loads the ECDSA key-pair tags.
+ */
+window.getECDHTags = async () => {
+  console.log('getECDHTags');
+  const result = await CryptoApi.getECDHTags();
+  document.getElementById('ECDHTags').textContent = JSON.stringify(result.tags);
 };
 
 /**
@@ -17,14 +26,16 @@ window.list = async () => {
 window.createKeyPair = async () => {
   console.log('createKeyPair');
   const tag = document.getElementById('tag').value;
+  const algorithm = document.forms.crypto.elements.algorithm.value;
 
-  if (!tag) {
-    alert('Please enter a tag.');
+  if (!tag || !algorithm) {
+    alert('Please enter a tag and an algorithm.');
     return;
   }
 
   const key = await CryptoApi.generateKey({
     tag,
+    algorithm
   });
   document.getElementById('publicKey').textContent = key.publicKey;
 };
@@ -73,6 +84,7 @@ window.getChallenge = async () => {
   const tag = document.getElementById('tag').value;
 
   if (!tag) {
+    alert('Please enter a tag.');
     return;
   }
 
@@ -104,6 +116,11 @@ window.sign = async () => {
   const tag = document.getElementById('tag').value;
   const challenge = document.getElementById('challenge').value;
 
+  if (!tag || !challenge) {
+    alert('Please enter a tag and a challenge');
+    return;
+  }
+
   const signature = await CryptoApi.sign({
     tag,
     data: challenge,
@@ -121,6 +138,7 @@ window.verify = async () => {
   const signature = document.getElementById('signature').textContent;
 
   if (!tag || !challenge || !signature) {
+    alert('A tag, challenge and signature are required.');
     return;
   }
 
@@ -157,4 +175,45 @@ window.verify = async () => {
       document.getElementById('verifiedServer').textContent =
         error.statusText || error;
     });
+};
+
+/**
+ * Encrypt a text.
+ */
+window.encrypt = async () => {
+  console.log('encrypt');
+  const tag = document.getElementById('tag').value;
+  const encrypt = document.getElementById('encryptText').value;
+
+  if (!tag || !encrypt) {
+    alert('Please enter a tag and a text to encrypt.');
+    return;
+  }
+  const result = await CryptoApi.encrypt({
+    tag,
+    data: encrypt,
+  });
+
+  document.getElementById('encrypted').textContent = result.encrypted;
+};
+
+/**
+ * Decrypt a text.
+ */
+window.decrypt = async () => {
+  console.log('decrypt');
+  const tag = document.getElementById('tag').value;
+  const encrypted = document.getElementById('encrypted').textContent;
+
+  if (!tag || !encrypted) {
+    alert('Please enter a tag and encrypt a text at first.');
+    return;
+  }
+
+  const result = await CryptoApi.decrypt({
+    tag,
+    data: encrypted,
+  });
+
+  document.getElementById('decrypted').textContent = result.decrypted;
 };

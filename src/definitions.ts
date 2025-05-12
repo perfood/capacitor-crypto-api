@@ -13,11 +13,32 @@ export const CRYPTO_API_ECDSA_SIGN_ALGORITHM = {
   hash: { name: 'SHA-256' },
 };
 
-export interface ListResponse {
+/**
+ * ECDH key algorithm.
+ */
+export const CRYPTO_API_ECDH_KEY_ALGORITHM = {
+  name: 'ECDH',
+  namedCurve: 'P-256',
+};
+
+
+export const PRIVATE_KEY_FORMAT = "pkcs8";
+
+export const PUBLIC_KEY_FORMAT = "spki";
+
+export const CRYPTO_API_AES_GCM_ALGORITHM = "AES-GCM";
+
+export const CRYPTO_API_ECDH_ALGORITHM = "ECDH";
+
+export const SECRET_KEY_LENGHT = 256;
+
+export const IV_LENGTH = 12;
+
+export interface GetTagsResponse {
   /**
    * The key-pair tags.
    */
-  list: string[];
+  tags: string[];
 }
 
 export interface GenerateKeyOptions {
@@ -25,6 +46,10 @@ export interface GenerateKeyOptions {
    * The key-pair tag.
    */
   tag: string;
+  /**
+   * The elliptic curve algorithm
+   */
+  algorithm: "ecdsa" | "ecdh";
 }
 
 export interface GenerateKeyResponse {
@@ -39,6 +64,10 @@ export interface LoadKeyOptions {
    * The key-pair tag.
    */
   tag: string;
+  /**
+   * The elliptic curve algorithm was used to create the key.
+   */
+  algorithm: "ecdsa" | "ecdh";
 }
 
 export interface LoadKeyResponse {
@@ -53,6 +82,10 @@ export interface DeleteKeyOptions {
    * The key-pair tag.
    */
   tag: string;
+  /**
+   * The elliptic curve algorithm was used to create the key.
+   */
+  algorithm: "ecdsa" | "ecdh";
 }
 
 export interface SignOptions {
@@ -94,11 +127,53 @@ export interface VerifyResponse {
   verified: boolean;
 }
 
+export interface EncryptOptions {
+  /**
+   * The key-pair tag.
+   */
+  tag: string;
+  /**
+   * The data to be encrypted.
+   */
+  data: string;
+}
+
+export interface EncryptResponse {
+  /**
+   * JSON string which includes iv and encrypted data.
+   */
+  encrypted: string;
+}
+
+export interface DecryptOptions {
+  /**
+   * The key-pair tag.
+   */
+  tag: string;
+  /**
+   * The encrypted data to be decrypted.
+   */
+  data: string;
+}
+
+export interface DecryptResponse {
+  /**
+   * Decrypted data.
+   */
+  decrypted: string;
+}
+
+
 export interface CryptoApiPlugin {
   /**
-   * Returns all key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+   * Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
    */
-  list(): Promise<ListResponse>;
+  getECDSATags(): Promise<GetTagsResponse>;
+
+  /**
+   * Returns all ECDH key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+   */
+  getECDHTags(): Promise<GetTagsResponse>;
 
   /**
    * Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),
@@ -141,4 +216,14 @@ export interface CryptoApiPlugin {
    * @since 1.0.0
    */
   verify(options: VerifyOptions): Promise<VerifyResponse>;
+
+  /**
+   * Encrypt data with AES-GCM.
+   */
+  encrypt(options: EncryptOptions): Promise<EncryptResponse>;
+  
+  /**
+   * Decrypt data with AES-GCM.
+   */
+  decrypt(options: DecryptOptions): Promise<DecryptResponse>;
 }
