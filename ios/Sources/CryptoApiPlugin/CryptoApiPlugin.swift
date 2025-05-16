@@ -10,27 +10,39 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "CryptoApiPlugin"
     public let jsName = "CryptoApi"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "list", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getECDSATags", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getECDHTags", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "generateKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "loadKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "sign", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "verify", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "verify", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "encrypt", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "decrypt", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
 
-    @objc func list(_ call: CAPPluginCall) {
-        let list = implementation.list()
+    @objc func getECDSATags(_ call: CAPPluginCall) {
+        let tags = implementation.getTags("ecdsa")
 
         call.resolve([
-            "list": list
+            "tags": tags
+        ])
+    }
+
+    @objc func getECDHTags(_ call: CAPPluginCall) {
+        let tags = implementation.getTags("ecdh")
+
+        call.resolve([
+            "tags": tags
         ])
     }
 
     @objc func generateKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
+        let algorithm = call.getString("algorithm") ?? ""
 
-        guard let publicKey = implementation.generateKey(tag) else {
+        guard let publicKey = implementation.generateKey(tag, algorithm) else {
             call.resolve([:])
 
             return
@@ -43,8 +55,9 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func loadKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
+        let algorithm = call.getString("algorithm") ?? ""
 
-        guard let publicKey = implementation.loadKey(tag) else {
+        guard let publicKey = implementation.loadKey(tag, algorithm) else {
             call.resolve([:])
 
             return
@@ -57,8 +70,9 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func deleteKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
+        let algorithm = call.getString("algorithm") ?? ""
 
-        implementation.deleteKey(tag)
+        implementation.deleteKey(tag, algorithm)
 
         call.resolve()
     }
@@ -87,6 +101,37 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
 
         call.resolve([
             "verified": verified
+        ])
+    }
+
+    @objc func encrypt(_ call: CAPPluginCall) {
+        let tag = call.getString("tag") ?? ""
+        let foreignPublicKey = call.getString("foreignPublicKey") ?? ""
+        let plaintext = call.getString("plaintext") ?? ""
+
+        guard let encrypted = implementation.encrypt(tag, foreignPublicKey, plaintext) else {
+            call.resolve([:])
+
+            return
+        }
+
+        call.resolve(encrypted)
+    }
+
+    @objc func decrypt(_ call: CAPPluginCall) {
+        let tag = call.getString("tag") ?? ""
+        let foreignPublicKey = call.getString("foreignPublicKey") ?? ""
+        let iv = call.getString("iv") ?? ""
+        let encryptedData = call.getString("encryptedData") ?? ""
+
+        guard let plaintext = implementation.decrypt(tag, foreignPublicKey, iv, encryptedData) else {
+            call.resolve([:])
+
+            return
+        }
+
+        call.resolve([
+            "plaintext": plaintext
         ])
     }
 }

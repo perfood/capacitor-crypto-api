@@ -298,31 +298,35 @@ Decrypt data with AES-GCM.
 
 #### EncryptResponse
 
-| Prop            | Type                | Description                                       |
-| --------------- | ------------------- | ------------------------------------------------- |
-| **`encrypted`** | <code>string</code> | JSON string which includes iv and encrypted data. |
+| Prop                | Type                | Description                          |
+| ------------------- | ------------------- | ------------------------------------ |
+| **`iv`**            | <code>string</code> | The iv in base64 format.             |
+| **`encryptedData`** | <code>string</code> | The encrypted data in base64 format. |
 
 
 #### EncryptOptions
 
-| Prop       | Type                | Description               |
-| ---------- | ------------------- | ------------------------- |
-| **`tag`**  | <code>string</code> | The key-pair tag.         |
-| **`data`** | <code>string</code> | The data to be encrypted. |
+| Prop                   | Type                | Description                              |
+| ---------------------- | ------------------- | ---------------------------------------- |
+| **`tag`**              | <code>string</code> | The key-pair tag.                        |
+| **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format. |
+| **`plaintext`**        | <code>string</code> | The plaintext to be encrypted.           |
 
 
 #### DecryptResponse
 
-| Prop            | Type                | Description     |
-| --------------- | ------------------- | --------------- |
-| **`decrypted`** | <code>string</code> | Decrypted data. |
+| Prop            | Type                | Description              |
+| --------------- | ------------------- | ------------------------ |
+| **`plaintext`** | <code>string</code> | The decrypted plaintext. |
 
 
 #### DecryptOptions
 
-| Prop       | Type                | Description                         |
-| ---------- | ------------------- | ----------------------------------- |
-| **`tag`**  | <code>string</code> | The key-pair tag.                   |
-| **`data`** | <code>string</code> | The encrypted data to be decrypted. |
+| Prop                   | Type                | Description                              |
+| ---------------------- | ------------------- | ---------------------------------------- |
+| **`tag`**              | <code>string</code> | The key-pair tag.                        |
+| **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format. |
+| **`iv`**               | <code>string</code> | The iv in base64 format.                 |
+| **`encryptedData`**    | <code>string</code> | The encrypted data in base64 format.     |
 
 </docgen-api>

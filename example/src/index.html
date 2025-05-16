@@ -26,6 +26,13 @@
       <form name="crypto" onsubmit="event.preventDefault()">
         <h1>capacitor-crypto-api example</h1>
         <p>
+          This example demonstrates the use of the capacitor-crypto-api plugin. The plugin provides a simple API to
+          create and manage key-pairs, sign and verify data, encrypt and decrypt data.
+        </p>
+
+        <h2>ECDSA - sign and verify data</h2>
+        <hr />
+        <p>
           This example demonstrates a simple 2-factor-authentication mechanism. The client creates a key-pair and
           registers the public-key with the server. The server creates a challenge and sends it to the client. The
           client signs the challenge with the private-key and sends the signed data back to the server. The server can
@@ -33,60 +40,99 @@
           private-key.
         </p>
 
-        <h3>tag</h3>
-        <input type="text" id="tag" name="tag" placeholder="tag" />
-
-        <h2>Get key-pair tags</h2>
-        <h3>ECDSA</h3>
+        <h3>1. load existing tags</h3>
         <button onclick="getECDSATags()">load ECDSA key-pair tags</button>
         <code id="ECDSATags"></code>
-        <h3>ECDH</h3>
+
+        <h3>2. create / load tag</h3>
+        <input type="text" id="ecdsa-tag" name="ecdsa-tag" placeholder="ecdsa-tag" />
+        <button onclick="createECDSAKeyPair()">create / load ECDSA key-pair</button>
+
+        <h4>2.1 public key from tag</h4>
+        <code id="ecdsa-public-key">create / load a tag first</code>
+
+        <h3>3. register public key with server</h3>
+        <button onclick="registerECDSAPublicKey()">register public-key with server</button>
+        <code id="ecdsa-registered"></code>
+
+        <h3>4. get challenge from server</h3>
+        <button onclick="getECDSAChallenge()">get challenge</button>
+
+        <h4>4.1 challenge</h4>
+        <input type="text" id="ecdsa-challenge" name="ecdsa-challenge" placeholder="ecdsa-challenge" />
+
+        <h3>5. sign challenge</h3>
+        <button onclick="signECDSA()">sign challenge</button>
+
+        <h4>5.1 signature</h4>
+        <input type="text" id="ecdsa-signature" name="ecdsa-signature" placeholder="ecdsa-signature" />
+
+        <h3>6. foreign public key to verify with</h3>
+        <input
+          type="text"
+          id="ecdsa-foreign-public-key"
+          name="ecdsa-foreign-public-key"
+          placeholder="ecdsa-foreign-public-key"
+        /><button onclick="copyOwnECDSAPublicKey()">copy own public key</button>
+
+        <h3>7. verify challenge local</h3>
+        <button onclick="verifyECDSALocal()">verify challenge local</button>
+
+        <h4>7.1 verified local</h4>
+        <code id="ecdsa-verified-local"></code>
+
+        <h3>8. verify challenge server</h3>
+        <button onclick="verifyECDSAServer()">verify challenge server</button>
+
+        <h4>8.1 verified server</h4>
+        <code id="ecdsa-verified-server"></code>
+
+        <h2>ECDH - encrypt and decrypt data</h2>
+        <hr />
+        <p>
+          This example demonstrates a simple end-to-end encryption mechanism. The client creates a key-pair and encrypts
+          the data with the foreign public-key. The foreign party can then decrypt the data with its private-key and the
+          clints public-key. The client can also decrypt the data with its private-key that was encrypted from the
+          remote party.
+        </p>
+
+        <h3>1. load existing tags</h3>
         <button onclick="getECDHTags()">load ECDH key-pair tags</button>
         <code id="ECDHTags"></code>
 
-        <h2>key-pair</h2>
+        <h3>2. create / load tag</h3>
+        <input type="text" id="ecdh-tag" name="ecdh-tag" placeholder="ecdh-tag" />
+        <button onclick="createECDHKeyPair()">create / load ECDH key-pair</button>
 
-        <h3>Create/Load</h3>
-        <input type="radio" id="ecdsa" name="algorithm" value="ecdsa" />
-        <label for="ecdsa">ECDSA</label><br />
-        <input type="radio" id="ecdh" name="algorithm" value="ecdh" />
-        <label for="ecdh">ECDH</label><br />
-        <button onclick="createKeyPair()">create / load key-pair</button>
+        <h3>2.1 public key from tag</h3>
+        <code id="ecdh-public-key"></code>
 
-        <h3>Register public-key</h3>
-        <code id="publicKey"></code>
-        <button onclick="registerPublicKey()">register public-key with server</button>
-        <code id="registered"></code>
+        <h3>3. plaintext to encrypt</h3>
+        <input type="text" id="ecdh-plaintext" name="ecdh-plaintext" placeholder="ecdh-plaintext" />
 
-        <h2>sign / verify</h2>
+        <h3>4. foreign public key to encrypt with</h3>
+        <input
+          type="text"
+          id="ecdh-foreign-public-key"
+          name="ecdh-foreign-public-key"
+          placeholder="ecdh-foreign-public-key"
+        /><button onclick="copyOwnECDHPublicKey()">copy own public key</button>
 
-        <h3>sign challenge</h3>
-        <input type="text" id="challenge" name="challenge" placeholder="challenge" readonly />
-        <button onclick="getChallenge()">get challenge</button>
-        <button onclick="sign()">sign challenge</button>
+        <h3>5. encrypt plaintext</h3>
+        <button onclick="encryptECDH()">encrypt plaintext</button>
 
-        <h4>signature</h4>
-        <code id="signature"></code>
+        <h4>5.1 iv</h4>
+        <input type="text" id="ecdh-iv" name="ecdh-iv" placeholder="ecdh-iv" />
 
-        <h3>verify challenge</h3>
-        <button onclick="verify()">verify challenge</button>
+        <h4>5.2 encrypted data</h4>
+        <input type="text" id="ecdh-encrypted-data" name="ecdh-encrypted-data" placeholder="ecdh-encrypted-data" />
 
-        <h4>verified local</h4>
-        <code id="verifiedLocal"></code>
+        <h3>6. decrypt data</h3>
+        <button onclick="decryptECDH()">decrypt data</button>
+        <code id="ecdh-decrypted"></code>
 
-        <h4>verified server</h4>
-        <code id="verifiedServer"></code>
-
-        <h2>encyrpt / decrypt</h2>
-
-        <h3>encrypt</h3>
-        <input type="text" id="encryptText" name="encryptText" placeholder="encryptText" />
-        <button onclick="encrypt()">encrypt</button>
-        <code id="encrypted"></code>
-
-        <h3>decrypt</h3>
-        <button onclick="decrypt()">decrypt</button>
-        <code id="decrypted"></code>
+        <h4>6.1 decrypted data</h4>
+        <code id="ecdh-decrypted-data"></code>
       </form>
     </main>
 
