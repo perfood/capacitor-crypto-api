@@ -11,11 +11,14 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "CryptoApi"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "getECDSATags", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getECDHTags", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "generateKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "loadKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "deleteKey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "sign", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "verify", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "verify", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "encrypt", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "decrypt", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
 
@@ -102,32 +105,33 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     @objc func encrypt(_ call: CAPPluginCall) {
-        let data = call.getString("data") ?? ""
         let tag = call.getString("tag") ?? ""
+        let foreignPublicKey = call.getString("foreignPublicKey") ?? ""
+        let plaintext = call.getString("plaintext") ?? ""
 
-        guard let encrypted = implementation.encrypt(data, tag) else {
+        guard let encrypted = implementation.encrypt(tag, foreignPublicKey, plaintext) else {
             call.resolve([:])
 
             return
         }
 
-        call.resolve([
-            "encrypted": encrypted
-        ])
+        call.resolve(encrypted)
     }
 
     @objc func decrypt(_ call: CAPPluginCall) {
-        let data = call.getString("data") ?? ""
         let tag = call.getString("tag") ?? ""
+        let foreignPublicKey = call.getString("foreignPublicKey") ?? ""
+        let iv = call.getString("iv") ?? ""
+        let encryptedData = call.getString("encryptedData") ?? ""
 
-        guard let decrypted = implementation.decrypt(data, tag) else {
+        guard let plaintext = implementation.decrypt(tag, foreignPublicKey, iv, encryptedData) else {
             call.resolve([:])
 
             return
         }
 
         call.resolve([
-            "decrypted": decrypted
+            "plaintext": plaintext
         ])
     }
 }

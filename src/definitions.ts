@@ -97,6 +97,7 @@ export interface SignOptions {
    */
   data: string;
 }
+
 export interface SignResponse {
   /**
    * The signature in base64 format.
@@ -132,16 +133,24 @@ export interface EncryptOptions {
    */
   tag: string;
   /**
-   * The data to be encrypted.
+   * The foreign public-key in base64 format.
    */
-  data: string;
+  foreignPublicKey: string;
+  /**
+   * The plaintext to be encrypted.
+   */
+  plaintext: string;
 }
 
 export interface EncryptResponse {
   /**
-   * JSON string which includes iv and encrypted data.
+   * The iv in base64 format.
    */
-  encrypted: string;
+  iv: string;
+  /**
+   * The encrypted data in base64 format.
+   */
+  encryptedData: string;
 }
 
 export interface DecryptOptions {
@@ -150,16 +159,24 @@ export interface DecryptOptions {
    */
   tag: string;
   /**
-   * The encrypted data to be decrypted.
+   * The foreign public-key in base64 format.
    */
-  data: string;
+  foreignPublicKey: string;
+  /**
+   * The iv in base64 format.
+   */
+  iv: string;
+  /**
+   * The encrypted data in base64 format.
+   */
+  encryptedData: string;
 }
 
 export interface DecryptResponse {
   /**
-   * Decrypted data.
+   * The decrypted plaintext.
    */
-  decrypted: string;
+  plaintext: string;
 }
 
 export interface CryptoApiPlugin {

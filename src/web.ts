@@ -141,14 +141,12 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       throw new Error('Private key not found');
     }
 
-    const privateKey = await this.importKey('ecdsa', PRIVATE_KEY_FORMAT, keyPair.privateKey, ['sign']);
-
     const signature = arrayBufferToBase64(
       p1363ToDer(
         new Uint8Array(
           await crypto.subtle.sign(
             CRYPTO_API_ECDSA_SIGN_ALGORITHM,
-            privateKey,
+            await this.importKey('ecdsa', PRIVATE_KEY_FORMAT, keyPair.privateKey, ['sign']),
             base64ToArrayBuffer(btoa(options.data)),
           ),
         ),
@@ -165,11 +163,9 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       throw new Error('WebCrypto API is only available in secure contexts (https)');
     }
 
-    const foreignPublicKey = await this.importKey('ecdsa', PUBLIC_KEY_FORMAT, options.foreignPublicKey, ['verify']);
-
     const verified = await crypto.subtle.verify(
       CRYPTO_API_ECDSA_SIGN_ALGORITHM,
-      foreignPublicKey,
+      await this.importKey('ecdsa', PUBLIC_KEY_FORMAT, options.foreignPublicKey, ['verify']),
       derToP1363(base64ToArrayBuffer(options.signature)),
       base64ToArrayBuffer(btoa(options.data)),
     );
@@ -180,44 +176,46 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async encrypt(options: EncryptOptions): Promise<EncryptResponse> {
     console.log('CryptoApi.encrypt', options);
 
+    if (window.location.protocol != 'https:') {
+      throw new Error('WebCrypto API is only available in secure contexts (https)');
+    }
+
     const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
-    const arrayBuffer = new TextEncoder().encode(options.data);
-    const secretKey = await this.deriveSecret(options.tag);
 
     const encryptedData = await crypto.subtle.encrypt(
       {
         name: CRYPTO_API_AES_GCM_ALGORITHM,
         iv,
       },
-      secretKey,
-      arrayBuffer,
+      await this.deriveKey(options.tag, options.foreignPublicKey),
+      new TextEncoder().encode(options.plaintext),
     );
 
-    const encrypted = JSON.stringify({
+    return {
       iv: arrayBufferToBase64(iv),
       encryptedData: arrayBufferToBase64(encryptedData),
-    });
-
-    return { encrypted };
+    };
   }
 
   async decrypt(options: DecryptOptions): Promise<DecryptResponse> {
     console.log('CryptoApi.decrypt', options);
 
-    const data = JSON.parse(options.data);
-    const secretKey = await this.deriveSecret(options.tag);
+    if (window.location.protocol != 'https:') {
+      throw new Error('WebCrypto API is only available in secure contexts (https)');
+    }
 
     const decryptedData = await crypto.subtle.decrypt(
       {
         name: CRYPTO_API_AES_GCM_ALGORITHM,
-        iv: base64ToArrayBuffer(data.iv),
+        iv: base64ToArrayBuffer(options.iv),
       },
-      secretKey,
-      base64ToArrayBuffer(data.encryptedData),
+      await this.deriveKey(options.tag, options.foreignPublicKey),
+      base64ToArrayBuffer(options.encryptedData),
     );
-    const decrypted = new TextDecoder().decode(decryptedData);
 
-    return { decrypted };
+    return {
+      plaintext: new TextDecoder().decode(decryptedData),
+    };
   }
 
   private async importKey(
@@ -231,27 +229,23 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     return crypto.subtle.importKey(format, keyData, keyAlgorithm, false, keyUsages);
   }
 
-  private async deriveSecret(tag: string): Promise<CryptoKey> {
-    let item = localStorage.getItem(`${LabelECDH}${tag}`);
-    console.log('CryptoApi.deriveSecret - item', item);
+  private async deriveKey(tag: string, foreignPublicKey: string): Promise<CryptoKey> {
+    const item = localStorage.getItem(`${LabelECDH}${tag}`);
     if (!item) {
-      await this.generateKey({ tag, algorithm: 'ecdh' });
-      item = localStorage.getItem(`${LabelECDH}${tag}`);
-
-      if (!item) {
-        throw new Error('CryptoApi.deriveSecret - Failed to generate new key pair.');
-      }
+      throw new Error('Key not found');
     }
+
     const keyPair = JSON.parse(item);
-    const privateKey = await this.importKey('ecdh', PRIVATE_KEY_FORMAT, keyPair.privateKey, ['deriveKey']);
-    const publicKey = await this.importKey('ecdh', PUBLIC_KEY_FORMAT, keyPair.publicKey, []);
+    if (!keyPair.privateKey) {
+      throw new Error('Private key not found');
+    }
 
     const sharedSecret = await crypto.subtle.deriveKey(
       {
         name: CRYPTO_API_ECDH_ALGORITHM,
-        public: publicKey,
+        public: await this.importKey('ecdh', PUBLIC_KEY_FORMAT, foreignPublicKey, []),
       },
-      privateKey,
+      await this.importKey('ecdh', PRIVATE_KEY_FORMAT, keyPair.privateKey, ['deriveKey']),
       {
         name: CRYPTO_API_AES_GCM_ALGORITHM,
         length: SECRET_KEY_LENGHT,

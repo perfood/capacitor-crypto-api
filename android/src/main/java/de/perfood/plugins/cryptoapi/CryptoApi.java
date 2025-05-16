@@ -51,7 +51,7 @@ public class CryptoApi {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
 
-            ArrayList<String> list = new ArrayList();
+            ArrayList<String> list = new ArrayList<>();
             String label = this.getLabel(algorithm);
 
             for (String tag : Collections.list(keyStore.aliases())) {
@@ -61,15 +61,7 @@ public class CryptoApi {
             }
 
             return list;
-        } catch (Error e) {
-            return Collections.emptyList();
-        } catch (CertificateException e) {
-            return Collections.emptyList();
-        } catch (KeyStoreException e) {
-            return Collections.emptyList();
-        } catch (IOException e) {
-            return Collections.emptyList();
-        } catch (NoSuchAlgorithmException e) {
+        } catch (Error | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
             return Collections.emptyList();
         }
     }
@@ -103,13 +95,7 @@ public class CryptoApi {
             keyPairGenerator.generateKeyPair();
 
             return getPublicKeyBase64(tag, algorithm);
-        } catch (Error e) {
-            return null;
-        } catch (InvalidAlgorithmParameterException e) {
-            return null;
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        } catch (NoSuchProviderException e) {
+        } catch (Error | InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException e) {
             return null;
         }
     }
@@ -128,9 +114,9 @@ public class CryptoApi {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
             keyStore.deleteEntry(label + tag);
-        } catch (Error e) {} catch (CertificateException e) {} catch (KeyStoreException e) {} catch (IOException e) {} catch (
-            NoSuchAlgorithmException e
-        ) {}
+        } catch (Error | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
+            return;
+        }
     }
 
     public String sign(String tag, String data) {
@@ -148,13 +134,7 @@ public class CryptoApi {
             signature.update(data.getBytes());
 
             return Base64.encodeToString(signature.sign(), Base64.DEFAULT);
-        } catch (Error e) {
-            return null;
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        } catch (SignatureException e) {
-            return null;
-        } catch (InvalidKeyException e) {
+        } catch (Error | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
             return null;
         }
     }
@@ -174,13 +154,7 @@ public class CryptoApi {
             signature.update(data.getBytes());
 
             return signature.verify(Base64.decode(signatureBase64, Base64.DEFAULT));
-        } catch (Error e) {
-            return false;
-        } catch (NoSuchAlgorithmException e) {
-            return false;
-        } catch (SignatureException e) {
-            return false;
-        } catch (InvalidKeyException e) {
+        } catch (Error | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
             return false;
         }
     }
@@ -261,17 +235,9 @@ public class CryptoApi {
             keyStore.load(null);
 
             return (KeyStore.PrivateKeyEntry) keyStore.getEntry(label + tag, null);
-        } catch (Error e) {
-            return null;
-        } catch (UnrecoverableEntryException e) {
-            return null;
-        } catch (CertificateException e) {
-            return null;
-        } catch (KeyStoreException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        } catch (NoSuchAlgorithmException e) {
+        } catch (
+            Error | UnrecoverableEntryException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e
+        ) {
             return null;
         }
     }
@@ -295,11 +261,7 @@ public class CryptoApi {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_EC);
             return keyFactory.generatePublic(new X509EncodedKeySpec(Base64.decode(publicKeyBase64, Base64.DEFAULT)));
-        } catch (Error e) {
-            return null;
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        } catch (InvalidKeySpecException e) {
+        } catch (Error | NoSuchAlgorithmException | InvalidKeySpecException e) {
             return null;
         }
     }

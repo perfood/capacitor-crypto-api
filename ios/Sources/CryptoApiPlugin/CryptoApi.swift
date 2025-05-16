@@ -127,11 +127,11 @@ import CryptoKit
                                      &error)
     }
 
-    @objc public func encrypt(_ data: String, _ tag: String) -> String? {
-        print("CryptoApi.encrypt", data, tag)
+    @objc public func encrypt(_ tag: String, _ foreignPublicKey: String, _ plaintext: String) -> [String: String]? {
+        print("CryptoApi.encrypt", tag, foreignPublicKey, plaintext)
 
-        guard let symmetricKey = deriveSecret(tag),
-              let plaintextData = Data(base64Encoded: data) else {
+        guard let symmetricKey = deriveSecret(tag, foreignPublicKey),
+              let plaintextData = plaintext.data(using: .utf8) else {
             return nil
         }
 
@@ -143,30 +143,28 @@ import CryptoKit
                 "iv": Data(iv).base64EncodedString(),
                 "encryptedData": (sealedBox.ciphertext + sealedBox.tag).base64EncodedString()
             ]
-            let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
-            return String(data: jsonData, encoding: .utf8)
+
+            return resultDict
         } catch {
             print("CryptoApi.encrypt failed:", error)
             return nil
         }
     }
 
-    @objc public func decrypt(_ data: String, _ tag: String) -> String? {
-        print("CryptoApi.decrypt: \(data) \(tag)")
+    @objc public func decrypt(_ tag: String, _ foreignPublicKey: String, _ iv: String, _ encryptedData: String) -> String? {
+        print("CryptoApi.decrypt", tag, foreignPublicKey, iv, encryptedData)
 
-        guard let jsonData = data.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: String],
-              let ivBase64 = json["iv"],
-              let combinedBase64 = json["encryptedData"],
-              let ivData = Data(base64Encoded: ivBase64),
-              let combinedData = Data(base64Encoded: combinedBase64),
-              let symmetricKey = deriveSecret(tag),
+        guard let ivData = Data(base64Encoded: iv),
+              let combinedData = Data(base64Encoded: encryptedData),
+              let symmetricKey = deriveSecret(tag, foreignPublicKey),
               let nonce = try? AES.GCM.Nonce(data: ivData) else {
             return nil
         }
 
         let tagLength = 16
-        guard combinedData.count > tagLength else { return nil }
+        guard combinedData.count > tagLength else {
+            return nil
+        }
 
         let ciphertext = combinedData.prefix(combinedData.count - tagLength)
         let tag = combinedData.suffix(tagLength)
@@ -181,37 +179,25 @@ import CryptoKit
         }
     }
 
-    private func deriveSecret(_ tag: String) -> SymmetricKey? {
+    private func deriveSecret(_ tag: String, _ foreignPublicKey: String) -> SymmetricKey? {
         guard let secPrivateKey = getPrivateKey(tag, "ecdh"),
-              let publicKeyData = getPublicKeyData(tag, "ecdh"),
-              let privateKeyData = SecKeyCopyExternalRepresentation(secPrivateKey, nil) as Data? else {
-            _ = generateKey(tag, "ecdh")
-            guard let secPrivateKey = getPrivateKey(tag, "ecdh"),
-                  let publicKeyData = getPublicKeyData(tag, "ecdh"),
-                  let privateKeyData = SecKeyCopyExternalRepresentation(secPrivateKey, nil) as Data? else {
-                return nil
-            }
-            return deriveSecretFromRawKeys(privateKeyData, publicKeyData)
-        }
-
-        return deriveSecretFromRawKeys(privateKeyData, publicKeyData)
-    }
-
-    private func deriveSecretFromRawKeys(_ privateKeyData: Data, _ publicKeyData: Data) -> SymmetricKey? {
-        do {
-            let privateKey = try P256.KeyAgreement.PrivateKey(rawRepresentation: privateKeyData)
-            let remotePublicKey = try P256.KeyAgreement.PublicKey(rawRepresentation: publicKeyData)
-            let sharedSecret = try privateKey.sharedSecretFromKeyAgreement(with: remotePublicKey)
-            return sharedSecret.hkdfDerivedSymmetricKey(
-                using: SHA256.self,
-                salt: Data(),
-                sharedInfo: Data(),
-                outputByteCount: 32
-            )
-        } catch {
-            print("Key derivation failed:", error)
+              let secPublicKey =  loadPublicKeyFromBase64(foreignPublicKey) else {
             return nil
         }
+
+        var keyExchangeError: Unmanaged<CFError>?
+
+        guard let derivedData = SecKeyCopyKeyExchangeResult(
+                secPrivateKey,
+                SecKeyAlgorithm.ecdhKeyExchangeStandardX963SHA256,
+                secPublicKey,
+                [SecKeyKeyExchangeParameter.requestedSize.rawValue as String: 32] as CFDictionary,
+                &keyExchangeError)
+        else {
+            return nil
+        }
+
+        return SymmetricKey(data: derivedData as Data)
     }
 
     private func getPrivateKey(_ tag: String, _ algorithm: String) -> SecKey? {
