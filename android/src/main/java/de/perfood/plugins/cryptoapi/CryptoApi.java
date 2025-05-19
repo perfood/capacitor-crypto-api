@@ -4,6 +4,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.util.Log;
+import com.getcapacitor.JSObject;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
@@ -33,7 +34,6 @@ import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import com.getcapacitor.JSObject;
 
 public class CryptoApi {
 
@@ -191,6 +191,7 @@ public class CryptoApi {
 
         return null;
     }
+
     public String decrypt(String tag, String foreignPublicKey, String iv, String encryptedData) {
         Log.i("CryptoApi.decrypt", tag + " " + foreignPublicKey + " " + iv + " " + encryptedData);
 

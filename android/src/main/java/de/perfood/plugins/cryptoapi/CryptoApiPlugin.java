@@ -107,7 +107,7 @@ public class CryptoApiPlugin extends Plugin {
         String plaintext = call.getString("plaintext");
 
         JSObject encrypted = implementation.encrypt(tag, foreignPublicKey, plaintext);
-        
+
         call.resolve(encrypted);
     }
 
