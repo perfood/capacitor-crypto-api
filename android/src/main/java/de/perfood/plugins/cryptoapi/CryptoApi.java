@@ -33,8 +33,7 @@ import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.getcapacitor.JSObject;
 
 public class CryptoApi {
 
@@ -159,59 +158,52 @@ public class CryptoApi {
         }
     }
 
-    public String encrypt(String base64Data, String tag) {
-        Log.i("CryptoApi.encrypt", base64Data + " " + tag);
+    public JSObject encrypt(String tag, String foreignPublicKey, String plaintext) {
+        Log.i("CryptoApi.encrypt", tag + " " + foreignPublicKey + " " + plaintext);
 
         try {
-            SecretKey secretKey = this.deriveSecret(tag);
+            SecretKey secretKey = this.deriveSecret(tag, foreignPublicKey);
 
             byte[] iv = new byte[IV_LENGTH];
             SecureRandom secureRandom = new SecureRandom();
             secureRandom.nextBytes(iv);
 
-            byte[] plaintext = base64Data.getBytes(StandardCharsets.UTF_8);
+            byte[] plaintextBytes = plaintext.getBytes(StandardCharsets.UTF_8);
             Cipher cipher = Cipher.getInstance(AES_MODE);
             GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, gcmSpec);
-            byte[] encrypted = cipher.doFinal(plaintext);
+            byte[] encrypted = cipher.doFinal(plaintextBytes);
 
-            JSONObject result = new JSONObject();
+            JSObject result = new JSObject();
             result.put("iv", Base64.encodeToString(iv, Base64.DEFAULT));
             result.put("encryptedData", Base64.encodeToString(encrypted, Base64.DEFAULT));
 
-            return result.toString();
+            return result;
         } catch (NoSuchAlgorithmException e) {
             Log.e("CryptoApi.encrypt", "NoSuchAlgorithmException", e);
         } catch (InvalidKeyException e) {
             Log.e("CryptoApi.encrypt", "InvalidKeyException", e);
         } catch (InvalidAlgorithmParameterException e) {
             Log.e("CryptoApi.encrypt", "InvalidAlgorithmParameterException", e);
-        } catch (JSONException e) {
-            Log.e("CryptoApi.encrypt", "JSONException", e);
         } catch (Exception e) {
             Log.e("CryptoApi.encrypt", "Unexpected exception", e);
         }
 
         return null;
     }
-
-    public String decrypt(String encryptedJson, String tag) {
-        Log.i("CryptoApi.decrypt", encryptedJson + " " + tag);
+    public String decrypt(String tag, String foreignPublicKey, String iv, String encryptedData) {
+        Log.i("CryptoApi.decrypt", tag + " " + foreignPublicKey + " " + iv + " " + encryptedData);
 
         try {
-            SecretKey secretKey = this.deriveSecret(tag);
+            SecretKey secretKey = this.deriveSecret(tag, foreignPublicKey);
 
-            JSONObject json = new JSONObject(encryptedJson);
-            String ivBase64 = json.getString("iv");
-            String encryptedDataBase64 = json.getString("encryptedData");
-
-            byte[] iv = Base64.decode(ivBase64, Base64.DEFAULT);
-            byte[] encryptedData = Base64.decode(encryptedDataBase64, Base64.DEFAULT);
+            byte[] ivBytes = Base64.decode(iv, Base64.DEFAULT);
+            byte[] encryptedDataBytes = Base64.decode(encryptedData, Base64.DEFAULT);
 
             Cipher cipher = Cipher.getInstance(AES_MODE);
-            GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+            GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, ivBytes);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec);
-            byte[] decryptedBytes = cipher.doFinal(encryptedData);
+            byte[] decryptedBytes = cipher.doFinal(encryptedDataBytes);
 
             return new String(decryptedBytes, StandardCharsets.UTF_8);
         } catch (NoSuchAlgorithmException e) {
@@ -220,8 +212,6 @@ public class CryptoApi {
             Log.e("CryptoApi.decrypt", "InvalidKeyException", e);
         } catch (InvalidAlgorithmParameterException e) {
             Log.e("CryptoApi.decrypt", "InvalidAlgorithmParameterException", e);
-        } catch (JSONException e) {
-            Log.e("CryptoApi.decrypt", "JSONException", e);
         } catch (Exception e) {
             Log.e("CryptoApi.decrypt", "Unexpected exception", e);
         }
@@ -266,8 +256,8 @@ public class CryptoApi {
         }
     }
 
-    private SecretKey deriveSecret(String tag) {
-        Log.i("CryptoApi.deriveSecret", tag);
+    private SecretKey deriveSecret(String tag, String foreignPublicKeyBase64) {
+        Log.i("CryptoApi.deriveSecret", tag + " " + foreignPublicKeyBase64);
 
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDH);
@@ -279,11 +269,11 @@ public class CryptoApi {
             }
 
             PrivateKey privateKey = privateKeyEntry.getPrivateKey();
-            PublicKey publicKey = privateKeyEntry.getCertificate().getPublicKey();
+            PublicKey foreignPublicKey = loadPublicKeyFromBase64(foreignPublicKeyBase64);
 
             KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH");
             keyAgreement.init(privateKey);
-            keyAgreement.doPhase(publicKey, true);
+            keyAgreement.doPhase(foreignPublicKey, true);
 
             byte[] sharedSecret = keyAgreement.generateSecret();
             byte[] rawKey = Arrays.copyOf(sharedSecret, 32); // 256-bit key
