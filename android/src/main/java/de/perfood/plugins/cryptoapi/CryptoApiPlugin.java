@@ -116,9 +116,9 @@ public class CryptoApiPlugin extends Plugin {
         String tag = call.getString("tag");
         String foreignPublicKey = call.getString("foreignPublicKey");
         String iv = call.getString("iv");
-        String encryptedData = call.getString("encryptedData");
+        String ciphertext = call.getString("ciphertext");
 
-        String plaintext = implementation.decrypt(tag, foreignPublicKey, iv, encryptedData);
+        String plaintext = implementation.decrypt(tag, foreignPublicKey, iv, ciphertext);
 
         JSObject ret = new JSObject();
         ret.put("plaintext", plaintext);

@@ -122,9 +122,9 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         let tag = call.getString("tag") ?? ""
         let foreignPublicKey = call.getString("foreignPublicKey") ?? ""
         let iv = call.getString("iv") ?? ""
-        let encryptedData = call.getString("encryptedData") ?? ""
+        let ciphertext = call.getString("ciphertext") ?? ""
 
-        guard let plaintext = implementation.decrypt(tag, foreignPublicKey, iv, encryptedData) else {
+        guard let plaintext = implementation.decrypt(tag, foreignPublicKey, iv, ciphertext) else {
             call.resolve([:])
 
             return

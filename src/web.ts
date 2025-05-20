@@ -182,7 +182,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
 
     const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
 
-    const encryptedData = await crypto.subtle.encrypt(
+    const ciphertext = await crypto.subtle.encrypt(
       {
         name: CRYPTO_API_AES_GCM_ALGORITHM,
         iv,
@@ -193,7 +193,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
 
     return {
       iv: arrayBufferToBase64(iv),
-      encryptedData: arrayBufferToBase64(encryptedData),
+      ciphertext: arrayBufferToBase64(ciphertext),
     };
   }
 
@@ -210,7 +210,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
         iv: base64ToArrayBuffer(options.iv),
       },
       await this.deriveKey(options.tag, options.foreignPublicKey),
-      base64ToArrayBuffer(options.encryptedData),
+      base64ToArrayBuffer(options.ciphertext),
     );
 
     return {

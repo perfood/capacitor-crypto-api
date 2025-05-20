@@ -141,7 +141,7 @@ import CryptoKit
 
             let resultDict: [String: String] = [
                 "iv": Data(iv).base64EncodedString(),
-                "encryptedData": (sealedBox.ciphertext + sealedBox.tag).base64EncodedString()
+                "ciphertext": (sealedBox.ciphertext + sealedBox.tag).base64EncodedString()
             ]
 
             return resultDict
@@ -151,11 +151,11 @@ import CryptoKit
         }
     }
 
-    @objc public func decrypt(_ tag: String, _ foreignPublicKey: String, _ iv: String, _ encryptedData: String) -> String? {
-        print("CryptoApi.decrypt", tag, foreignPublicKey, iv, encryptedData)
+    @objc public func decrypt(_ tag: String, _ foreignPublicKey: String, _ iv: String, _ ciphertext: String) -> String? {
+        print("CryptoApi.decrypt", tag, foreignPublicKey, iv, ciphertext)
 
         guard let ivData = Data(base64Encoded: iv),
-              let combinedData = Data(base64Encoded: encryptedData),
+              let combinedData = Data(base64Encoded: ciphertext),
               let symmetricKey = deriveSecret(tag, foreignPublicKey),
               let nonce = try? AES.GCM.Nonce(data: ivData) else {
             return nil

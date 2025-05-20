@@ -176,7 +176,7 @@ public class CryptoApi {
 
             JSObject result = new JSObject();
             result.put("iv", Base64.encodeToString(iv, Base64.DEFAULT));
-            result.put("encryptedData", Base64.encodeToString(encrypted, Base64.DEFAULT));
+            result.put("ciphertext", Base64.encodeToString(encrypted, Base64.DEFAULT));
 
             return result;
         } catch (NoSuchAlgorithmException e) {
@@ -192,19 +192,19 @@ public class CryptoApi {
         return null;
     }
 
-    public String decrypt(String tag, String foreignPublicKey, String iv, String encryptedData) {
-        Log.i("CryptoApi.decrypt", tag + " " + foreignPublicKey + " " + iv + " " + encryptedData);
+    public String decrypt(String tag, String foreignPublicKey, String iv, String ciphertext) {
+        Log.i("CryptoApi.decrypt", tag + " " + foreignPublicKey + " " + iv + " " + ciphertext);
 
         try {
             SecretKey secretKey = this.deriveSecret(tag, foreignPublicKey);
 
             byte[] ivBytes = Base64.decode(iv, Base64.DEFAULT);
-            byte[] encryptedDataBytes = Base64.decode(encryptedData, Base64.DEFAULT);
+            byte[] ciphertextBytes = Base64.decode(ciphertext, Base64.DEFAULT);
 
             Cipher cipher = Cipher.getInstance(AES_MODE);
             GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, ivBytes);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmSpec);
-            byte[] decryptedBytes = cipher.doFinal(encryptedDataBytes);
+            byte[] decryptedBytes = cipher.doFinal(ciphertextBytes);
 
             return new String(decryptedBytes, StandardCharsets.UTF_8);
         } catch (NoSuchAlgorithmException e) {

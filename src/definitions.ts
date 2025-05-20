@@ -148,9 +148,9 @@ export interface EncryptResponse {
    */
   iv: string;
   /**
-   * The encrypted data in base64 format.
+   * The ciphertext (encrypted data) in base64 format.
    */
-  encryptedData: string;
+  ciphertext: string;
 }
 
 export interface DecryptOptions {
@@ -167,9 +167,9 @@ export interface DecryptOptions {
    */
   iv: string;
   /**
-   * The encrypted data in base64 format.
+   * The ciphertext (encrypted data) in base64 format.
    */
-  encryptedData: string;
+  ciphertext: string;
 }
 
 export interface DecryptResponse {

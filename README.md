@@ -298,10 +298,10 @@ Decrypt data with AES-GCM.
 
 #### EncryptResponse
 
-| Prop                | Type                | Description                          |
-| ------------------- | ------------------- | ------------------------------------ |
-| **`iv`**            | <code>string</code> | The iv in base64 format.             |
-| **`encryptedData`** | <code>string</code> | The encrypted data in base64 format. |
+| Prop             | Type                | Description                                       |
+| ---------------- | ------------------- | ------------------------------------------------- |
+| **`iv`**         | <code>string</code> | The iv in base64 format.                          |
+| **`ciphertext`** | <code>string</code> | The ciphertext (encrypted data) in base64 format. |
 
 
 #### EncryptOptions
@@ -322,11 +322,11 @@ Decrypt data with AES-GCM.
 
 #### DecryptOptions
 
-| Prop                   | Type                | Description                              |
-| ---------------------- | ------------------- | ---------------------------------------- |
-| **`tag`**              | <code>string</code> | The key-pair tag.                        |
-| **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format. |
-| **`iv`**               | <code>string</code> | The iv in base64 format.                 |
-| **`encryptedData`**    | <code>string</code> | The encrypted data in base64 format.     |
+| Prop                   | Type                | Description                                       |
+| ---------------------- | ------------------- | ------------------------------------------------- |
+| **`tag`**              | <code>string</code> | The key-pair tag.                                 |
+| **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format.          |
+| **`iv`**               | <code>string</code> | The iv in base64 format.                          |
+| **`ciphertext`**       | <code>string</code> | The ciphertext (encrypted data) in base64 format. |
 
 </docgen-api>

@@ -249,7 +249,7 @@ window.encryptECDH = async () => {
   });
 
   document.getElementById('ecdh-iv').value = result.iv;
-  document.getElementById('ecdh-encrypted-data').value = result.encryptedData;
+  document.getElementById('ecdh-encrypted-data').value = result.ciphertext;
 };
 
 /**
@@ -260,9 +260,9 @@ window.decryptECDH = async () => {
   const tag = document.getElementById('ecdh-tag').value;
   const foreignPublicKey = document.getElementById('ecdh-foreign-public-key').value;
   const iv = document.getElementById('ecdh-iv').value;
-  const encryptedData = document.getElementById('ecdh-encrypted-data').value;
+  const ciphertext = document.getElementById('ecdh-encrypted-data').value;
 
-  if (!tag || !foreignPublicKey || !iv || !encryptedData) {
+  if (!tag || !foreignPublicKey || !iv || !ciphertext) {
     alert('Please enter a tag, encrypt a text and copy the foreign public key.');
     return;
   }
@@ -272,7 +272,7 @@ window.decryptECDH = async () => {
       tag,
       foreignPublicKey,
       iv,
-      encryptedData,
+      ciphertext,
     });
 
     document.getElementById('ecdh-decrypted-data').textContent = result.plaintext;
