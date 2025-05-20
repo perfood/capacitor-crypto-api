@@ -267,6 +267,9 @@ public class CryptoApi {
                 Log.i("CryptoApi.deriveSecret", "No private key entry found for tag. Generating new one...");
                 this.generateKey(tag, "ecdh");
                 privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDH);
+                if (privateKeyEntry == null) {
+                    return null;
+                }
             }
 
             PrivateKey privateKey = privateKeyEntry.getPrivateKey();
@@ -280,6 +283,10 @@ public class CryptoApi {
             byte[] rawKey = Arrays.copyOf(sharedSecret, 32); // 256-bit key
 
             return new SecretKeySpec(rawKey, "AES");
+        } catch (Error e) {
+            Log.e("CryptoApi.deriveSecret", "Error", e);
+        } catch (NullPointerException e) {
+            Log.e("CryptoApi.deriveSecret", "NullPointerException", e);
         } catch (NoSuchAlgorithmException e) {
             Log.e("CryptoApi.deriveSecret", "NoSuchAlgorithmException", e);
         } catch (InvalidKeyException e) {
