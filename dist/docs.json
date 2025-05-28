@@ -1,0 +1,505 @@
+{
+  "api": {
+    "name": "CryptoApiPlugin",
+    "slug": "cryptoapiplugin",
+    "docs": "",
+    "tags": [],
+    "methods": [
+      {
+        "name": "getECDSATags",
+        "signature": "() => Promise<GetTagsResponse>",
+        "parameters": [],
+        "returns": "Promise<GetTagsResponse>",
+        "tags": [],
+        "docs": "Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).",
+        "complexTypes": [
+          "GetTagsResponse"
+        ],
+        "slug": "getecdsatags"
+      },
+      {
+        "name": "getECDHTags",
+        "signature": "() => Promise<GetTagsResponse>",
+        "parameters": [],
+        "returns": "Promise<GetTagsResponse>",
+        "tags": [],
+        "docs": "Returns all ECDH key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).",
+        "complexTypes": [
+          "GetTagsResponse"
+        ],
+        "slug": "getecdhtags"
+      },
+      {
+        "name": "generateKey",
+        "signature": "(options: GenerateKeyOptions) => Promise<GenerateKeyResponse>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "GenerateKeyOptions"
+          }
+        ],
+        "returns": "Promise<GenerateKeyResponse>",
+        "tags": [
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),\ntags it for alter referencing and returns the public-key only,\nsince the private-key is protected and can't be extracted.",
+        "complexTypes": [
+          "GenerateKeyResponse",
+          "GenerateKeyOptions"
+        ],
+        "slug": "generatekey"
+      },
+      {
+        "name": "loadKey",
+        "signature": "(options: LoadKeyOptions) => Promise<LoadKeyResponse>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "LoadKeyOptions"
+          }
+        ],
+        "returns": "Promise<LoadKeyResponse>",
+        "tags": [
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Loads the public-key from the Secure Enclave (iOS) or StrongBox/TEE (Android).",
+        "complexTypes": [
+          "LoadKeyResponse",
+          "LoadKeyOptions"
+        ],
+        "slug": "loadkey"
+      },
+      {
+        "name": "deleteKey",
+        "signature": "(options: DeleteKeyOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "DeleteKeyOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Deletes the key-pair from the Secure Enclave (iOS) or StrongBox/TEE (Android).",
+        "complexTypes": [
+          "DeleteKeyOptions"
+        ],
+        "slug": "deletekey"
+      },
+      {
+        "name": "sign",
+        "signature": "(options: SignOptions) => Promise<SignResponse>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "SignOptions"
+          }
+        ],
+        "returns": "Promise<SignResponse>",
+        "tags": [
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Signs the data in the Secure Enclave (iOS) or StrongBox/TEE (Android).\nUses the private-key associated with the tag.\n\nOnly ECDSA is supported.",
+        "complexTypes": [
+          "SignResponse",
+          "SignOptions"
+        ],
+        "slug": "sign"
+      },
+      {
+        "name": "verify",
+        "signature": "(options: VerifyOptions) => Promise<VerifyResponse>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "VerifyOptions"
+          }
+        ],
+        "returns": "Promise<VerifyResponse>",
+        "tags": [
+          {
+            "name": "since",
+            "text": "1.0.0"
+          }
+        ],
+        "docs": "Verifies the signature of the data with the foreign public-key.\n\nOnly ECDSA is supported.",
+        "complexTypes": [
+          "VerifyResponse",
+          "VerifyOptions"
+        ],
+        "slug": "verify"
+      },
+      {
+        "name": "encrypt",
+        "signature": "(options: EncryptOptions) => Promise<EncryptResponse>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "EncryptOptions"
+          }
+        ],
+        "returns": "Promise<EncryptResponse>",
+        "tags": [],
+        "docs": "Encrypt data with AES-GCM.",
+        "complexTypes": [
+          "EncryptResponse",
+          "EncryptOptions"
+        ],
+        "slug": "encrypt"
+      },
+      {
+        "name": "decrypt",
+        "signature": "(options: DecryptOptions) => Promise<DecryptResponse>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "DecryptOptions"
+          }
+        ],
+        "returns": "Promise<DecryptResponse>",
+        "tags": [],
+        "docs": "Decrypt data with AES-GCM.",
+        "complexTypes": [
+          "DecryptResponse",
+          "DecryptOptions"
+        ],
+        "slug": "decrypt"
+      }
+    ],
+    "properties": []
+  },
+  "interfaces": [
+    {
+      "name": "GetTagsResponse",
+      "slug": "gettagsresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "tags",
+          "tags": [],
+          "docs": "The key-pair tags.",
+          "complexTypes": [],
+          "type": "string[]"
+        }
+      ]
+    },
+    {
+      "name": "GenerateKeyResponse",
+      "slug": "generatekeyresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "publicKey",
+          "tags": [],
+          "docs": "The public-key in base64 format.",
+          "complexTypes": [],
+          "type": "string | undefined"
+        }
+      ]
+    },
+    {
+      "name": "GenerateKeyOptions",
+      "slug": "generatekeyoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "tag",
+          "tags": [],
+          "docs": "The key-pair tag.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "algorithm",
+          "tags": [],
+          "docs": "The elliptic curve algorithm",
+          "complexTypes": [],
+          "type": "'ecdsa' | 'ecdh'"
+        }
+      ]
+    },
+    {
+      "name": "LoadKeyResponse",
+      "slug": "loadkeyresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "publicKey",
+          "tags": [],
+          "docs": "The public-key in base64 format.",
+          "complexTypes": [],
+          "type": "string | undefined"
+        }
+      ]
+    },
+    {
+      "name": "LoadKeyOptions",
+      "slug": "loadkeyoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "tag",
+          "tags": [],
+          "docs": "The key-pair tag.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "algorithm",
+          "tags": [],
+          "docs": "The elliptic curve algorithm was used to create the key.",
+          "complexTypes": [],
+          "type": "'ecdsa' | 'ecdh'"
+        }
+      ]
+    },
+    {
+      "name": "DeleteKeyOptions",
+      "slug": "deletekeyoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "tag",
+          "tags": [],
+          "docs": "The key-pair tag.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "algorithm",
+          "tags": [],
+          "docs": "The elliptic curve algorithm was used to create the key.",
+          "complexTypes": [],
+          "type": "'ecdsa' | 'ecdh'"
+        }
+      ]
+    },
+    {
+      "name": "SignResponse",
+      "slug": "signresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "signature",
+          "tags": [],
+          "docs": "The signature in base64 format.",
+          "complexTypes": [],
+          "type": "string | undefined"
+        }
+      ]
+    },
+    {
+      "name": "SignOptions",
+      "slug": "signoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "tag",
+          "tags": [],
+          "docs": "The key-pair tag.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "data",
+          "tags": [],
+          "docs": "The data to sign.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "VerifyResponse",
+      "slug": "verifyresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "verified",
+          "tags": [],
+          "docs": "Whether the signature is verified.",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "VerifyOptions",
+      "slug": "verifyoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "foreignPublicKey",
+          "tags": [],
+          "docs": "The foreign public-key in base64 format.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "data",
+          "tags": [],
+          "docs": "The signed data.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "signature",
+          "tags": [],
+          "docs": "The signature in base64 format.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "EncryptResponse",
+      "slug": "encryptresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "iv",
+          "tags": [],
+          "docs": "The iv in base64 format.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "ciphertext",
+          "tags": [],
+          "docs": "The ciphertext (encrypted data) in base64 format.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "EncryptOptions",
+      "slug": "encryptoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "tag",
+          "tags": [],
+          "docs": "The key-pair tag.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "foreignPublicKey",
+          "tags": [],
+          "docs": "The foreign public-key in base64 format.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "plaintext",
+          "tags": [],
+          "docs": "The plaintext to be encrypted.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "DecryptResponse",
+      "slug": "decryptresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "plaintext",
+          "tags": [],
+          "docs": "The decrypted plaintext.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "DecryptOptions",
+      "slug": "decryptoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "tag",
+          "tags": [],
+          "docs": "The key-pair tag.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "foreignPublicKey",
+          "tags": [],
+          "docs": "The foreign public-key in base64 format.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "iv",
+          "tags": [],
+          "docs": "The iv in base64 format.",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "ciphertext",
+          "tags": [],
+          "docs": "The ciphertext (encrypted data) in base64 format.",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "enums": [],
+  "typeAliases": [],
+  "pluginConfigs": []
+}
