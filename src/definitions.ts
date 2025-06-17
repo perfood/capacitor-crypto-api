@@ -33,6 +33,12 @@ export const SECRET_KEY_LENGHT = 256;
 
 export const IV_LENGTH = 12;
 
+export enum BiometryType {
+  BIOMETRY = 'BIOMETRY', // biometryCurrentSet (iOS), KeyProperties.AUTH_BIOMETRIC_STRONG (android)
+  BIOMETRY_OR_PASSCODE = 'BIOMETRY_OR_PASSCODE', // userPresence (iOS), KeyProperties.AUTH_BIOMETRIC_STRONG | KeyProperties.AUTH_DEVICE_CREDENTIAL (android)
+  PASSCODE = 'PASSCODE', // devicePasscode (iOS), KeyProperties.AUTH_DEVICE_CREDENTIAL (android)
+}
+
 export interface GetTagsResponse {
   /**
    * The key-pair tags.
@@ -179,6 +185,51 @@ export interface DecryptResponse {
   plaintext: string;
 }
 
+export interface BiometricsEnabledOptions {
+  type: BiometryType;
+}
+
+export interface BiometricsEnabledResponse {
+  isEnabled: boolean;
+}
+
+export interface BiometricsStatusOptions {
+  type: BiometryType;
+}
+
+export enum BiometricsStatus {
+  SUCCESS = 'SUCCESS',
+  HARDWARE_UNAVAILABLE = 'HARDWARE_UNAVAILABLE',
+  NONE_ENROLLED = 'NONE_ENROLLED',
+  UNKNOWN = 'UNKNOWN',
+}
+
+export interface BiometricsStatusResponse {
+  status: BiometricsStatus;
+}
+
+export enum BiometricsHardware {
+  FINGER,
+  IRIS,
+  FACE,
+}
+
+export interface AvailableHardwareResponse {
+  hardware: BiometricsHardware[];
+}
+
+export interface DevicePasscodeResponse {
+  isDevicePasscodeSet: boolean;
+}
+
+export interface EnrollOptions {
+  type: BiometryType;
+}
+
+export interface RegisterOptions {
+  type: BiometryType;
+}
+
 export interface CryptoApiPlugin {
   /**
    * Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
@@ -241,4 +292,40 @@ export interface CryptoApiPlugin {
    * Decrypt data with AES-GCM.
    */
   decrypt(options: DecryptOptions): Promise<DecryptResponse>;
+
+  /**
+   *
+   */
+  isBiometricsEnabled(options: BiometricsEnabledOptions): Promise<BiometricsEnabledResponse>;
+
+  /**
+   *
+   */
+  getBiometricsStatus(options: BiometricsStatusOptions): Promise<BiometricsStatusResponse>;
+
+  /**
+   *
+   */
+  getAvailableHardware(): Promise<AvailableHardwareResponse>;
+
+  /**
+   *
+   */
+  isDevicePasscodeSet(): Promise<DevicePasscodeResponse>;
+
+  /**
+   *
+   */
+  enrollBiometrics(optione: EnrollOptions): Promise<void>;
+
+  /**
+   *
+   */
+  register(optione: RegisterOptions): Promise<void>;
+
+  // loginWithBiometry(): Promise<void>;
+
+  // activateBiometry(): Promise<void>;
+
+  // isBiometryPermitted(): Promise<boolean>
 }

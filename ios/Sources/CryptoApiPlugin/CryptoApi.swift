@@ -188,16 +188,17 @@ import CryptoKit
         var keyExchangeError: Unmanaged<CFError>?
 
         guard let derivedData = SecKeyCopyKeyExchangeResult(
-                secPrivateKey,
-                SecKeyAlgorithm.ecdhKeyExchangeStandardX963SHA256,
-                secPublicKey,
-                [SecKeyKeyExchangeParameter.requestedSize.rawValue as String: 32] as CFDictionary,
-                &keyExchangeError)
-        else {
+            secPrivateKey,
+            .ecdhKeyExchangeStandard,
+            secPublicKey,
+            [:] as CFDictionary,
+            &keyExchangeError
+        ) as Data? else {
+            print("❌ Fehler beim Ableiten des Shared Secrets")
             return nil
         }
 
-        return SymmetricKey(data: derivedData as Data)
+        return SymmetricKey(data: derivedData)
     }
 
     private func getPrivateKey(_ tag: String, _ algorithm: String) -> SecKey? {

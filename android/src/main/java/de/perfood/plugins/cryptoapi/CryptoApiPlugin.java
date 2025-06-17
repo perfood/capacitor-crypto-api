@@ -1,5 +1,7 @@
 package de.perfood.plugins.cryptoapi;
 
+import android.app.Activity;
+import androidx.biometric.BiometricManager;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -7,11 +9,17 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import java.util.List;
+import org.json.JSONArray;
 
 @CapacitorPlugin(name = "CryptoApi")
 public class CryptoApiPlugin extends Plugin {
 
-    private CryptoApi implementation = new CryptoApi();
+    private static final CryptoApi implementation = new CryptoApi();
+    private static final BiometryApi biometry = new BiometryApi();
+
+    public static final String BIOMETRY = "BIOMETRY";
+    public static final String BIOMETRY_OR_PASSCODE = "BIOMETRY_OR_PASSCODE";
+    public static final String PASSCODE = "PASSCODE";
 
     @PluginMethod
     public void getECDSATags(PluginCall call) {
@@ -39,8 +47,15 @@ public class CryptoApiPlugin extends Plugin {
     public void generateKey(PluginCall call) {
         String tag = call.getString("tag");
         String algorithm = call.getString("algorithm");
+        String type = call.getString("type");
+        String publicKey;
 
-        String publicKey = implementation.generateKey(tag, algorithm);
+        if (type != null) {
+            int authenticationType = this.getAuthenticationType(type);
+            publicKey = implementation.generateKey(tag, algorithm, authenticationType);
+        } else {
+            publicKey = implementation.generateKey(tag, algorithm);
+        }
 
         JSObject ret = new JSObject();
         if (publicKey != null) {
@@ -123,5 +138,74 @@ public class CryptoApiPlugin extends Plugin {
         JSObject ret = new JSObject();
         ret.put("plaintext", plaintext);
         call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void isBiometricsEnabled(PluginCall call) {
+        String type = call.getString("type");
+
+        boolean isEnabled = biometry.isBiometricsEnabled(this.getActivity(), this.getAuthenticationType(type));
+
+        JSObject ret = new JSObject();
+        ret.put("isEnabled", isEnabled);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void getBiometricsStatus(PluginCall call) {
+        String type = call.getString("type");
+
+        BiometryApi.BiometricsStatus status = biometry.getBiometricsStatus(this.getActivity(), this.getAuthenticationType(type));
+
+        JSObject ret = new JSObject();
+        ret.put("status", status);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void getAvailableHardware(PluginCall call) {
+        JSONArray hardware = biometry.getAvailableHardware(this.getActivity());
+
+        JSObject ret = new JSObject();
+        ret.put("hardware", hardware);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void isDevicePasscodeSet(PluginCall call) {
+        boolean isDevicePasscodeSet = biometry.isDevicePasscodeSet(this.getActivity());
+
+        JSObject ret = new JSObject();
+        ret.put("isDevicePasscodeSet", isDevicePasscodeSet);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void enrollBiometrics(PluginCall call) {
+        String type = call.getString("type");
+
+        biometry.enrollBiometrics(this.getActivity(), this.getAuthenticationType(type));
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void register(PluginCall call) {
+        String type = call.getString("type");
+
+        biometry.register(this.getActivity(), this.getContext(), this.getAuthenticationType(type));
+        call.resolve();
+    }
+
+    private int getAuthenticationType(String type) {
+        switch (type) {
+            case CryptoApiPlugin.BIOMETRY:
+                return BiometricManager.Authenticators.BIOMETRIC_STRONG;
+            case CryptoApiPlugin.BIOMETRY_OR_PASSCODE:
+                return BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+            case CryptoApiPlugin.PASSCODE:
+                return BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+        }
+
+        throw new IllegalArgumentException("Unbekannter BiometryType: " + type);
     }
 }

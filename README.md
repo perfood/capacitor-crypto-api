@@ -50,7 +50,14 @@ npx cap sync
 * [`verify(...)`](#verify)
 * [`encrypt(...)`](#encrypt)
 * [`decrypt(...)`](#decrypt)
+* [`isBiometricsEnabled(...)`](#isbiometricsenabled)
+* [`getBiometricsStatus(...)`](#getbiometricsstatus)
+* [`getAvailableHardware()`](#getavailablehardware)
+* [`isDevicePasscodeSet()`](#isdevicepasscodeset)
+* [`enrollBiometrics(...)`](#enrollbiometrics)
+* [`register(...)`](#register)
 * [Interfaces](#interfaces)
+* [Enums](#enums)
 
 </docgen-index>
 
@@ -217,6 +224,84 @@ Decrypt data with AES-GCM.
 --------------------
 
 
+### isBiometricsEnabled(...)
+
+```typescript
+isBiometricsEnabled(options: BiometricsEnabledOptions) => Promise<BiometricsEnabledResponse>
+```
+
+| Param         | Type                                                                          |
+| ------------- | ----------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#biometricsenabledoptions">BiometricsEnabledOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#biometricsenabledresponse">BiometricsEnabledResponse</a>&gt;</code>
+
+--------------------
+
+
+### getBiometricsStatus(...)
+
+```typescript
+getBiometricsStatus(options: BiometricsStatusOptions) => Promise<BiometricsStatusResponse>
+```
+
+| Param         | Type                                                                        |
+| ------------- | --------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#biometricsstatusoptions">BiometricsStatusOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#biometricsstatusresponse">BiometricsStatusResponse</a>&gt;</code>
+
+--------------------
+
+
+### getAvailableHardware()
+
+```typescript
+getAvailableHardware() => Promise<AvailableHardwareResponse>
+```
+
+**Returns:** <code>Promise&lt;<a href="#availablehardwareresponse">AvailableHardwareResponse</a>&gt;</code>
+
+--------------------
+
+
+### isDevicePasscodeSet()
+
+```typescript
+isDevicePasscodeSet() => Promise<DevicePasscodeResponse>
+```
+
+**Returns:** <code>Promise&lt;<a href="#devicepasscoderesponse">DevicePasscodeResponse</a>&gt;</code>
+
+--------------------
+
+
+### enrollBiometrics(...)
+
+```typescript
+enrollBiometrics(optione: EnrollOptions) => Promise<void>
+```
+
+| Param         | Type                                                    |
+| ------------- | ------------------------------------------------------- |
+| **`optione`** | <code><a href="#enrolloptions">EnrollOptions</a></code> |
+
+--------------------
+
+
+### register(...)
+
+```typescript
+register(optione: RegisterOptions) => Promise<void>
+```
+
+| Param         | Type                                                        |
+| ------------- | ----------------------------------------------------------- |
+| **`optione`** | <code><a href="#registeroptions">RegisterOptions</a></code> |
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -328,5 +413,92 @@ Decrypt data with AES-GCM.
 | **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format.          |
 | **`iv`**               | <code>string</code> | The iv in base64 format.                          |
 | **`ciphertext`**       | <code>string</code> | The ciphertext (encrypted data) in base64 format. |
+
+
+#### BiometricsEnabledResponse
+
+| Prop            | Type                 |
+| --------------- | -------------------- |
+| **`isEnabled`** | <code>boolean</code> |
+
+
+#### BiometricsEnabledOptions
+
+| Prop       | Type                                                  |
+| ---------- | ----------------------------------------------------- |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
+
+
+#### BiometricsStatusResponse
+
+| Prop         | Type                                                          |
+| ------------ | ------------------------------------------------------------- |
+| **`status`** | <code><a href="#biometricsstatus">BiometricsStatus</a></code> |
+
+
+#### BiometricsStatusOptions
+
+| Prop       | Type                                                  |
+| ---------- | ----------------------------------------------------- |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
+
+
+#### AvailableHardwareResponse
+
+| Prop           | Type                              |
+| -------------- | --------------------------------- |
+| **`hardware`** | <code>BiometricsHardware[]</code> |
+
+
+#### DevicePasscodeResponse
+
+| Prop                      | Type                 |
+| ------------------------- | -------------------- |
+| **`isDevicePasscodeSet`** | <code>boolean</code> |
+
+
+#### EnrollOptions
+
+| Prop       | Type                                                  |
+| ---------- | ----------------------------------------------------- |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
+
+
+#### RegisterOptions
+
+| Prop       | Type                                                  |
+| ---------- | ----------------------------------------------------- |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
+
+
+### Enums
+
+
+#### BiometryType
+
+| Members                    | Value                               |
+| -------------------------- | ----------------------------------- |
+| **`BIOMETRY`**             | <code>'BIOMETRY'</code>             |
+| **`BIOMETRY_OR_PASSCODE`** | <code>'BIOMETRY_OR_PASSCODE'</code> |
+| **`PASSCODE`**             | <code>'PASSCODE'</code>             |
+
+
+#### BiometricsStatus
+
+| Members                    | Value                               |
+| -------------------------- | ----------------------------------- |
+| **`SUCCESS`**              | <code>'SUCCESS'</code>              |
+| **`HARDWARE_UNAVAILABLE`** | <code>'HARDWARE_UNAVAILABLE'</code> |
+| **`NONE_ENROLLED`**        | <code>'NONE_ENROLLED'</code>        |
+| **`UNKNOWN`**              | <code>'UNKNOWN'</code>              |
+
+
+#### BiometricsHardware
+
+| Members      |
+| ------------ |
+| **`FINGER`** |
+| **`IRIS`**   |
+| **`FACE`**   |
 
 </docgen-api>

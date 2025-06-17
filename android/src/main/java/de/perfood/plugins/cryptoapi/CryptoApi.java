@@ -65,7 +65,7 @@ public class CryptoApi {
         }
     }
 
-    public String generateKey(String tag, String algorithm) {
+    public String generateKey(String tag, String algorithm, int... type) {
         Log.i("CryptoApi.generateKey", tag + " " + algorithm);
 
         try {
@@ -88,6 +88,13 @@ public class CryptoApi {
             // Only set digests if it's ECDSA
             if (algorithm.equalsIgnoreCase("ecdsa")) {
                 builder.setDigests(KeyProperties.DIGEST_SHA256);
+            }
+
+            if (type.length != 0) {
+                builder.setInvalidatedByBiometricEnrollment(true);
+                builder.setUserAuthenticationRequired(true);
+                builder.setUserAuthenticationParameters(60, type[0]);
+                builder.setIsStrongBoxBacked(true);
             }
 
             keyPairGenerator.initialize(builder.build());

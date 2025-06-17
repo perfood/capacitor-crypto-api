@@ -1,17 +1,25 @@
 import { WebPlugin } from '@capacitor/core';
 
 import type {
+  AvailableHardwareResponse,
+  BiometricsEnabledOptions,
+  BiometricsEnabledResponse,
+  BiometricsStatusOptions,
+  BiometricsStatusResponse,
   CryptoApiPlugin,
   DecryptOptions,
   DecryptResponse,
   DeleteKeyOptions,
+  DevicePasscodeResponse,
   EncryptOptions,
   EncryptResponse,
+  EnrollOptions,
   GenerateKeyOptions,
   GenerateKeyResponse,
   GetTagsResponse,
   LoadKeyOptions,
   LoadKeyResponse,
+  RegisterOptions,
   SignOptions,
   SignResponse,
   VerifyOptions,
@@ -27,6 +35,8 @@ import {
   PRIVATE_KEY_FORMAT,
   PUBLIC_KEY_FORMAT,
   SECRET_KEY_LENGHT,
+  BiometricsHardware,
+  BiometricsStatus,
 } from './definitions';
 import { arrayBufferToBase64, base64ToArrayBuffer, derToP1363, p1363ToDer } from './utils';
 
@@ -216,6 +226,53 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     return {
       plaintext: new TextDecoder().decode(decryptedData),
     };
+  }
+
+  async isBiometricsEnabled(options: BiometricsEnabledOptions): Promise<BiometricsEnabledResponse> {
+    console.log('CryptoApi.isBiometricsEnabled', options);
+
+    const isWebAuthnSupported = !!(
+      window.PublicKeyCredential &&
+      typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function'
+    );
+
+    return {
+      isEnabled: isWebAuthnSupported,
+    };
+    // throw new Error('Biometry is only available on mobile devices');
+  }
+
+  async getBiometricsStatus(options: BiometricsStatusOptions): Promise<BiometricsStatusResponse> {
+    console.log('CryptoApi.isBiometricsEnabled', options);
+
+    return {
+      status: BiometricsStatus.UNKNOWN,
+    };
+    // throw new Error('Biometry is only available on mobile devices');
+  }
+
+  async getAvailableHardware(): Promise<AvailableHardwareResponse> {
+    return {
+      hardware: [BiometricsHardware.FINGER],
+    };
+    // throw new Error('Biometry is only available on mobile devices');
+  }
+
+  async isDevicePasscodeSet(): Promise<DevicePasscodeResponse> {
+    return {
+      isDevicePasscodeSet: true,
+    };
+    // throw new Error('Biometry is only available on mobile devices');
+  }
+
+  async register(options: RegisterOptions): Promise<void> {
+    console.log('CryptoApi.register', options);
+    // throw new Error('Biometry is only available on mobile devices');
+  }
+
+  async enrollBiometrics(options: EnrollOptions): Promise<void> {
+    console.log('CryptoApi.enrollBiometrics', options);
+    // throw new Error('Biometry is only available on mobile devices');
   }
 
   private async importKey(

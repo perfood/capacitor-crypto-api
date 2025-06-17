@@ -185,6 +185,104 @@
           "DecryptOptions"
         ],
         "slug": "decrypt"
+      },
+      {
+        "name": "isBiometricsEnabled",
+        "signature": "(options: BiometricsEnabledOptions) => Promise<BiometricsEnabledResponse>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "BiometricsEnabledOptions"
+          }
+        ],
+        "returns": "Promise<BiometricsEnabledResponse>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "BiometricsEnabledResponse",
+          "BiometricsEnabledOptions"
+        ],
+        "slug": "isbiometricsenabled"
+      },
+      {
+        "name": "getBiometricsStatus",
+        "signature": "(options: BiometricsStatusOptions) => Promise<BiometricsStatusResponse>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "BiometricsStatusOptions"
+          }
+        ],
+        "returns": "Promise<BiometricsStatusResponse>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "BiometricsStatusResponse",
+          "BiometricsStatusOptions"
+        ],
+        "slug": "getbiometricsstatus"
+      },
+      {
+        "name": "getAvailableHardware",
+        "signature": "() => Promise<AvailableHardwareResponse>",
+        "parameters": [],
+        "returns": "Promise<AvailableHardwareResponse>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "AvailableHardwareResponse"
+        ],
+        "slug": "getavailablehardware"
+      },
+      {
+        "name": "isDevicePasscodeSet",
+        "signature": "() => Promise<DevicePasscodeResponse>",
+        "parameters": [],
+        "returns": "Promise<DevicePasscodeResponse>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "DevicePasscodeResponse"
+        ],
+        "slug": "isdevicepasscodeset"
+      },
+      {
+        "name": "enrollBiometrics",
+        "signature": "(optione: EnrollOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "optione",
+            "docs": "",
+            "type": "EnrollOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "EnrollOptions"
+        ],
+        "slug": "enrollbiometrics"
+      },
+      {
+        "name": "register",
+        "signature": "(optione: RegisterOptions) => Promise<void>",
+        "parameters": [
+          {
+            "name": "optione",
+            "docs": "",
+            "type": "RegisterOptions"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "RegisterOptions"
+        ],
+        "slug": "register"
       }
     ],
     "properties": []
@@ -497,9 +595,225 @@
           "type": "string"
         }
       ]
+    },
+    {
+      "name": "BiometricsEnabledResponse",
+      "slug": "biometricsenabledresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "isEnabled",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "BiometricsEnabledOptions",
+      "slug": "biometricsenabledoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BiometryType"
+          ],
+          "type": "BiometryType"
+        }
+      ]
+    },
+    {
+      "name": "BiometricsStatusResponse",
+      "slug": "biometricsstatusresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "status",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BiometricsStatus"
+          ],
+          "type": "BiometricsStatus"
+        }
+      ]
+    },
+    {
+      "name": "BiometricsStatusOptions",
+      "slug": "biometricsstatusoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BiometryType"
+          ],
+          "type": "BiometryType"
+        }
+      ]
+    },
+    {
+      "name": "AvailableHardwareResponse",
+      "slug": "availablehardwareresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "hardware",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BiometricsHardware"
+          ],
+          "type": "BiometricsHardware[]"
+        }
+      ]
+    },
+    {
+      "name": "DevicePasscodeResponse",
+      "slug": "devicepasscoderesponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "isDevicePasscodeSet",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "EnrollOptions",
+      "slug": "enrolloptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BiometryType"
+          ],
+          "type": "BiometryType"
+        }
+      ]
+    },
+    {
+      "name": "RegisterOptions",
+      "slug": "registeroptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BiometryType"
+          ],
+          "type": "BiometryType"
+        }
+      ]
     }
   ],
-  "enums": [],
+  "enums": [
+    {
+      "name": "BiometryType",
+      "slug": "biometrytype",
+      "members": [
+        {
+          "name": "BIOMETRY",
+          "value": "'BIOMETRY'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "BIOMETRY_OR_PASSCODE",
+          "value": "'BIOMETRY_OR_PASSCODE'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "PASSCODE",
+          "value": "'PASSCODE'",
+          "tags": [],
+          "docs": ""
+        }
+      ]
+    },
+    {
+      "name": "BiometricsStatus",
+      "slug": "biometricsstatus",
+      "members": [
+        {
+          "name": "SUCCESS",
+          "value": "'SUCCESS'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "HARDWARE_UNAVAILABLE",
+          "value": "'HARDWARE_UNAVAILABLE'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "NONE_ENROLLED",
+          "value": "'NONE_ENROLLED'",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "UNKNOWN",
+          "value": "'UNKNOWN'",
+          "tags": [],
+          "docs": ""
+        }
+      ]
+    },
+    {
+      "name": "BiometricsHardware",
+      "slug": "biometricshardware",
+      "members": [
+        {
+          "name": "FINGER",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "IRIS",
+          "tags": [],
+          "docs": ""
+        },
+        {
+          "name": "FACE",
+          "tags": [],
+          "docs": ""
+        }
+      ]
+    }
+  ],
   "typeAliases": [],
   "pluginConfigs": []
 }
