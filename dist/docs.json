@@ -340,6 +340,15 @@
           "docs": "The elliptic curve algorithm",
           "complexTypes": [],
           "type": "'ecdsa' | 'ecdh'"
+        },
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "secured with biometry type?",
+          "complexTypes": [
+            "BiometryType"
+          ],
+          "type": "BiometryType"
         }
       ]
     },

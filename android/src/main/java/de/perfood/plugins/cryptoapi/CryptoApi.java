@@ -66,7 +66,7 @@ public class CryptoApi {
     }
 
     public String generateKey(String tag, String algorithm, int... type) {
-        Log.i("CryptoApi.generateKey", tag + " " + algorithm);
+        Log.i("CryptoApi.generateKey", tag + " " + algorithm + " " + type);
 
         try {
             String publicKeyFound = this.loadKey(tag, algorithm);

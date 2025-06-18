@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -113,12 +115,10 @@ public class BiometryApi {
 
     // only works if BiometricManager.BIOMETRIC_SUCCESS
     public void register(Activity activity, Context context, int authenticationType) {
-        
-        // APP CRASHES
-
-        Executor executor = ContextCompat.getMainExecutor(context);
-
         Log.i("BiometryApi.register", "authenticationType: " + authenticationType);
+
+        FragmentActivity fragmentActivity = (FragmentActivity) activity;
+        Executor executor = ContextCompat.getMainExecutor(context);
 
         BiometricPrompt.AuthenticationCallback callback = new BiometricPrompt.AuthenticationCallback() {
             @Override
@@ -140,19 +140,27 @@ public class BiometryApi {
             }
         };
 
-        BiometricPrompt prompt = new BiometricPrompt((FragmentActivity) activity, executor, callback);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            BiometricPrompt prompt = new BiometricPrompt(fragmentActivity, executor, callback);
 
-        BiometricPrompt.PromptInfo.Builder builder = new BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Biometric login for my app")
-            .setSubtitle("Log in using your biometric credential")
-            .setAllowedAuthenticators(authenticationType);
+            BiometricPrompt.PromptInfo.Builder builder = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric login")
+                .setSubtitle("Use biometrics to continue")
+                .setAllowedAuthenticators(authenticationType);
 
-        // Wenn KEIN DEVICE_CREDENTIAL dabei ist, MUSS negativeButtonText gesetzt werden
-        if ((authenticationType & BiometricManager.Authenticators.DEVICE_CREDENTIAL) == 0) {
-            builder.setNegativeButtonText("Cancel");
-        }
+            if ((authenticationType & BiometricManager.Authenticators.DEVICE_CREDENTIAL) == 0) {
+                builder.setNegativeButtonText("Cancel");
+            }
 
-        BiometricPrompt.PromptInfo promptInfo = builder.build();
-        prompt.authenticate(promptInfo);
+            BiometricPrompt.PromptInfo promptInfo = builder.build();
+            prompt.authenticate(promptInfo);
+        });
+    }
+
+    public boolean deviceSupportsStrongBox(Context context) {
+        return (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+            context.getPackageManager().hasSystemFeature("android.hardware.strongbox_keystore")
+        );
     }
 }

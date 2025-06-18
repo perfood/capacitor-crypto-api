@@ -55,6 +55,10 @@ export interface GenerateKeyOptions {
    * The elliptic curve algorithm
    */
   algorithm: 'ecdsa' | 'ecdh';
+  /**
+   * secured with biometry type?
+   */
+  type?: BiometryType;
 }
 
 export interface GenerateKeyResponse {

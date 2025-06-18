@@ -321,10 +321,11 @@ register(optione: RegisterOptions) => Promise<void>
 
 #### GenerateKeyOptions
 
-| Prop            | Type                           | Description                  |
-| --------------- | ------------------------------ | ---------------------------- |
-| **`tag`**       | <code>string</code>            | The key-pair tag.            |
-| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code> | The elliptic curve algorithm |
+| Prop            | Type                                                  | Description                  |
+| --------------- | ----------------------------------------------------- | ---------------------------- |
+| **`tag`**       | <code>string</code>                                   | The key-pair tag.            |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code>                        | The elliptic curve algorithm |
+| **`type`**      | <code><a href="#biometrytype">BiometryType</a></code> | secured with biometry type?  |
 
 
 #### LoadKeyResponse
