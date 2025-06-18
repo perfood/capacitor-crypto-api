@@ -138,6 +138,7 @@ public class BiometryApi {
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
                 // User can try again
+            }
         };
 
         new Handler(Looper.getMainLooper()).post(() -> {
