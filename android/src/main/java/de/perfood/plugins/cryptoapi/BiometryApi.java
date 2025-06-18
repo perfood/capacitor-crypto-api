@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import java.util.concurrent.Executor;
 import org.json.JSONArray;
+import com.getcapacitor.PluginCall;
 
 public class BiometryApi {
 
@@ -114,8 +115,8 @@ public class BiometryApi {
     }
 
     // only works if BiometricManager.BIOMETRIC_SUCCESS
-    public void register(Activity activity, Context context, int authenticationType) {
-        Log.i("BiometryApi.register", "authenticationType: " + authenticationType);
+    public void authenticate(Activity activity, Context context, int authenticationType, PluginCall call) {
+        Log.i("BiometryApi.authenticate", "authenticationType: " + authenticationType);
 
         FragmentActivity fragmentActivity = (FragmentActivity) activity;
         Executor executor = ContextCompat.getMainExecutor(context);
@@ -124,20 +125,19 @@ public class BiometryApi {
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                // call.resolve(); // Success
+                call.resolve(); 
             }
 
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
-                // call.reject("Authentication error: " + errString);
+                call.reject("Authentication error: " + errString);
             }
 
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
-                // Optional: call.reject(...) – je nach Bedarf
-            }
+                // User can try again
         };
 
         new Handler(Looper.getMainLooper()).post(() -> {

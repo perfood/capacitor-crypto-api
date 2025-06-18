@@ -200,7 +200,7 @@ export interface DevicePasscodeResponse {
 export interface EnrollOptions {
     type: BiometryType;
 }
-export interface RegisterOptions {
+export interface AuthenticateOptions {
     type: BiometryType;
 }
 export interface CryptoApiPlugin {
@@ -280,5 +280,5 @@ export interface CryptoApiPlugin {
     /**
      *
      */
-    register(optione: RegisterOptions): Promise<void>;
+    authenticate(optione: AuthenticateOptions): Promise<void>;
 }

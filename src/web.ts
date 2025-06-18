@@ -19,7 +19,7 @@ import type {
   GetTagsResponse,
   LoadKeyOptions,
   LoadKeyResponse,
-  RegisterOptions,
+  AuthenticateOptions,
   SignOptions,
   SignResponse,
   VerifyOptions,
@@ -265,8 +265,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     // throw new Error('Biometry is only available on mobile devices');
   }
 
-  async register(options: RegisterOptions): Promise<void> {
-    console.log('CryptoApi.register', options);
+  async authenticate(options: AuthenticateOptions): Promise<void> {
+    console.log('CryptoApi.authenticate', options);
     // throw new Error('Biometry is only available on mobile devices');
   }
 

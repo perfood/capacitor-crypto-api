@@ -193,11 +193,10 @@ public class CryptoApiPlugin extends Plugin {
     }
 
     @PluginMethod
-    public void register(PluginCall call) {
+    public void authenticate(PluginCall call) {
         String type = call.getString("type");
 
-        biometry.register(this.getActivity(), this.getContext(), this.getAuthenticationType(type));
-        call.resolve();
+        biometry.authenticate(this.getActivity(), this.getContext(), this.getAuthenticationType(type), call);
     }
 
     private int getAuthenticationType(String type) {

@@ -55,7 +55,7 @@ npx cap sync
 * [`getAvailableHardware()`](#getavailablehardware)
 * [`isDevicePasscodeSet()`](#isdevicepasscodeset)
 * [`enrollBiometrics(...)`](#enrollbiometrics)
-* [`register(...)`](#register)
+* [`authenticate(...)`](#authenticate)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 
@@ -289,15 +289,15 @@ enrollBiometrics(optione: EnrollOptions) => Promise<void>
 --------------------
 
 
-### register(...)
+### authenticate(...)
 
 ```typescript
-register(optione: RegisterOptions) => Promise<void>
+authenticate(optione: AuthenticateOptions) => Promise<void>
 ```
 
-| Param         | Type                                                        |
-| ------------- | ----------------------------------------------------------- |
-| **`optione`** | <code><a href="#registeroptions">RegisterOptions</a></code> |
+| Param         | Type                                                                |
+| ------------- | ------------------------------------------------------------------- |
+| **`optione`** | <code><a href="#authenticateoptions">AuthenticateOptions</a></code> |
 
 --------------------
 
@@ -465,7 +465,7 @@ register(optione: RegisterOptions) => Promise<void>
 | **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
 
 
-#### RegisterOptions
+#### AuthenticateOptions
 
 | Prop       | Type                                                  |
 | ---------- | ----------------------------------------------------- |

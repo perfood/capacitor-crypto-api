@@ -267,22 +267,22 @@
         "slug": "enrollbiometrics"
       },
       {
-        "name": "register",
-        "signature": "(optione: RegisterOptions) => Promise<void>",
+        "name": "authenticate",
+        "signature": "(optione: AuthenticateOptions) => Promise<void>",
         "parameters": [
           {
             "name": "optione",
             "docs": "",
-            "type": "RegisterOptions"
+            "type": "AuthenticateOptions"
           }
         ],
         "returns": "Promise<void>",
         "tags": [],
         "docs": "",
         "complexTypes": [
-          "RegisterOptions"
+          "AuthenticateOptions"
         ],
-        "slug": "register"
+        "slug": "authenticate"
       }
     ],
     "properties": []
@@ -728,8 +728,8 @@
       ]
     },
     {
-      "name": "RegisterOptions",
-      "slug": "registeroptions",
+      "name": "AuthenticateOptions",
+      "slug": "authenticateoptions",
       "docs": "",
       "tags": [],
       "methods": [],
