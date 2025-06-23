@@ -94,7 +94,7 @@ public class CryptoApi {
                 builder.setInvalidatedByBiometricEnrollment(true);
                 builder.setUserAuthenticationRequired(true);
                 builder.setUserAuthenticationParameters(60, type[0]);
-                builder.setIsStrongBoxBacked(true);
+                // builder.setIsStrongBoxBacked(true);
             }
 
             keyPairGenerator.initialize(builder.build());

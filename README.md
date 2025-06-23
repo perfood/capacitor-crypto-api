@@ -57,6 +57,7 @@ npx cap sync
 * [`enrollBiometrics(...)`](#enrollbiometrics)
 * [`authenticateWithBiometry(...)`](#authenticatewithbiometry)
 * [Interfaces](#interfaces)
+* [Type Aliases](#type-aliases)
 * [Enums](#enums)
 
 </docgen-index>
@@ -484,16 +485,15 @@ authenticateWithBiometry(options: AuthenticateOptions) => Promise<AuthenticateRe
 | **`foreignPublicKey`** | <code>string</code>                                   |
 
 
-### Enums
+### Type Aliases
 
 
 #### BiometryType
 
-| Members                    | Value                               |
-| -------------------------- | ----------------------------------- |
-| **`BIOMETRY`**             | <code>'BIOMETRY'</code>             |
-| **`BIOMETRY_OR_PASSCODE`** | <code>'BIOMETRY_OR_PASSCODE'</code> |
-| **`PASSCODE`**             | <code>'PASSCODE'</code>             |
+<code>'BIOMETRY' | 'BIOMETRY_OR_PASSCODE' | 'PASSCODE'</code>
+
+
+### Enums
 
 
 #### BiometricsStatus

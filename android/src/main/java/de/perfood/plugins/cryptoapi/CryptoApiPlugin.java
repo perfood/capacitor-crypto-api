@@ -52,10 +52,10 @@ public class CryptoApiPlugin extends Plugin {
 
         if (type != null) {
             int authenticationType = this.getAuthenticationType(type);
-            if (!biometry.deviceSupportsStrongBox(this.getContext())) {
-                call.reject("Error generating biometric secured key on android. StrongBox is not supported.");
-                return;
-            }
+            // if (!biometry.deviceSupportsStrongBox(this.getContext())) {
+            //     call.reject("Error generating biometric secured key on android. StrongBox is not supported.");
+            //     return;
+            // }
             publicKey = implementation.generateKey(tag, algorithm, authenticationType);
         } else {
             publicKey = implementation.generateKey(tag, algorithm);

@@ -33,11 +33,7 @@ export const SECRET_KEY_LENGHT = 256;
 
 export const IV_LENGTH = 12;
 
-export enum BiometryType {
-  BIOMETRY = 'BIOMETRY', // biometryCurrentSet (iOS), KeyProperties.AUTH_BIOMETRIC_STRONG (android)
-  BIOMETRY_OR_PASSCODE = 'BIOMETRY_OR_PASSCODE', // userPresence (iOS), KeyProperties.AUTH_BIOMETRIC_STRONG | KeyProperties.AUTH_DEVICE_CREDENTIAL (android)
-  PASSCODE = 'PASSCODE', // devicePasscode (iOS), KeyProperties.AUTH_DEVICE_CREDENTIAL (android)
-}
+export type BiometryType = 'BIOMETRY' | 'BIOMETRY_OR_PASSCODE' | 'PASSCODE';
 
 export interface GetTagsResponse {
   /**

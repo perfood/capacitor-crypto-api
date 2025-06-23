@@ -786,30 +786,6 @@
   ],
   "enums": [
     {
-      "name": "BiometryType",
-      "slug": "biometrytype",
-      "members": [
-        {
-          "name": "BIOMETRY",
-          "value": "'BIOMETRY'",
-          "tags": [],
-          "docs": ""
-        },
-        {
-          "name": "BIOMETRY_OR_PASSCODE",
-          "value": "'BIOMETRY_OR_PASSCODE'",
-          "tags": [],
-          "docs": ""
-        },
-        {
-          "name": "PASSCODE",
-          "value": "'PASSCODE'",
-          "tags": [],
-          "docs": ""
-        }
-      ]
-    },
-    {
       "name": "BiometricsStatus",
       "slug": "biometricsstatus",
       "members": [
@@ -861,6 +837,26 @@
       ]
     }
   ],
-  "typeAliases": [],
+  "typeAliases": [
+    {
+      "name": "BiometryType",
+      "slug": "biometrytype",
+      "docs": "",
+      "types": [
+        {
+          "text": "'BIOMETRY'",
+          "complexTypes": []
+        },
+        {
+          "text": "'BIOMETRY_OR_PASSCODE'",
+          "complexTypes": []
+        },
+        {
+          "text": "'PASSCODE'",
+          "complexTypes": []
+        }
+      ]
+    }
+  ],
   "pluginConfigs": []
 }

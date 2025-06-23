@@ -27,11 +27,7 @@ export declare const CRYPTO_API_AES_GCM_ALGORITHM = "AES-GCM";
 export declare const CRYPTO_API_ECDH_ALGORITHM = "ECDH";
 export declare const SECRET_KEY_LENGHT = 256;
 export declare const IV_LENGTH = 12;
-export declare enum BiometryType {
-    BIOMETRY = "BIOMETRY",
-    BIOMETRY_OR_PASSCODE = "BIOMETRY_OR_PASSCODE",
-    PASSCODE = "PASSCODE"
-}
+export declare type BiometryType = 'BIOMETRY' | 'BIOMETRY_OR_PASSCODE' | 'PASSCODE';
 export interface GetTagsResponse {
     /**
      * The key-pair tags.

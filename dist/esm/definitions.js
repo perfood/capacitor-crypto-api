@@ -25,12 +25,6 @@ export const CRYPTO_API_AES_GCM_ALGORITHM = 'AES-GCM';
 export const CRYPTO_API_ECDH_ALGORITHM = 'ECDH';
 export const SECRET_KEY_LENGHT = 256;
 export const IV_LENGTH = 12;
-export var BiometryType;
-(function (BiometryType) {
-    BiometryType["BIOMETRY"] = "BIOMETRY";
-    BiometryType["BIOMETRY_OR_PASSCODE"] = "BIOMETRY_OR_PASSCODE";
-    BiometryType["PASSCODE"] = "PASSCODE";
-})(BiometryType || (BiometryType = {}));
 export var BiometricsStatus;
 (function (BiometricsStatus) {
     BiometricsStatus["SUCCESS"] = "SUCCESS";
