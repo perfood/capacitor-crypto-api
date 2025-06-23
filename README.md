@@ -55,7 +55,7 @@ npx cap sync
 * [`getAvailableHardware()`](#getavailablehardware)
 * [`isDevicePasscodeSet()`](#isdevicepasscodeset)
 * [`enrollBiometrics(...)`](#enrollbiometrics)
-* [`authenticate(...)`](#authenticate)
+* [`authenticateWithBiometry(...)`](#authenticatewithbiometry)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 
@@ -279,25 +279,27 @@ isDevicePasscodeSet() => Promise<DevicePasscodeResponse>
 ### enrollBiometrics(...)
 
 ```typescript
-enrollBiometrics(optione: EnrollOptions) => Promise<void>
+enrollBiometrics(options: EnrollOptions) => Promise<void>
 ```
 
 | Param         | Type                                                    |
 | ------------- | ------------------------------------------------------- |
-| **`optione`** | <code><a href="#enrolloptions">EnrollOptions</a></code> |
+| **`options`** | <code><a href="#enrolloptions">EnrollOptions</a></code> |
 
 --------------------
 
 
-### authenticate(...)
+### authenticateWithBiometry(...)
 
 ```typescript
-authenticate(optione: AuthenticateOptions) => Promise<void>
+authenticateWithBiometry(options: AuthenticateOptions) => Promise<AuthenticateResult>
 ```
 
 | Param         | Type                                                                |
 | ------------- | ------------------------------------------------------------------- |
-| **`optione`** | <code><a href="#authenticateoptions">AuthenticateOptions</a></code> |
+| **`options`** | <code><a href="#authenticateoptions">AuthenticateOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#authenticateresult">AuthenticateResult</a>&gt;</code>
 
 --------------------
 
@@ -465,11 +467,21 @@ authenticate(optione: AuthenticateOptions) => Promise<void>
 | **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
 
 
+#### AuthenticateResult
+
+| Prop           | Type                 |
+| -------------- | -------------------- |
+| **`verified`** | <code>boolean</code> |
+
+
 #### AuthenticateOptions
 
-| Prop       | Type                                                  |
-| ---------- | ----------------------------------------------------- |
-| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
+| Prop                   | Type                                                  |
+| ---------------------- | ----------------------------------------------------- |
+| **`type`**             | <code><a href="#biometrytype">BiometryType</a></code> |
+| **`tag`**              | <code>string</code>                                   |
+| **`data`**             | <code>string</code>                                   |
+| **`foreignPublicKey`** | <code>string</code>                                   |
 
 
 ### Enums

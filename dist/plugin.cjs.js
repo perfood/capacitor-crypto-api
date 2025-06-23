@@ -255,8 +255,11 @@ class CryptoApiWeb extends core.WebPlugin {
         };
         // throw new Error('Biometry is only available on mobile devices');
     }
-    async authenticate(options) {
+    async authenticateWithBiometry(options) {
         console.log('CryptoApi.authenticate', options);
+        return {
+            verified: true,
+        };
         // throw new Error('Biometry is only available on mobile devices');
     }
     async enrollBiometrics(options) {

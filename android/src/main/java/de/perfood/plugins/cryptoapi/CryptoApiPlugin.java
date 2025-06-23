@@ -193,10 +193,28 @@ public class CryptoApiPlugin extends Plugin {
     }
 
     @PluginMethod
-    public void authenticate(PluginCall call) {
+    public void authenticateWithBiometry(PluginCall call) {
         String type = call.getString("type");
+        String tag = call.getString("tag");
+        String data = call.getString("data");
+        String foreignPublicKey = call.getString("foreignPublicKey");
 
-        biometry.authenticate(this.getActivity(), this.getContext(), this.getAuthenticationType(type), call);
+        biometry.authenticate(this.getActivity(), this.getContext(), this.getAuthenticationType(type), new BiometryApi.AuthenticationCallback() {
+            @Override
+            public void onSuccess() {
+                String signature = implementation.sign(tag, data); 
+                boolean verified = implementation.verify(foreignPublicKey, data, signature);
+
+                JSObject ret = new JSObject();
+                ret.put("verified", verified);
+                call.resolve(ret);
+            }
+
+            @Override
+            public void onError(String error) {
+                call.reject(error);
+            }
+        });
     }
 
     private int getAuthenticationType(String type) {

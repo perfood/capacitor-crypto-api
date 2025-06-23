@@ -250,10 +250,10 @@
       },
       {
         "name": "enrollBiometrics",
-        "signature": "(optione: EnrollOptions) => Promise<void>",
+        "signature": "(options: EnrollOptions) => Promise<void>",
         "parameters": [
           {
-            "name": "optione",
+            "name": "options",
             "docs": "",
             "type": "EnrollOptions"
           }
@@ -267,22 +267,23 @@
         "slug": "enrollbiometrics"
       },
       {
-        "name": "authenticate",
-        "signature": "(optione: AuthenticateOptions) => Promise<void>",
+        "name": "authenticateWithBiometry",
+        "signature": "(options: AuthenticateOptions) => Promise<AuthenticateResult>",
         "parameters": [
           {
-            "name": "optione",
+            "name": "options",
             "docs": "",
             "type": "AuthenticateOptions"
           }
         ],
-        "returns": "Promise<void>",
+        "returns": "Promise<AuthenticateResult>",
         "tags": [],
         "docs": "",
         "complexTypes": [
+          "AuthenticateResult",
           "AuthenticateOptions"
         ],
-        "slug": "authenticate"
+        "slug": "authenticatewithbiometry"
       }
     ],
     "properties": []
@@ -728,6 +729,22 @@
       ]
     },
     {
+      "name": "AuthenticateResult",
+      "slug": "authenticateresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "verified",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
       "name": "AuthenticateOptions",
       "slug": "authenticateoptions",
       "docs": "",
@@ -742,6 +759,27 @@
             "BiometryType"
           ],
           "type": "BiometryType"
+        },
+        {
+          "name": "tag",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "data",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "foreignPublicKey",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
         }
       ]
     }
