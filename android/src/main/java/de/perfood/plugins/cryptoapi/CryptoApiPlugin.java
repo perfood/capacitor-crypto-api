@@ -55,7 +55,7 @@ public class CryptoApiPlugin extends Plugin {
             int authenticationType = this.getAuthenticationType(type);
             if (!utils.isEmulator() && !biometry.deviceSupportsStrongBox(this.getContext())) {
                 call.reject("Error generating biometric secured key on android. StrongBox is not supported.");
-                return;            
+                return;
             }
             publicKey = implementation.generateKey(tag, algorithm, authenticationType);
         } else {
@@ -200,22 +200,27 @@ public class CryptoApiPlugin extends Plugin {
         String data = call.getString("data");
         String foreignPublicKey = call.getString("foreignPublicKey");
 
-        biometry.authenticate(this.getActivity(), this.getContext(), this.getAuthenticationType(type), new BiometryApi.AuthenticationCallback() {
-            @Override
-            public void onSuccess() {
-                String signature = implementation.sign(tag, data); 
-                boolean verified = implementation.verify(foreignPublicKey, data, signature);
+        biometry.authenticate(
+            this.getActivity(),
+            this.getContext(),
+            this.getAuthenticationType(type),
+            new BiometryApi.AuthenticationCallback() {
+                @Override
+                public void onSuccess() {
+                    String signature = implementation.sign(tag, data);
+                    boolean verified = implementation.verify(foreignPublicKey, data, signature);
 
-                JSObject ret = new JSObject();
-                ret.put("verified", verified);
-                call.resolve(ret);
-            }
+                    JSObject ret = new JSObject();
+                    ret.put("verified", verified);
+                    call.resolve(ret);
+                }
 
-            @Override
-            public void onError(String error) {
-                call.reject(error);
+                @Override
+                public void onError(String error) {
+                    call.reject(error);
+                }
             }
-        });
+        );
     }
 
     private int getAuthenticationType(String type) {

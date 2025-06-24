@@ -234,7 +234,7 @@ export interface AuthenticateOptions {
 }
 
 export interface AuthenticateResult {
-  verified: boolean
+  verified: boolean;
 }
 
 export interface CryptoApiPlugin {

@@ -13,17 +13,19 @@ public class Utils {
         String product = android.os.Build.PRODUCT;
         String hardware = android.os.Build.HARDWARE;
 
-        return fingerprint.startsWith("generic")
-            || fingerprint.toLowerCase().contains("vbox")
-            || fingerprint.toLowerCase().contains("test-keys")
-            || model.contains("Emulator")
-            || model.contains("Android SDK built for x86")
-            || model.contains("google_sdk")
-            || manufacturer.contains("Genymotion")
-            || (brand.startsWith("generic") && device.startsWith("generic"))
-            || "google_sdk".equals(product)
-            || hardware.contains("goldfish")
-            || hardware.contains("ranchu")
-            || hardware.contains("qcom") && product.contains("sdk");
+        return (
+            fingerprint.startsWith("generic") ||
+            fingerprint.toLowerCase().contains("vbox") ||
+            fingerprint.toLowerCase().contains("test-keys") ||
+            model.contains("Emulator") ||
+            model.contains("Android SDK built for x86") ||
+            model.contains("google_sdk") ||
+            manufacturer.contains("Genymotion") ||
+            (brand.startsWith("generic") && device.startsWith("generic")) ||
+            "google_sdk".equals(product) ||
+            hardware.contains("goldfish") ||
+            hardware.contains("ranchu") ||
+            (hardware.contains("qcom") && product.contains("sdk"))
+        );
     }
 }

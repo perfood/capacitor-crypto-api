@@ -270,7 +270,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     console.log('CryptoApi.authenticate', options);
     return {
       verified: true,
-    }
+    };
     // throw new Error('Biometry is only available on mobile devices');
   }
 

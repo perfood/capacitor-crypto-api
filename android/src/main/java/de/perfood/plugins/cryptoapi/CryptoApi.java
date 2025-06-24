@@ -1,5 +1,6 @@
 package de.perfood.plugins.cryptoapi;
 
+import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
@@ -70,6 +71,11 @@ public class CryptoApi {
     public String generateKey(String tag, String algorithm, int... type) {
         Log.i("CryptoApi.generateKey", tag + " " + algorithm + " " + type);
 
+        // we do not support ecdh below android 12
+        if (algorithm.equalsIgnoreCase("ecdh") && Build.VERSION.SDK_INT < 31) {
+            return null;
+        }
+
         try {
             String publicKeyFound = this.loadKey(tag, algorithm);
             if (publicKeyFound != null) {
@@ -95,8 +101,8 @@ public class CryptoApi {
             if (type.length != 0) {
                 builder.setInvalidatedByBiometricEnrollment(true);
                 builder.setUserAuthenticationRequired(true);
-                builder.setUserAuthenticationParameters(60, type[0]);
-                if (!utils.isEmulator()){
+                builder.setUserAuthenticationParameters(0, type[0]); // 0 = user authentication must take place for every use of the key
+                if (!utils.isEmulator()) {
                     builder.setIsStrongBoxBacked(true);
                 }
             }
