@@ -37,6 +37,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class CryptoApi {
 
+    private static final Utils utils = new Utils();
+
     public static String LabelECDSA = "CryptoApiECDSA:";
     public static String LabelECDH = "CryptoApiECDH:";
     private static final String AES_MODE = "AES/GCM/NoPadding";
@@ -94,7 +96,9 @@ public class CryptoApi {
                 builder.setInvalidatedByBiometricEnrollment(true);
                 builder.setUserAuthenticationRequired(true);
                 builder.setUserAuthenticationParameters(60, type[0]);
-                // builder.setIsStrongBoxBacked(true);
+                if (!utils.isEmulator()){
+                    builder.setIsStrongBoxBacked(true);
+                }
             }
 
             keyPairGenerator.initialize(builder.build());

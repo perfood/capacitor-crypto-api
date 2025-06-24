@@ -16,6 +16,7 @@ public class CryptoApiPlugin extends Plugin {
 
     private static final CryptoApi implementation = new CryptoApi();
     private static final BiometryApi biometry = new BiometryApi();
+    private static final Utils utils = new Utils();
 
     public static final String BIOMETRY = "BIOMETRY";
     public static final String BIOMETRY_OR_PASSCODE = "BIOMETRY_OR_PASSCODE";
@@ -52,10 +53,10 @@ public class CryptoApiPlugin extends Plugin {
 
         if (type != null) {
             int authenticationType = this.getAuthenticationType(type);
-            // if (!biometry.deviceSupportsStrongBox(this.getContext())) {
-            //     call.reject("Error generating biometric secured key on android. StrongBox is not supported.");
-            //     return;
-            // }
+            if (!utils.isEmulator() && !biometry.deviceSupportsStrongBox(this.getContext())) {
+                call.reject("Error generating biometric secured key on android. StrongBox is not supported.");
+                return;            
+            }
             publicKey = implementation.generateKey(tag, algorithm, authenticationType);
         } else {
             publicKey = implementation.generateKey(tag, algorithm);
