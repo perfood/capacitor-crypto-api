@@ -101,7 +101,7 @@ public class CryptoApi {
             if (type.length != 0) {
                 builder.setInvalidatedByBiometricEnrollment(true);
                 builder.setUserAuthenticationRequired(true);
-                builder.setUserAuthenticationParameters(0, type[0]); // 0 = user authentication must take place for every use of the key
+                builder.setUserAuthenticationParameters(60, type[0]); // 60 seconds for which this key is authorized to be used after the user is successfully authenticated
                 if (!utils.isEmulator()) {
                     builder.setIsStrongBoxBacked(true);
                 }
