@@ -267,8 +267,8 @@
         "slug": "enrollbiometrics"
       },
       {
-        "name": "authenticateWithBiometry",
-        "signature": "(options: AuthenticateOptions) => Promise<AuthenticateResult>",
+        "name": "authenticate",
+        "signature": "(options: AuthenticateOptions) => Promise<void>",
         "parameters": [
           {
             "name": "options",
@@ -276,14 +276,13 @@
             "type": "AuthenticateOptions"
           }
         ],
-        "returns": "Promise<AuthenticateResult>",
+        "returns": "Promise<void>",
         "tags": [],
         "docs": "",
         "complexTypes": [
-          "AuthenticateResult",
           "AuthenticateOptions"
         ],
-        "slug": "authenticatewithbiometry"
+        "slug": "authenticate"
       }
     ],
     "properties": []
@@ -729,22 +728,6 @@
       ]
     },
     {
-      "name": "AuthenticateResult",
-      "slug": "authenticateresult",
-      "docs": "",
-      "tags": [],
-      "methods": [],
-      "properties": [
-        {
-          "name": "verified",
-          "tags": [],
-          "docs": "",
-          "complexTypes": [],
-          "type": "boolean"
-        }
-      ]
-    },
-    {
       "name": "AuthenticateOptions",
       "slug": "authenticateoptions",
       "docs": "",
@@ -759,27 +742,6 @@
             "BiometryType"
           ],
           "type": "BiometryType"
-        },
-        {
-          "name": "tag",
-          "tags": [],
-          "docs": "",
-          "complexTypes": [],
-          "type": "string"
-        },
-        {
-          "name": "data",
-          "tags": [],
-          "docs": "",
-          "complexTypes": [],
-          "type": "string"
-        },
-        {
-          "name": "foreignPublicKey",
-          "tags": [],
-          "docs": "",
-          "complexTypes": [],
-          "type": "string"
         }
       ]
     }

@@ -198,12 +198,6 @@ export interface EnrollOptions {
 }
 export interface AuthenticateOptions {
     type: BiometryType;
-    tag: string;
-    data: string;
-    foreignPublicKey: string;
-}
-export interface AuthenticateResult {
-    verified: boolean;
 }
 export interface CryptoApiPlugin {
     /**
@@ -282,5 +276,5 @@ export interface CryptoApiPlugin {
     /**
      *
      */
-    authenticateWithBiometry(options: AuthenticateOptions): Promise<AuthenticateResult>;
+    authenticate(options: AuthenticateOptions): Promise<void>;
 }

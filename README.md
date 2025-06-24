@@ -55,7 +55,7 @@ npx cap sync
 * [`getAvailableHardware()`](#getavailablehardware)
 * [`isDevicePasscodeSet()`](#isdevicepasscodeset)
 * [`enrollBiometrics(...)`](#enrollbiometrics)
-* [`authenticateWithBiometry(...)`](#authenticatewithbiometry)
+* [`authenticate(...)`](#authenticate)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -290,17 +290,15 @@ enrollBiometrics(options: EnrollOptions) => Promise<void>
 --------------------
 
 
-### authenticateWithBiometry(...)
+### authenticate(...)
 
 ```typescript
-authenticateWithBiometry(options: AuthenticateOptions) => Promise<AuthenticateResult>
+authenticate(options: AuthenticateOptions) => Promise<void>
 ```
 
 | Param         | Type                                                                |
 | ------------- | ------------------------------------------------------------------- |
 | **`options`** | <code><a href="#authenticateoptions">AuthenticateOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#authenticateresult">AuthenticateResult</a>&gt;</code>
 
 --------------------
 
@@ -468,21 +466,11 @@ authenticateWithBiometry(options: AuthenticateOptions) => Promise<AuthenticateRe
 | **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
 
 
-#### AuthenticateResult
-
-| Prop           | Type                 |
-| -------------- | -------------------- |
-| **`verified`** | <code>boolean</code> |
-
-
 #### AuthenticateOptions
 
-| Prop                   | Type                                                  |
-| ---------------------- | ----------------------------------------------------- |
-| **`type`**             | <code><a href="#biometrytype">BiometryType</a></code> |
-| **`tag`**              | <code>string</code>                                   |
-| **`data`**             | <code>string</code>                                   |
-| **`foreignPublicKey`** | <code>string</code>                                   |
+| Prop       | Type                                                  |
+| ---------- | ----------------------------------------------------- |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
 
 
 ### Type Aliases
