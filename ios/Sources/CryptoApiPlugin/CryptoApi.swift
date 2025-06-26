@@ -43,7 +43,7 @@ import CryptoKit
         return list
     }
 
-    @objc public func generateKey(_ tag: String, _ algorithm: String) -> String? {
+    @objc public func generateKey(_ tag: String, _ algorithm: String, _ accessControlFlag: SecAccessControlCreateFlags) -> String? {
         print("CryptoApi.generateKey", tag, algorithm)
 
         let publicKeyFound = loadKey(tag, algorithm)
@@ -62,7 +62,7 @@ import CryptoKit
                 kSecAttrAccessControl as String: SecAccessControlCreateWithFlags(
                     kCFAllocatorDefault,
                     kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                    .privateKeyUsage,
+                    [.privateKeyUsage, accessControlFlag],
                     nil)!
             ]
         ]

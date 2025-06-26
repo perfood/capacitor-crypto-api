@@ -1,5 +1,6 @@
 import Foundation
 import Capacitor
+import LocalAuthentication
 
 /**
  * Please read the Capacitor iOS Plugin Development Guide
@@ -21,6 +22,7 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "decrypt", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
+    private let biometry = BiometryApi()
 
     @objc func getECDSATags(_ call: CAPPluginCall) {
         let tags = implementation.getTags("ecdsa")
@@ -41,12 +43,9 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func generateKey(_ call: CAPPluginCall) {
         let tag = call.getString("tag") ?? ""
         let algorithm = call.getString("algorithm") ?? ""
+        let type = call.getString("type") ?? ""
 
-        guard let publicKey = implementation.generateKey(tag, algorithm) else {
-            call.resolve([:])
-
-            return
-        }
+        let publicKey = implementation.generateKey(tag, algorithm, getAccessControlFlag(type));
 
         call.resolve([
             "publicKey": publicKey
@@ -133,5 +132,40 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve([
             "plaintext": plaintext
         ])
+    }
+
+    @objc func getBiometricsStatus(_ call: CAPPluginCall) {
+        print("CryptoApiPlugin.getBiometricsStatus")
+
+        let type = call.getString("type") ?? ""
+
+        let status = biometry.getBiometricsStatus(getAuthenticationPolicy(type))
+
+        call.resolve([
+            "status": status.stringValue
+        ])
+    }
+
+    private func getAccessControlFlag(_ type: String) -> SecAccessControlCreateFlags {
+        switch type {
+            case "BIOMETRY":
+                return .biometryCurrentSet
+
+            case "BIOMETRY_OR_PASSCODE":
+                return .userPresence
+
+            default:
+                return .devicePasscode
+        }
+    }
+
+    private func getAuthenticationPolicy(_ type: String) -> LAPolicy {
+        switch type {
+            case "BIOMETRY":
+                return .deviceOwnerAuthenticationWithBiometrics
+
+            default:
+                return .deviceOwnerAuthentication
+        }
     }
 }

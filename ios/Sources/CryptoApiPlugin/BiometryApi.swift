@@ -1,0 +1,53 @@
+import Foundation
+import LocalAuthentication
+
+@objc public enum BiometricsStatus: Int {
+    case SUCCESS
+    case HARDWARE_UNAVAILABLE
+    case NONE_ENROLLED
+    case UNKNOWN
+
+    public var stringValue: String {
+        switch self {
+            case .SUCCESS:
+                return "SUCCESS"
+            case .HARDWARE_UNAVAILABLE:
+                return "HARDWARE_UNAVAILABLE"
+            case .NONE_ENROLLED:
+                return "NONE_ENROLLED"
+            case .UNKNOWN:
+                return "UNKNOWN"
+        }
+    }
+}
+
+@objc public class BiometryApi: NSObject {
+
+    @objc public func getBiometricsStatus(_ policy: LAPolicy) -> BiometricsStatus {
+        print("BiometryApi.getBiometricsStatus", policy)
+
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(policy, error: &error) {
+            return .SUCCESS
+        }
+
+        if let laError = error {
+            switch laError.code {
+                case LAError.biometryNotAvailable.rawValue:
+                    return .HARDWARE_UNAVAILABLE
+                case LAError.biometryNotEnrolled.rawValue:
+                    return .NONE_ENROLLED
+
+                default:
+                    return .UNKNOWN
+            }
+        }
+
+        return .UNKNOWN
+    }
+
+  
+
+}
