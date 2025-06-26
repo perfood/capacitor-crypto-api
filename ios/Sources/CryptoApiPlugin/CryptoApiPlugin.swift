@@ -19,7 +19,11 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "sign", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "verify", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "encrypt", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "decrypt", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "decrypt", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "isBiometricsEnabled", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getBiometricsStatus", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getAvailableHardware", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "isDevicePasscodeSet", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
     private let biometry = BiometryApi()
@@ -134,6 +138,18 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         ])
     }
 
+    @objc func isBiometricsEnabled(_ call: CAPPluginCall) {
+        print("CryptoApiPlugin.isBiometricsEnabled")
+
+        let type = call.getString("type") ?? ""
+
+        let isEnabled = biometry.isBiometricsEnabled(getAuthenticationPolicy(type))
+
+        call.resolve([
+            "isEnabled": isEnabled
+        ])
+    }
+
     @objc func getBiometricsStatus(_ call: CAPPluginCall) {
         print("CryptoApiPlugin.getBiometricsStatus")
 
@@ -143,6 +159,26 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
 
         call.resolve([
             "status": status.stringValue
+        ])
+    }
+
+    @objc func getAvailableHardware(_ call: CAPPluginCall) {
+        print("CryptoApiPlugin.getAvailableHardware")
+
+        let hardware = biometry.getAvailableHardware()
+
+        call.resolve([
+            "hardware": hardware
+        ])
+    }
+
+    @objc func isDevicePasscodeSet(_ call: CAPPluginCall) {
+        print("CryptoApiPlugin.isDevicePasscodeSet")
+
+        let isDevicePasscodeSet = biometry.isDevicePasscodeSet()
+
+        call.resolve([
+            "isDevicePasscodeSet": isDevicePasscodeSet
         ])
     }
 
