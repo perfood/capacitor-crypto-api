@@ -102,6 +102,10 @@ export interface SignOptions {
    * The data to sign.
    */
   data: string;
+  /**
+   * The biometryType to authenticate with.
+   */
+  type?: BiometryType;
 }
 
 export interface SignResponse {
@@ -226,10 +230,6 @@ export interface EnrollOptions {
   type: BiometryType;
 }
 
-export interface AuthenticateOptions {
-  type: BiometryType;
-}
-
 export interface CryptoApiPlugin {
   /**
    * Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
@@ -317,9 +317,4 @@ export interface CryptoApiPlugin {
    *
    */
   enrollBiometrics(options: EnrollOptions): Promise<void>;
-
-  /**
-   *
-   */
-  authenticate(options: AuthenticateOptions): Promise<void>;
 }

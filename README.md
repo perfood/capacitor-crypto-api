@@ -55,7 +55,6 @@ npx cap sync
 * [`getAvailableHardware()`](#getavailablehardware)
 * [`isDevicePasscodeSet()`](#isdevicepasscodeset)
 * [`enrollBiometrics(...)`](#enrollbiometrics)
-* [`authenticate(...)`](#authenticate)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -290,19 +289,6 @@ enrollBiometrics(options: EnrollOptions) => Promise<void>
 --------------------
 
 
-### authenticate(...)
-
-```typescript
-authenticate(options: AuthenticateOptions) => Promise<void>
-```
-
-| Param         | Type                                                                |
-| ------------- | ------------------------------------------------------------------- |
-| **`options`** | <code><a href="#authenticateoptions">AuthenticateOptions</a></code> |
-
---------------------
-
-
 ### Interfaces
 
 
@@ -361,10 +347,11 @@ authenticate(options: AuthenticateOptions) => Promise<void>
 
 #### SignOptions
 
-| Prop       | Type                | Description       |
-| ---------- | ------------------- | ----------------- |
-| **`tag`**  | <code>string</code> | The key-pair tag. |
-| **`data`** | <code>string</code> | The data to sign. |
+| Prop       | Type                                                  | Description                            |
+| ---------- | ----------------------------------------------------- | -------------------------------------- |
+| **`tag`**  | <code>string</code>                                   | The key-pair tag.                      |
+| **`data`** | <code>string</code>                                   | The data to sign.                      |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> | The biometryType to authenticate with. |
 
 
 #### VerifyResponse
@@ -460,13 +447,6 @@ authenticate(options: AuthenticateOptions) => Promise<void>
 
 
 #### EnrollOptions
-
-| Prop       | Type                                                  |
-| ---------- | ----------------------------------------------------- |
-| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
-
-
-#### AuthenticateOptions
 
 | Prop       | Type                                                  |
 | ---------- | ----------------------------------------------------- |

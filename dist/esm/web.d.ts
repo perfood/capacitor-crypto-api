@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import type { AvailableHardwareResponse, BiometricsEnabledOptions, BiometricsEnabledResponse, BiometricsStatusOptions, BiometricsStatusResponse, CryptoApiPlugin, DecryptOptions, DecryptResponse, DeleteKeyOptions, DevicePasscodeResponse, EncryptOptions, EncryptResponse, EnrollOptions, GenerateKeyOptions, GenerateKeyResponse, GetTagsResponse, LoadKeyOptions, LoadKeyResponse, AuthenticateOptions, SignOptions, SignResponse, VerifyOptions, VerifyResponse } from './definitions';
+import type { AvailableHardwareResponse, BiometricsEnabledOptions, BiometricsEnabledResponse, BiometricsStatusOptions, BiometricsStatusResponse, CryptoApiPlugin, DecryptOptions, DecryptResponse, DeleteKeyOptions, DevicePasscodeResponse, EncryptOptions, EncryptResponse, EnrollOptions, GenerateKeyOptions, GenerateKeyResponse, GetTagsResponse, LoadKeyOptions, LoadKeyResponse, SignOptions, SignResponse, VerifyOptions, VerifyResponse } from './definitions';
 export declare class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     getECDSATags(): Promise<GetTagsResponse>;
     getECDHTags(): Promise<GetTagsResponse>;
@@ -14,7 +14,6 @@ export declare class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     getBiometricsStatus(options: BiometricsStatusOptions): Promise<BiometricsStatusResponse>;
     getAvailableHardware(): Promise<AvailableHardwareResponse>;
     isDevicePasscodeSet(): Promise<DevicePasscodeResponse>;
-    authenticate(options: AuthenticateOptions): Promise<void>;
     enrollBiometrics(options: EnrollOptions): Promise<void>;
     private importKey;
     private deriveKey;

@@ -120,7 +120,7 @@ public class BiometryApi {
     }
 
     // only works if BiometricManager.BIOMETRIC_SUCCESS
-    public void authenticate(Activity activity, Context context, int authenticationType, PluginCall call) {
+    public void authenticate(Activity activity, Context context, int authenticationType, AuthenticationCallback authCallback) {
         Log.i("BiometryApi.authenticate", "authenticationType: " + authenticationType);
 
         FragmentActivity fragmentActivity = (FragmentActivity) activity;
@@ -130,13 +130,13 @@ public class BiometryApi {
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                call.resolve();
+                authCallback.onSuccess();
             }
 
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
-                call.reject("Authentication error: " + errString);
+                authCallback.onError("Authentication error: " + errString);
             }
 
             @Override

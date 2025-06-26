@@ -3,6 +3,7 @@ package de.perfood.plugins.cryptoapi;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.security.keystore.UserNotAuthenticatedException;
 import android.util.Base64;
 import android.util.Log;
 import com.getcapacitor.JSObject;
@@ -135,24 +136,20 @@ public class CryptoApi {
         }
     }
 
-    public String sign(String tag, String data) {
+    public String sign(String tag, String data) throws UserNotAuthenticatedException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Log.i("CryptoApi.sign", tag + " " + data);
 
-        try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDSA);
+        KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDSA);
 
-            if (privateKeyEntry == null) {
-                return null;
-            }
-
-            Signature signature = Signature.getInstance("SHA256withECDSA");
-            signature.initSign(privateKeyEntry.getPrivateKey());
-            signature.update(data.getBytes());
-
-            return Base64.encodeToString(signature.sign(), Base64.DEFAULT);
-        } catch (Error | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+        if (privateKeyEntry == null) {
             return null;
         }
+
+        Signature signature = Signature.getInstance("SHA256withECDSA");
+        signature.initSign(privateKeyEntry.getPrivateKey());
+        signature.update(data.getBytes());
+
+        return Base64.encodeToString(signature.sign(), Base64.DEFAULT);
     }
 
     public boolean verify(String foreignPublicKeyBase64, String data, String signatureBase64) {

@@ -19,12 +19,10 @@ import type {
   GetTagsResponse,
   LoadKeyOptions,
   LoadKeyResponse,
-  AuthenticateOptions,
   SignOptions,
   SignResponse,
   VerifyOptions,
   VerifyResponse,
-  AuthenticateResult,
 } from './definitions';
 import {
   CRYPTO_API_AES_GCM_ALGORITHM,
@@ -262,14 +260,6 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async isDevicePasscodeSet(): Promise<DevicePasscodeResponse> {
     return {
       isDevicePasscodeSet: true,
-    };
-    // throw new Error('Biometry is only available on mobile devices');
-  }
-
-  async authenticateWithBiometry(options: AuthenticateOptions): Promise<AuthenticateResult> {
-    console.log('CryptoApi.authenticate', options);
-    return {
-      verified: true,
     };
     // throw new Error('Biometry is only available on mobile devices');
   }

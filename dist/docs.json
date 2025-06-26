@@ -265,24 +265,6 @@
           "EnrollOptions"
         ],
         "slug": "enrollbiometrics"
-      },
-      {
-        "name": "authenticate",
-        "signature": "(options: AuthenticateOptions) => Promise<void>",
-        "parameters": [
-          {
-            "name": "options",
-            "docs": "",
-            "type": "AuthenticateOptions"
-          }
-        ],
-        "returns": "Promise<void>",
-        "tags": [],
-        "docs": "",
-        "complexTypes": [
-          "AuthenticateOptions"
-        ],
-        "slug": "authenticate"
       }
     ],
     "properties": []
@@ -450,6 +432,15 @@
           "docs": "The data to sign.",
           "complexTypes": [],
           "type": "string"
+        },
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "The biometryType to authenticate with.",
+          "complexTypes": [
+            "BiometryType"
+          ],
+          "type": "BiometryType"
         }
       ]
     },
@@ -712,24 +703,6 @@
     {
       "name": "EnrollOptions",
       "slug": "enrolloptions",
-      "docs": "",
-      "tags": [],
-      "methods": [],
-      "properties": [
-        {
-          "name": "type",
-          "tags": [],
-          "docs": "",
-          "complexTypes": [
-            "BiometryType"
-          ],
-          "type": "BiometryType"
-        }
-      ]
-    },
-    {
-      "name": "AuthenticateOptions",
-      "slug": "authenticateoptions",
       "docs": "",
       "tags": [],
       "methods": [],

@@ -10,6 +10,10 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import java.util.List;
 import org.json.JSONArray;
+import android.security.keystore.UserNotAuthenticatedException;
+import java.security.SignatureException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 @CapacitorPlugin(name = "CryptoApi")
 public class CryptoApiPlugin extends Plugin {
@@ -97,14 +101,47 @@ public class CryptoApiPlugin extends Plugin {
     public void sign(PluginCall call) {
         String tag = call.getString("tag");
         String data = call.getString("data");
+        String type = call.getString("type");
 
-        String signature = implementation.sign(tag, data);
+        try {
+            String signature = implementation.sign(tag, data);
+            JSObject ret = new JSObject();
+            if (signature != null) {
+                ret.put("signature", signature);
+            }
+            call.resolve(ret);
+        } catch (UserNotAuthenticatedException e) {
+            // key is secured with biometry and needs authentication
+            biometry.authenticate(
+                this.getActivity(),
+                this.getContext(),
+                this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY_OR_PASSCODE),
+                new BiometryApi.AuthenticationCallback() {
+                    @Override
+                    public void onSuccess() {
+                        try {
+                            String signature = implementation.sign(tag, data);
+                            JSObject ret = new JSObject();
+                            if (signature != null) {
+                                ret.put("signature", signature);
+                            }
+                            call.resolve(ret);
+                        } catch (UserNotAuthenticatedException e) {
+                            call.reject("CryptoAPIPlugin.sign: Error authenticating user");
+                        } catch (Error | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+                            call.reject("CryptoAPIPlugin.sign: Error" + e);
+                        }
+                    }
 
-        JSObject ret = new JSObject();
-        if (signature != null) {
-            ret.put("signature", signature);
+                    @Override
+                    public void onError(String error) {
+                        call.reject(error);
+                    }
+                }
+            );
+        } catch (Error | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            call.reject("CryptoAPIPlugin.sign: Error" + e);
         }
-        call.resolve(ret);
     }
 
     @PluginMethod
@@ -191,18 +228,6 @@ public class CryptoApiPlugin extends Plugin {
 
         biometry.enrollBiometrics(this.getActivity(), this.getAuthenticationType(type));
         call.resolve();
-    }
-
-    @PluginMethod
-    public void authenticate(PluginCall call) {
-        String type = call.getString("type");
-       
-        biometry.authenticate(
-            this.getActivity(),
-            this.getContext(),
-            this.getAuthenticationType(type),
-            call
-        );
     }
 
     private int getAuthenticationType(String type) {
