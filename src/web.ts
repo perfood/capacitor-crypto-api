@@ -13,7 +13,6 @@ import type {
   DevicePasscodeResponse,
   EncryptOptions,
   EncryptResponse,
-  EnrollOptions,
   GenerateKeyOptions,
   GenerateKeyResponse,
   GetTagsResponse,
@@ -261,11 +260,6 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     return {
       isDevicePasscodeSet: true,
     };
-    // throw new Error('Biometry is only available on mobile devices');
-  }
-
-  async enrollBiometrics(options: EnrollOptions): Promise<void> {
-    console.log('CryptoApi.enrollBiometrics', options);
     // throw new Error('Biometry is only available on mobile devices');
   }
 

@@ -222,14 +222,6 @@ public class CryptoApiPlugin extends Plugin {
         call.resolve(ret);
     }
 
-    @PluginMethod
-    public void enrollBiometrics(PluginCall call) {
-        String type = call.getString("type");
-
-        biometry.enrollBiometrics(this.getActivity(), this.getAuthenticationType(type));
-        call.resolve();
-    }
-
     private int getAuthenticationType(String type) {
         switch (type) {
             case CryptoApiPlugin.BIOMETRY:

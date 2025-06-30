@@ -247,24 +247,6 @@
           "DevicePasscodeResponse"
         ],
         "slug": "isdevicepasscodeset"
-      },
-      {
-        "name": "enrollBiometrics",
-        "signature": "(options: EnrollOptions) => Promise<void>",
-        "parameters": [
-          {
-            "name": "options",
-            "docs": "",
-            "type": "EnrollOptions"
-          }
-        ],
-        "returns": "Promise<void>",
-        "tags": [],
-        "docs": "",
-        "complexTypes": [
-          "EnrollOptions"
-        ],
-        "slug": "enrollbiometrics"
       }
     ],
     "properties": []
@@ -697,24 +679,6 @@
           "docs": "",
           "complexTypes": [],
           "type": "boolean"
-        }
-      ]
-    },
-    {
-      "name": "EnrollOptions",
-      "slug": "enrolloptions",
-      "docs": "",
-      "tags": [],
-      "methods": [],
-      "properties": [
-        {
-          "name": "type",
-          "tags": [],
-          "docs": "",
-          "complexTypes": [
-            "BiometryType"
-          ],
-          "type": "BiometryType"
         }
       ]
     }

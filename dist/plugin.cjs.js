@@ -249,10 +249,6 @@ class CryptoApiWeb extends core.WebPlugin {
         };
         // throw new Error('Biometry is only available on mobile devices');
     }
-    async enrollBiometrics(options) {
-        console.log('CryptoApi.enrollBiometrics', options);
-        // throw new Error('Biometry is only available on mobile devices');
-    }
     async importKey(algorithm, format, privateKeyBase64, keyUsages) {
         const keyData = base64ToArrayBuffer(privateKeyBase64);
         const keyAlgorithm = algorithm == 'ecdsa' ? CRYPTO_API_ECDSA_KEY_ALGORITHM : CRYPTO_API_ECDH_KEY_ALGORITHM;

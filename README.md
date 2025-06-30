@@ -54,7 +54,6 @@ npx cap sync
 * [`getBiometricsStatus(...)`](#getbiometricsstatus)
 * [`getAvailableHardware()`](#getavailablehardware)
 * [`isDevicePasscodeSet()`](#isdevicepasscodeset)
-* [`enrollBiometrics(...)`](#enrollbiometrics)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -276,19 +275,6 @@ isDevicePasscodeSet() => Promise<DevicePasscodeResponse>
 --------------------
 
 
-### enrollBiometrics(...)
-
-```typescript
-enrollBiometrics(options: EnrollOptions) => Promise<void>
-```
-
-| Param         | Type                                                    |
-| ------------- | ------------------------------------------------------- |
-| **`options`** | <code><a href="#enrolloptions">EnrollOptions</a></code> |
-
---------------------
-
-
 ### Interfaces
 
 
@@ -444,13 +430,6 @@ enrollBiometrics(options: EnrollOptions) => Promise<void>
 | Prop                      | Type                 |
 | ------------------------- | -------------------- |
 | **`isDevicePasscodeSet`** | <code>boolean</code> |
-
-
-#### EnrollOptions
-
-| Prop       | Type                                                  |
-| ---------- | ----------------------------------------------------- |
-| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
 
 
 ### Type Aliases

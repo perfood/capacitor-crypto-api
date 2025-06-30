@@ -226,10 +226,6 @@ export interface DevicePasscodeResponse {
   isDevicePasscodeSet: boolean;
 }
 
-export interface EnrollOptions {
-  type: BiometryType;
-}
-
 export interface CryptoApiPlugin {
   /**
    * Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
@@ -312,9 +308,4 @@ export interface CryptoApiPlugin {
    *
    */
   isDevicePasscodeSet(): Promise<DevicePasscodeResponse>;
-
-  /**
-   *
-   */
-  enrollBiometrics(options: EnrollOptions): Promise<void>;
 }

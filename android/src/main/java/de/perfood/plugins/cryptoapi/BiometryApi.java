@@ -110,15 +110,6 @@ public class BiometryApi {
         return hardwareArray;
     }
 
-    public void enrollBiometrics(Activity activity, int authenticationType) {
-        Log.i("BiometryApi.enrollBiometrics", "authenticationType: " + authenticationType);
-
-        // Prompts the user to create credentials that your app accepts.
-        final Intent enrollIntent = new Intent(Settings.ACTION_BIOMETRIC_ENROLL);
-        enrollIntent.putExtra(Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED, authenticationType);
-        activity.startActivity(enrollIntent);
-    }
-
     // only works if BiometricManager.BIOMETRIC_SUCCESS
     public void authenticate(Activity activity, Context context, int authenticationType, AuthenticationCallback authCallback) {
         Log.i("BiometryApi.authenticate", "authenticationType: " + authenticationType);
