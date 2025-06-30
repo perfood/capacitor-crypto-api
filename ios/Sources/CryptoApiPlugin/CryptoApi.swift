@@ -1,5 +1,6 @@
 import Foundation
 import CryptoKit
+import LocalAuthentication
 
 @objc public class CryptoApi: NSObject {
     struct Constants {
@@ -43,12 +44,23 @@ import CryptoKit
         return list
     }
 
-    @objc public func generateKey(_ tag: String, _ algorithm: String, _ accessControlFlag: SecAccessControlCreateFlags) -> String? {
-        print("CryptoApi.generateKey", tag, algorithm)
+    @objc public func generateKey(_ tag: String, _ algorithm: String, _ type: String) -> String? {
+        print("CryptoApi.generateKey", tag, algorithm, type)
 
         let publicKeyFound = loadKey(tag, algorithm)
         if publicKeyFound != nil {
             return publicKeyFound
+        }
+
+        let accessControlFlags = getAccessControlFlags(type)
+        guard let accessControl = SecAccessControlCreateWithFlags(
+            kCFAllocatorDefault,
+            kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+            accessControlFlags,
+            nil
+        ) else {
+            print("CryptoApi.generateKey: Failed to create access control")
+            return nil
         }
 
         let attributes: [String: Any] = [
@@ -59,11 +71,7 @@ import CryptoKit
                 kSecAttrIsPermanent as String: true,
                 kSecAttrApplicationTag as String: tag.data(using: .utf8)!,
                 kSecAttrLabel as String: getLabel(algorithm),
-                kSecAttrAccessControl as String: SecAccessControlCreateWithFlags(
-                    kCFAllocatorDefault,
-                    kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                    [.privateKeyUsage, accessControlFlag],
-                    nil)!
+                kSecAttrAccessControl as String: accessControl
             ]
         ]
 
@@ -96,7 +104,8 @@ import CryptoKit
     @objc public func sign(_ tag: String, _ data: String) -> String? {
         print("CryptoApi.sign", tag, data)
 
-        guard let privateKey = getPrivateKey(tag, "ecdsa") else {
+        let context = LAContext()
+        guard let privateKey = getPrivateKey(tag, "ecdsa", context) else {
             return nil
         }
 
@@ -180,7 +189,8 @@ import CryptoKit
     }
 
     private func deriveSecret(_ tag: String, _ foreignPublicKey: String) -> SymmetricKey? {
-        guard let secPrivateKey = getPrivateKey(tag, "ecdh"),
+        let context = LAContext()
+        guard let secPrivateKey = getPrivateKey(tag, "ecdh", context),
               let secPublicKey =  loadPublicKeyFromBase64(foreignPublicKey) else {
             return nil
         }
@@ -201,13 +211,14 @@ import CryptoKit
         return SymmetricKey(data: derivedData)
     }
 
-    private func getPrivateKey(_ tag: String, _ algorithm: String) -> SecKey? {
+    private func getPrivateKey(_ tag: String, _ algorithm: String, _ context: LAContext) -> SecKey? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: tag.data(using: .utf8)!,
             kSecAttrLabel as String: getLabel(algorithm),
             kSecAttrKeyType as String: kSecAttrKeyTypeEC,
-            kSecReturnRef as String: true
+            kSecReturnRef as String: true,
+            kSecUseAuthenticationContext as String: context
         ]
 
         var privateKey: CFTypeRef?
@@ -231,7 +242,8 @@ import CryptoKit
     }
 
     private func getPublicKeyData(_ tag: String, _ algorithm: String) -> Data? {
-        guard let privateKey = getPrivateKey(tag, algorithm),
+        let context = LAContext()
+        guard let privateKey = getPrivateKey(tag, algorithm, context),
               let publicKey = SecKeyCopyPublicKey(privateKey),
               let publicKeyData = SecKeyCopyExternalRepresentation(publicKey, nil) as Data? else {
             return nil
@@ -259,5 +271,22 @@ import CryptoKit
 
     private func getLabel(_ algorithm: String) -> String {
         return algorithm.lowercased() == "ecdsa" ? Constants.LabelECDSA : Constants.LabelECDH
+    }
+
+    private func getAccessControlFlags(_ type: String) -> SecAccessControlCreateFlags {
+        switch type {
+            case "BIOMETRY":
+                return [.privateKeyUsage, .biometryCurrentSet]
+
+            case "BIOMETRY_OR_PASSCODE":
+                return [.privateKeyUsage, .userPresence]
+
+            case "PASSCODE":
+                return [.privateKeyUsage, .devicePasscode]
+                
+            default:
+                return .privateKeyUsage
+
+        }
     }
 }

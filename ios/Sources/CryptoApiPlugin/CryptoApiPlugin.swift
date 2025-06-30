@@ -49,8 +49,8 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         let algorithm = call.getString("algorithm") ?? ""
         let type = call.getString("type") ?? ""
 
-        let publicKey = implementation.generateKey(tag, algorithm, getAccessControlFlag(type));
-
+        let publicKey = implementation.generateKey(tag, algorithm, type)
+       
         call.resolve([
             "publicKey": publicKey
         ])
@@ -180,19 +180,6 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve([
             "isDevicePasscodeSet": isDevicePasscodeSet
         ])
-    }
-
-    private func getAccessControlFlag(_ type: String) -> SecAccessControlCreateFlags {
-        switch type {
-            case "BIOMETRY":
-                return .biometryCurrentSet
-
-            case "BIOMETRY_OR_PASSCODE":
-                return .userPresence
-
-            default:
-                return .devicePasscode
-        }
     }
 
     private func getAuthenticationPolicy(_ type: String) -> LAPolicy {
