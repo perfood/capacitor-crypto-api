@@ -46,7 +46,7 @@
             "text": "1.0.0"
           }
         ],
-        "docs": "Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),\ntags it for alter referencing and returns the public-key only,\nsince the private-key is protected and can't be extracted.",
+        "docs": "Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),\ntags it for alter referencing and returns the public-key only,\nsince the private-key is protected and can't be extracted.\nPossibility to secure private key with biometry.",
         "complexTypes": [
           "GenerateKeyResponse",
           "GenerateKeyOptions"
@@ -198,7 +198,7 @@
         ],
         "returns": "Promise<BiometricsEnabledResponse>",
         "tags": [],
-        "docs": "",
+        "docs": "Is biometry enabled on the device?",
         "complexTypes": [
           "BiometricsEnabledResponse",
           "BiometricsEnabledOptions"
@@ -217,7 +217,7 @@
         ],
         "returns": "Promise<BiometricsStatusResponse>",
         "tags": [],
-        "docs": "",
+        "docs": "Get the status of biometry on the device.",
         "complexTypes": [
           "BiometricsStatusResponse",
           "BiometricsStatusOptions"
@@ -230,7 +230,7 @@
         "parameters": [],
         "returns": "Promise<AvailableHardwareResponse>",
         "tags": [],
-        "docs": "",
+        "docs": "Get the list of available biometry hardware on the device.",
         "complexTypes": [
           "AvailableHardwareResponse"
         ],
@@ -242,7 +242,7 @@
         "parameters": [],
         "returns": "Promise<DevicePasscodeResponse>",
         "tags": [],
-        "docs": "",
+        "docs": "Is the device passcode set on the device?",
         "complexTypes": [
           "DevicePasscodeResponse"
         ],
@@ -308,7 +308,7 @@
         {
           "name": "type",
           "tags": [],
-          "docs": "secured with biometry type?",
+          "docs": "Biometry type if key is possibly secured with biometry.",
           "complexTypes": [
             "BiometryType"
           ],
@@ -418,7 +418,7 @@
         {
           "name": "type",
           "tags": [],
-          "docs": "The biometryType to authenticate with.",
+          "docs": "Biometry type if key is possibly secured with biometry.",
           "complexTypes": [
             "BiometryType"
           ],
@@ -522,6 +522,15 @@
           "docs": "The plaintext to be encrypted.",
           "complexTypes": [],
           "type": "string"
+        },
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "Biometry type if key is possibly secured with biometry.",
+          "complexTypes": [
+            "BiometryType"
+          ],
+          "type": "BiometryType"
         }
       ]
     },
@@ -575,6 +584,15 @@
           "docs": "The ciphertext (encrypted data) in base64 format.",
           "complexTypes": [],
           "type": "string"
+        },
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "Biometry type if key is possibly secured with biometry.",
+          "complexTypes": [
+            "BiometryType"
+          ],
+          "type": "BiometryType"
         }
       ]
     },
@@ -588,7 +606,7 @@
         {
           "name": "isEnabled",
           "tags": [],
-          "docs": "",
+          "docs": "Whether biometry is enabled.",
           "complexTypes": [],
           "type": "boolean"
         }
@@ -604,7 +622,7 @@
         {
           "name": "type",
           "tags": [],
-          "docs": "",
+          "docs": "The biometry type whose availability is to be checked.",
           "complexTypes": [
             "BiometryType"
           ],
@@ -622,7 +640,7 @@
         {
           "name": "status",
           "tags": [],
-          "docs": "",
+          "docs": "Status of biometry on the device.",
           "complexTypes": [
             "BiometricsStatus"
           ],
@@ -640,7 +658,7 @@
         {
           "name": "type",
           "tags": [],
-          "docs": "",
+          "docs": "The biometry type whose availability is to be checked.",
           "complexTypes": [
             "BiometryType"
           ],
@@ -658,7 +676,7 @@
         {
           "name": "hardware",
           "tags": [],
-          "docs": "",
+          "docs": "List of available biometry hardware.",
           "complexTypes": [
             "BiometricsHardware"
           ],
@@ -676,7 +694,7 @@
         {
           "name": "isDevicePasscodeSet",
           "tags": [],
-          "docs": "",
+          "docs": "Whether device passcode is set.",
           "complexTypes": [],
           "type": "boolean"
         }

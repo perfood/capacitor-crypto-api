@@ -98,6 +98,7 @@ generateKey(options: GenerateKeyOptions) => Promise<GenerateKeyResponse>
 Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),
 tags it for alter referencing and returns the public-key only,
 since the private-key is protected and can't be extracted.
+Possibility to secure private key with biometry.
 
 | Param         | Type                                                              |
 | ------------- | ----------------------------------------------------------------- |
@@ -229,6 +230,8 @@ Decrypt data with AES-GCM.
 isBiometricsEnabled(options: BiometricsEnabledOptions) => Promise<BiometricsEnabledResponse>
 ```
 
+Is biometry enabled on the device?
+
 | Param         | Type                                                                          |
 | ------------- | ----------------------------------------------------------------------------- |
 | **`options`** | <code><a href="#biometricsenabledoptions">BiometricsEnabledOptions</a></code> |
@@ -243,6 +246,8 @@ isBiometricsEnabled(options: BiometricsEnabledOptions) => Promise<BiometricsEnab
 ```typescript
 getBiometricsStatus(options: BiometricsStatusOptions) => Promise<BiometricsStatusResponse>
 ```
+
+Get the status of biometry on the device.
 
 | Param         | Type                                                                        |
 | ------------- | --------------------------------------------------------------------------- |
@@ -259,6 +264,8 @@ getBiometricsStatus(options: BiometricsStatusOptions) => Promise<BiometricsStatu
 getAvailableHardware() => Promise<AvailableHardwareResponse>
 ```
 
+Get the list of available biometry hardware on the device.
+
 **Returns:** <code>Promise&lt;<a href="#availablehardwareresponse">AvailableHardwareResponse</a>&gt;</code>
 
 --------------------
@@ -269,6 +276,8 @@ getAvailableHardware() => Promise<AvailableHardwareResponse>
 ```typescript
 isDevicePasscodeSet() => Promise<DevicePasscodeResponse>
 ```
+
+Is the device passcode set on the device?
 
 **Returns:** <code>Promise&lt;<a href="#devicepasscoderesponse">DevicePasscodeResponse</a>&gt;</code>
 
@@ -294,11 +303,11 @@ isDevicePasscodeSet() => Promise<DevicePasscodeResponse>
 
 #### GenerateKeyOptions
 
-| Prop            | Type                                                  | Description                  |
-| --------------- | ----------------------------------------------------- | ---------------------------- |
-| **`tag`**       | <code>string</code>                                   | The key-pair tag.            |
-| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code>                        | The elliptic curve algorithm |
-| **`type`**      | <code><a href="#biometrytype">BiometryType</a></code> | secured with biometry type?  |
+| Prop            | Type                                                  | Description                                             |
+| --------------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| **`tag`**       | <code>string</code>                                   | The key-pair tag.                                       |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code>                        | The elliptic curve algorithm                            |
+| **`type`**      | <code><a href="#biometrytype">BiometryType</a></code> | Biometry type if key is possibly secured with biometry. |
 
 
 #### LoadKeyResponse
@@ -333,11 +342,11 @@ isDevicePasscodeSet() => Promise<DevicePasscodeResponse>
 
 #### SignOptions
 
-| Prop       | Type                                                  | Description                            |
-| ---------- | ----------------------------------------------------- | -------------------------------------- |
-| **`tag`**  | <code>string</code>                                   | The key-pair tag.                      |
-| **`data`** | <code>string</code>                                   | The data to sign.                      |
-| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> | The biometryType to authenticate with. |
+| Prop       | Type                                                  | Description                                             |
+| ---------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| **`tag`**  | <code>string</code>                                   | The key-pair tag.                                       |
+| **`data`** | <code>string</code>                                   | The data to sign.                                       |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> | Biometry type if key is possibly secured with biometry. |
 
 
 #### VerifyResponse
@@ -366,11 +375,12 @@ isDevicePasscodeSet() => Promise<DevicePasscodeResponse>
 
 #### EncryptOptions
 
-| Prop                   | Type                | Description                              |
-| ---------------------- | ------------------- | ---------------------------------------- |
-| **`tag`**              | <code>string</code> | The key-pair tag.                        |
-| **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format. |
-| **`plaintext`**        | <code>string</code> | The plaintext to be encrypted.           |
+| Prop                   | Type                                                  | Description                                             |
+| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| **`tag`**              | <code>string</code>                                   | The key-pair tag.                                       |
+| **`foreignPublicKey`** | <code>string</code>                                   | The foreign public-key in base64 format.                |
+| **`plaintext`**        | <code>string</code>                                   | The plaintext to be encrypted.                          |
+| **`type`**             | <code><a href="#biometrytype">BiometryType</a></code> | Biometry type if key is possibly secured with biometry. |
 
 
 #### DecryptResponse
@@ -382,54 +392,55 @@ isDevicePasscodeSet() => Promise<DevicePasscodeResponse>
 
 #### DecryptOptions
 
-| Prop                   | Type                | Description                                       |
-| ---------------------- | ------------------- | ------------------------------------------------- |
-| **`tag`**              | <code>string</code> | The key-pair tag.                                 |
-| **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format.          |
-| **`iv`**               | <code>string</code> | The iv in base64 format.                          |
-| **`ciphertext`**       | <code>string</code> | The ciphertext (encrypted data) in base64 format. |
+| Prop                   | Type                                                  | Description                                             |
+| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| **`tag`**              | <code>string</code>                                   | The key-pair tag.                                       |
+| **`foreignPublicKey`** | <code>string</code>                                   | The foreign public-key in base64 format.                |
+| **`iv`**               | <code>string</code>                                   | The iv in base64 format.                                |
+| **`ciphertext`**       | <code>string</code>                                   | The ciphertext (encrypted data) in base64 format.       |
+| **`type`**             | <code><a href="#biometrytype">BiometryType</a></code> | Biometry type if key is possibly secured with biometry. |
 
 
 #### BiometricsEnabledResponse
 
-| Prop            | Type                 |
-| --------------- | -------------------- |
-| **`isEnabled`** | <code>boolean</code> |
+| Prop            | Type                 | Description                  |
+| --------------- | -------------------- | ---------------------------- |
+| **`isEnabled`** | <code>boolean</code> | Whether biometry is enabled. |
 
 
 #### BiometricsEnabledOptions
 
-| Prop       | Type                                                  |
-| ---------- | ----------------------------------------------------- |
-| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
+| Prop       | Type                                                  | Description                                            |
+| ---------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> | The biometry type whose availability is to be checked. |
 
 
 #### BiometricsStatusResponse
 
-| Prop         | Type                                                          |
-| ------------ | ------------------------------------------------------------- |
-| **`status`** | <code><a href="#biometricsstatus">BiometricsStatus</a></code> |
+| Prop         | Type                                                          | Description                       |
+| ------------ | ------------------------------------------------------------- | --------------------------------- |
+| **`status`** | <code><a href="#biometricsstatus">BiometricsStatus</a></code> | Status of biometry on the device. |
 
 
 #### BiometricsStatusOptions
 
-| Prop       | Type                                                  |
-| ---------- | ----------------------------------------------------- |
-| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> |
+| Prop       | Type                                                  | Description                                            |
+| ---------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> | The biometry type whose availability is to be checked. |
 
 
 #### AvailableHardwareResponse
 
-| Prop           | Type                              |
-| -------------- | --------------------------------- |
-| **`hardware`** | <code>BiometricsHardware[]</code> |
+| Prop           | Type                              | Description                          |
+| -------------- | --------------------------------- | ------------------------------------ |
+| **`hardware`** | <code>BiometricsHardware[]</code> | List of available biometry hardware. |
 
 
 #### DevicePasscodeResponse
 
-| Prop                      | Type                 |
-| ------------------------- | -------------------- |
-| **`isDevicePasscodeSet`** | <code>boolean</code> |
+| Prop                      | Type                 | Description                     |
+| ------------------------- | -------------------- | ------------------------------- |
+| **`isDevicePasscodeSet`** | <code>boolean</code> | Whether device passcode is set. |
 
 
 ### Type Aliases

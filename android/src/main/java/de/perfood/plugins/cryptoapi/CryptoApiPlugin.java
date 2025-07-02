@@ -8,12 +8,12 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
-import java.util.List;
-import org.json.JSONArray;
-import android.security.keystore.UserNotAuthenticatedException;
-import java.security.SignatureException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.util.List;
+import javax.crypto.SecretKey;
+import org.json.JSONArray;
 
 @CapacitorPlugin(name = "CryptoApi")
 public class CryptoApiPlugin extends Plugin {
@@ -56,12 +56,11 @@ public class CryptoApiPlugin extends Plugin {
         String publicKey;
 
         if (type != null) {
-            int authenticationType = this.getAuthenticationType(type);
             if (!utils.isEmulator() && !biometry.deviceSupportsStrongBox(this.getContext())) {
                 call.reject("Error generating biometric secured key on android. StrongBox is not supported.");
                 return;
             }
-            publicKey = implementation.generateKey(tag, algorithm, authenticationType);
+            publicKey = implementation.generateKey(tag, algorithm, type);
         } else {
             publicKey = implementation.generateKey(tag, algorithm);
         }
@@ -110,12 +109,12 @@ public class CryptoApiPlugin extends Plugin {
                 ret.put("signature", signature);
             }
             call.resolve(ret);
-        } catch (UserNotAuthenticatedException e) {
+        } catch (InvalidKeyException e) { // UserNotAuthenticatedException belongs to InvalidKeyException
             // key is secured with biometry and needs authentication
             biometry.authenticate(
                 this.getActivity(),
                 this.getContext(),
-                this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY_OR_PASSCODE),
+                this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY),
                 new BiometryApi.AuthenticationCallback() {
                     @Override
                     public void onSuccess() {
@@ -126,10 +125,8 @@ public class CryptoApiPlugin extends Plugin {
                                 ret.put("signature", signature);
                             }
                             call.resolve(ret);
-                        } catch (UserNotAuthenticatedException e) {
+                        } catch (InvalidKeyException e) {
                             call.reject("CryptoAPIPlugin.sign: Error authenticating user");
-                        } catch (Error | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-                            call.reject("CryptoAPIPlugin.sign: Error" + e);
                         }
                     }
 
@@ -139,8 +136,6 @@ public class CryptoApiPlugin extends Plugin {
                     }
                 }
             );
-        } catch (Error | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-            call.reject("CryptoAPIPlugin.sign: Error" + e);
         }
     }
 
@@ -162,10 +157,37 @@ public class CryptoApiPlugin extends Plugin {
         String tag = call.getString("tag");
         String foreignPublicKey = call.getString("foreignPublicKey");
         String plaintext = call.getString("plaintext");
+        String type = call.getString("type");
 
-        JSObject encrypted = implementation.encrypt(tag, foreignPublicKey, plaintext);
+        try {
+            SecretKey secretKey = implementation.deriveSecret(tag, foreignPublicKey);
+            JSObject encrypted = implementation.encrypt(secretKey, plaintext);
+            call.resolve(encrypted);
+        } catch (InvalidKeyException e) { // UserNotAuthenticatedException belongs to InvalidKeyException
+            // key is secured with biometry and needs authentication
+            biometry.authenticate(
+                this.getActivity(),
+                this.getContext(),
+                this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY),
+                new BiometryApi.AuthenticationCallback() {
+                    @Override
+                    public void onSuccess() {
+                        try {
+                            SecretKey secretKey = implementation.deriveSecret(tag, foreignPublicKey);
+                            JSObject encrypted = implementation.encrypt(secretKey, plaintext);
+                            call.resolve(encrypted);
+                        } catch (InvalidKeyException e) {
+                            call.reject("Authentication failed.");
+                        }
+                    }
 
-        call.resolve(encrypted);
+                    @Override
+                    public void onError(String error) {
+                        call.reject("Authentication failed.");
+                    }
+                }
+            );
+        }
     }
 
     @PluginMethod
@@ -174,12 +196,43 @@ public class CryptoApiPlugin extends Plugin {
         String foreignPublicKey = call.getString("foreignPublicKey");
         String iv = call.getString("iv");
         String ciphertext = call.getString("ciphertext");
+        String type = call.getString("type");
 
-        String plaintext = implementation.decrypt(tag, foreignPublicKey, iv, ciphertext);
+        try {
+            SecretKey secretKey = implementation.deriveSecret(tag, foreignPublicKey);
+            String plaintext = implementation.decrypt(secretKey, iv, ciphertext);
 
-        JSObject ret = new JSObject();
-        ret.put("plaintext", plaintext);
-        call.resolve(ret);
+            JSObject ret = new JSObject();
+            ret.put("plaintext", plaintext);
+            call.resolve(ret);
+        } catch (InvalidKeyException e) { // UserNotAuthenticatedException belongs to InvalidKeyException
+            // key is secured with biometry and needs authentication
+            biometry.authenticate(
+                this.getActivity(),
+                this.getContext(),
+                this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY),
+                new BiometryApi.AuthenticationCallback() {
+                    @Override
+                    public void onSuccess() {
+                        try {
+                            SecretKey secretKey = implementation.deriveSecret(tag, foreignPublicKey);
+                            String plaintext = implementation.decrypt(secretKey, iv, ciphertext);
+
+                            JSObject ret = new JSObject();
+                            ret.put("plaintext", plaintext);
+                            call.resolve(ret);
+                        } catch (InvalidKeyException e) {
+                            call.reject("Authentication failed.");
+                        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        call.reject("Authentication failed.");
+                    }
+                }
+            );
+        }
     }
 
     @PluginMethod
@@ -232,6 +285,6 @@ public class CryptoApiPlugin extends Plugin {
                 return BiometricManager.Authenticators.DEVICE_CREDENTIAL;
         }
 
-        throw new IllegalArgumentException("Unbekannter BiometryType: " + type);
+        throw new IllegalArgumentException("Unknown BiometryType: " + type);
     }
 }

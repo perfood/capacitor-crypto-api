@@ -44,7 +44,7 @@ export interface GenerateKeyOptions {
      */
     algorithm: 'ecdsa' | 'ecdh';
     /**
-     * secured with biometry type?
+     * Biometry type if key is possibly secured with biometry.
      */
     type?: BiometryType;
 }
@@ -90,7 +90,7 @@ export interface SignOptions {
      */
     data: string;
     /**
-     * The biometryType to authenticate with.
+     * Biometry type if key is possibly secured with biometry.
      */
     type?: BiometryType;
 }
@@ -133,6 +133,10 @@ export interface EncryptOptions {
      * The plaintext to be encrypted.
      */
     plaintext: string;
+    /**
+     * Biometry type if key is possibly secured with biometry.
+     */
+    type?: BiometryType;
 }
 export interface EncryptResponse {
     /**
@@ -161,6 +165,10 @@ export interface DecryptOptions {
      * The ciphertext (encrypted data) in base64 format.
      */
     ciphertext: string;
+    /**
+     * Biometry type if key is possibly secured with biometry.
+     */
+    type?: BiometryType;
 }
 export interface DecryptResponse {
     /**
@@ -169,12 +177,21 @@ export interface DecryptResponse {
     plaintext: string;
 }
 export interface BiometricsEnabledOptions {
+    /**
+     * The biometry type whose availability is to be checked.
+     */
     type: BiometryType;
 }
 export interface BiometricsEnabledResponse {
+    /**
+     * Whether biometry is enabled.
+     */
     isEnabled: boolean;
 }
 export interface BiometricsStatusOptions {
+    /**
+     * The biometry type whose availability is to be checked.
+     */
     type: BiometryType;
 }
 export declare enum BiometricsStatus {
@@ -184,6 +201,9 @@ export declare enum BiometricsStatus {
     UNKNOWN = "UNKNOWN"
 }
 export interface BiometricsStatusResponse {
+    /**
+     * Status of biometry on the device.
+     */
     status: BiometricsStatus;
 }
 export declare enum BiometricsHardware {
@@ -192,9 +212,15 @@ export declare enum BiometricsHardware {
     FACE = 2
 }
 export interface AvailableHardwareResponse {
+    /**
+     * List of available biometry hardware.
+     */
     hardware: BiometricsHardware[];
 }
 export interface DevicePasscodeResponse {
+    /**
+     * Whether device passcode is set.
+     */
     isDevicePasscodeSet: boolean;
 }
 export interface CryptoApiPlugin {
@@ -210,6 +236,7 @@ export interface CryptoApiPlugin {
      * Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),
      * tags it for alter referencing and returns the public-key only,
      * since the private-key is protected and can't be extracted.
+     * Possibility to secure private key with biometry.
      *
      * @since 1.0.0
      */
@@ -252,19 +279,19 @@ export interface CryptoApiPlugin {
      */
     decrypt(options: DecryptOptions): Promise<DecryptResponse>;
     /**
-     *
+     * Is biometry enabled on the device?
      */
     isBiometricsEnabled(options: BiometricsEnabledOptions): Promise<BiometricsEnabledResponse>;
     /**
-     *
+     * Get the status of biometry on the device.
      */
     getBiometricsStatus(options: BiometricsStatusOptions): Promise<BiometricsStatusResponse>;
     /**
-     *
+     * Get the list of available biometry hardware on the device.
      */
     getAvailableHardware(): Promise<AvailableHardwareResponse>;
     /**
-     *
+     * Is the device passcode set on the device?
      */
     isDevicePasscodeSet(): Promise<DevicePasscodeResponse>;
 }

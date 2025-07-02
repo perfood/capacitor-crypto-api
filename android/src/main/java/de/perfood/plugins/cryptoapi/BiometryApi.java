@@ -145,6 +145,7 @@ public class BiometryApi {
                 .setSubtitle("Use biometrics to continue")
                 .setAllowedAuthenticators(authenticationType);
 
+            // if no DEVICE_CREDENTIAL is used, set negative button text
             if ((authenticationType & BiometricManager.Authenticators.DEVICE_CREDENTIAL) == 0) {
                 builder.setNegativeButtonText("Cancel");
             }

@@ -3,7 +3,6 @@ package de.perfood.plugins.cryptoapi;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.security.keystore.UserNotAuthenticatedException;
 import android.util.Base64;
 import android.util.Log;
 import com.getcapacitor.JSObject;
@@ -31,8 +30,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyAgreement;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -65,11 +67,13 @@ public class CryptoApi {
 
             return list;
         } catch (Error | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
+            Log.e("CryptoApi.getTags", "Error:", e);
+
             return Collections.emptyList();
         }
     }
 
-    public String generateKey(String tag, String algorithm, int... type) {
+    public String generateKey(String tag, String algorithm, String... type) {
         Log.i("CryptoApi.generateKey", tag + " " + algorithm + " " + type);
 
         // we do not support ecdh below android 12
@@ -102,7 +106,7 @@ public class CryptoApi {
             if (type.length != 0) {
                 builder.setInvalidatedByBiometricEnrollment(true);
                 builder.setUserAuthenticationRequired(true);
-                builder.setUserAuthenticationParameters(60, type[0]); // 60 seconds for which this key is authorized to be used after the user is successfully authenticated
+                builder.setUserAuthenticationParameters(5, this.getKeyProperties(type[0])); // 5 seconds for which this key is authorized to be used after the user is successfully authenticated
                 if (!utils.isEmulator()) {
                     builder.setIsStrongBoxBacked(true);
                 }
@@ -113,6 +117,8 @@ public class CryptoApi {
 
             return getPublicKeyBase64(tag, algorithm);
         } catch (Error | InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException e) {
+            Log.e("CryptoApi.generateKey", "Error:", e);
+
             return null;
         }
     }
@@ -132,24 +138,32 @@ public class CryptoApi {
             keyStore.load(null);
             keyStore.deleteEntry(label + tag);
         } catch (Error | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
+            Log.e("CryptoApi.deleteKey", "Error:", e);
+
             return;
         }
     }
 
-    public String sign(String tag, String data) throws UserNotAuthenticatedException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public String sign(String tag, String data) throws InvalidKeyException {
         Log.i("CryptoApi.sign", tag + " " + data);
 
-        KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDSA);
+        try {
+            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDSA);
 
-        if (privateKeyEntry == null) {
+            if (privateKeyEntry == null) {
+                return null;
+            }
+
+            Signature signature = Signature.getInstance("SHA256withECDSA");
+            signature.initSign(privateKeyEntry.getPrivateKey());
+            signature.update(data.getBytes());
+
+            return Base64.encodeToString(signature.sign(), Base64.DEFAULT);
+        } catch (NoSuchAlgorithmException | SignatureException e) {
+            Log.e("CryptoApi.sign", "Error:", e);
+
             return null;
         }
-
-        Signature signature = Signature.getInstance("SHA256withECDSA");
-        signature.initSign(privateKeyEntry.getPrivateKey());
-        signature.update(data.getBytes());
-
-        return Base64.encodeToString(signature.sign(), Base64.DEFAULT);
     }
 
     public boolean verify(String foreignPublicKeyBase64, String data, String signatureBase64) {
@@ -168,16 +182,16 @@ public class CryptoApi {
 
             return signature.verify(Base64.decode(signatureBase64, Base64.DEFAULT));
         } catch (Error | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            Log.e("CryptoApi.verify", "Error:", e);
+
             return false;
         }
     }
 
-    public JSObject encrypt(String tag, String foreignPublicKey, String plaintext) {
-        Log.i("CryptoApi.encrypt", tag + " " + foreignPublicKey + " " + plaintext);
+    public JSObject encrypt(SecretKey secretKey, String plaintext) {
+        Log.i("CryptoApi.encrypt", secretKey + " " + plaintext);
 
         try {
-            SecretKey secretKey = this.deriveSecret(tag, foreignPublicKey);
-
             byte[] iv = new byte[IV_LENGTH];
             SecureRandom secureRandom = new SecureRandom();
             secureRandom.nextBytes(iv);
@@ -193,25 +207,25 @@ public class CryptoApi {
             result.put("ciphertext", Base64.encodeToString(encrypted, Base64.DEFAULT));
 
             return result;
-        } catch (NoSuchAlgorithmException e) {
-            Log.e("CryptoApi.encrypt", "NoSuchAlgorithmException", e);
-        } catch (InvalidKeyException e) {
-            Log.e("CryptoApi.encrypt", "InvalidKeyException", e);
-        } catch (InvalidAlgorithmParameterException e) {
-            Log.e("CryptoApi.encrypt", "InvalidAlgorithmParameterException", e);
-        } catch (Exception e) {
-            Log.e("CryptoApi.encrypt", "Unexpected exception", e);
-        }
+        } catch (
+            Error
+            | NoSuchAlgorithmException
+            | NoSuchPaddingException
+            | BadPaddingException
+            | IllegalBlockSizeException
+            | InvalidKeyException
+            | InvalidAlgorithmParameterException e
+        ) {
+            Log.e("CryptoApi.encrypt", "Error:", e);
 
-        return null;
+            return null;
+        }
     }
 
-    public String decrypt(String tag, String foreignPublicKey, String iv, String ciphertext) {
-        Log.i("CryptoApi.decrypt", tag + " " + foreignPublicKey + " " + iv + " " + ciphertext);
+    public String decrypt(SecretKey secretKey, String iv, String ciphertext) {
+        Log.i("CryptoApi.decrypt", iv + " " + ciphertext);
 
         try {
-            SecretKey secretKey = this.deriveSecret(tag, foreignPublicKey);
-
             byte[] ivBytes = Base64.decode(iv, Base64.DEFAULT);
             byte[] ciphertextBytes = Base64.decode(ciphertext, Base64.DEFAULT);
 
@@ -221,57 +235,22 @@ public class CryptoApi {
             byte[] decryptedBytes = cipher.doFinal(ciphertextBytes);
 
             return new String(decryptedBytes, StandardCharsets.UTF_8);
-        } catch (NoSuchAlgorithmException e) {
-            Log.e("CryptoApi.decrypt", "NoSuchAlgorithmException", e);
-        } catch (InvalidKeyException e) {
-            Log.e("CryptoApi.decrypt", "InvalidKeyException", e);
-        } catch (InvalidAlgorithmParameterException e) {
-            Log.e("CryptoApi.decrypt", "InvalidAlgorithmParameterException", e);
-        } catch (Exception e) {
-            Log.e("CryptoApi.decrypt", "Unexpected exception", e);
-        }
-
-        return null;
-    }
-
-    private KeyStore.PrivateKeyEntry getPrivateKeyEntry(String tag, String label) {
-        try {
-            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-            keyStore.load(null);
-
-            return (KeyStore.PrivateKeyEntry) keyStore.getEntry(label + tag, null);
         } catch (
-            Error | UnrecoverableEntryException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e
+            Error
+            | NoSuchAlgorithmException
+            | NoSuchPaddingException
+            | BadPaddingException
+            | IllegalBlockSizeException
+            | InvalidKeyException
+            | InvalidAlgorithmParameterException e
         ) {
+            Log.e("CryptoApi.decrypt", "Error:", e);
+
             return null;
         }
     }
 
-    private String getPublicKeyBase64(String tag, String algorithm) {
-        try {
-            String label = this.getLabel(algorithm);
-            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, label);
-
-            if (privateKeyEntry == null) {
-                return null;
-            }
-
-            return Base64.encodeToString(privateKeyEntry.getCertificate().getPublicKey().getEncoded(), Base64.DEFAULT);
-        } catch (Error e) {
-            return null;
-        }
-    }
-
-    private PublicKey loadPublicKeyFromBase64(String publicKeyBase64) {
-        try {
-            KeyFactory keyFactory = KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_EC);
-            return keyFactory.generatePublic(new X509EncodedKeySpec(Base64.decode(publicKeyBase64, Base64.DEFAULT)));
-        } catch (Error | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            return null;
-        }
-    }
-
-    private SecretKey deriveSecret(String tag, String foreignPublicKeyBase64) {
+    public SecretKey deriveSecret(String tag, String foreignPublicKeyBase64) throws InvalidKeyException {
         Log.i("CryptoApi.deriveSecret", tag + " " + foreignPublicKeyBase64);
 
         try {
@@ -297,22 +276,69 @@ public class CryptoApi {
             byte[] rawKey = Arrays.copyOf(sharedSecret, 32); // 256-bit key
 
             return new SecretKeySpec(rawKey, "AES");
-        } catch (Error e) {
-            Log.e("CryptoApi.deriveSecret", "Error", e);
-        } catch (NullPointerException e) {
-            Log.e("CryptoApi.deriveSecret", "NullPointerException", e);
-        } catch (NoSuchAlgorithmException e) {
-            Log.e("CryptoApi.deriveSecret", "NoSuchAlgorithmException", e);
-        } catch (InvalidKeyException e) {
-            Log.e("CryptoApi.deriveSecret", "InvalidKeyException", e);
-        } catch (Exception e) {
-            Log.e("CryptoApi.deriveSecret", "Unexpected exception", e);
-        }
+        } catch (NullPointerException | NoSuchAlgorithmException e) {
+            Log.e("CryptoApi.deriveSecret", "Error:", e);
 
-        return null;
+            return null;
+        }
+    }
+
+    private KeyStore.PrivateKeyEntry getPrivateKeyEntry(String tag, String label) {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+
+            return (KeyStore.PrivateKeyEntry) keyStore.getEntry(label + tag, null);
+        } catch (
+            Error | UnrecoverableEntryException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e
+        ) {
+            Log.e("CryptoApi.getPrivateKeyEntry", "Error:", e);
+
+            return null;
+        }
+    }
+
+    private String getPublicKeyBase64(String tag, String algorithm) {
+        try {
+            String label = this.getLabel(algorithm);
+            KeyStore.PrivateKeyEntry privateKeyEntry = this.getPrivateKeyEntry(tag, label);
+
+            if (privateKeyEntry == null) {
+                return null;
+            }
+
+            return Base64.encodeToString(privateKeyEntry.getCertificate().getPublicKey().getEncoded(), Base64.DEFAULT);
+        } catch (Error e) {
+            Log.e("CryptoApi.getPublicKeyBase64", "Error:", e);
+
+            return null;
+        }
+    }
+
+    private PublicKey loadPublicKeyFromBase64(String publicKeyBase64) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_EC);
+            return keyFactory.generatePublic(new X509EncodedKeySpec(Base64.decode(publicKeyBase64, Base64.DEFAULT)));
+        } catch (Error | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            Log.e("CryptoApi.loadPublicKeyFromBase64", "Error:", e);
+
+            return null;
+        }
     }
 
     private String getLabel(String algorithm) {
         return algorithm.equalsIgnoreCase("ecdsa") ? CryptoApi.LabelECDSA : CryptoApi.LabelECDH;
+    }
+
+    private int getKeyProperties(String type) {
+        switch (type) {
+            case CryptoApiPlugin.BIOMETRY:
+                return KeyProperties.AUTH_BIOMETRIC_STRONG;
+            case CryptoApiPlugin.BIOMETRY_OR_PASSCODE:
+                return KeyProperties.AUTH_BIOMETRIC_STRONG | KeyProperties.AUTH_DEVICE_CREDENTIAL;
+            case CryptoApiPlugin.PASSCODE:
+                return KeyProperties.AUTH_DEVICE_CREDENTIAL;
+        }
+        throw new IllegalArgumentException("Unknown BiometryType: " + type);
     }
 }
