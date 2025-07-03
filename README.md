@@ -466,10 +466,10 @@ Is the device passcode set on the device?
 
 #### BiometricsHardware
 
-| Members      |
-| ------------ |
-| **`FINGER`** |
-| **`IRIS`**   |
-| **`FACE`**   |
+| Members      | Value                 |
+| ------------ | --------------------- |
+| **`FINGER`** | <code>"FINGER"</code> |
+| **`IRIS`**   | <code>"IRIS"</code>   |
+| **`FACE`**   | <code>"FACE"</code>   |
 
 </docgen-api>

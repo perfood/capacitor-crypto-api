@@ -738,16 +738,19 @@
       "members": [
         {
           "name": "FINGER",
+          "value": "\"FINGER\"",
           "tags": [],
           "docs": ""
         },
         {
           "name": "IRIS",
+          "value": "\"IRIS\"",
           "tags": [],
           "docs": ""
         },
         {
           "name": "FACE",
+          "value": "\"FACE\"",
           "tags": [],
           "docs": ""
         }

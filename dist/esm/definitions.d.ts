@@ -207,9 +207,9 @@ export interface BiometricsStatusResponse {
     status: BiometricsStatus;
 }
 export declare enum BiometricsHardware {
-    FINGER = 0,
-    IRIS = 1,
-    FACE = 2
+    FINGER = "FINGER",
+    IRIS = "IRIS",
+    FACE = "FACE"
 }
 export interface AvailableHardwareResponse {
     /**

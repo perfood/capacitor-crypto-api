@@ -38,9 +38,9 @@ exports.BiometricsStatus = void 0;
 })(exports.BiometricsStatus || (exports.BiometricsStatus = {}));
 exports.BiometricsHardware = void 0;
 (function (BiometricsHardware) {
-    BiometricsHardware[BiometricsHardware["FINGER"] = 0] = "FINGER";
-    BiometricsHardware[BiometricsHardware["IRIS"] = 1] = "IRIS";
-    BiometricsHardware[BiometricsHardware["FACE"] = 2] = "FACE";
+    BiometricsHardware["FINGER"] = "FINGER";
+    BiometricsHardware["IRIS"] = "IRIS";
+    BiometricsHardware["FACE"] = "FACE";
 })(exports.BiometricsHardware || (exports.BiometricsHardware = {}));
 
 /**
@@ -223,10 +223,12 @@ class CryptoApiWeb extends core.WebPlugin {
     }
     async isBiometricsEnabled(options) {
         console.log('CryptoApi.isBiometricsEnabled', options);
-        const isWebAuthnSupported = !!(window.PublicKeyCredential &&
-            typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function');
+        // const isWebAuthnSupported = !!(
+        //   window.PublicKeyCredential &&
+        //   typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function'
+        // );
         return {
-            isEnabled: isWebAuthnSupported,
+            isEnabled: true,
         };
         // throw new Error('Biometry is only available on mobile devices');
     }

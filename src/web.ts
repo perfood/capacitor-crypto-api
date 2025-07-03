@@ -229,13 +229,13 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async isBiometricsEnabled(options: BiometricsEnabledOptions): Promise<BiometricsEnabledResponse> {
     console.log('CryptoApi.isBiometricsEnabled', options);
 
-    const isWebAuthnSupported = !!(
-      window.PublicKeyCredential &&
-      typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function'
-    );
+    // const isWebAuthnSupported = !!(
+    //   window.PublicKeyCredential &&
+    //   typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function'
+    // );
 
     return {
-      isEnabled: isWebAuthnSupported,
+      isEnabled: true,
     };
     // throw new Error('Biometry is only available on mobile devices');
   }

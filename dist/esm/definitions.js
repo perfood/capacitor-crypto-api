@@ -34,8 +34,8 @@ export var BiometricsStatus;
 })(BiometricsStatus || (BiometricsStatus = {}));
 export var BiometricsHardware;
 (function (BiometricsHardware) {
-    BiometricsHardware[BiometricsHardware["FINGER"] = 0] = "FINGER";
-    BiometricsHardware[BiometricsHardware["IRIS"] = 1] = "IRIS";
-    BiometricsHardware[BiometricsHardware["FACE"] = 2] = "FACE";
+    BiometricsHardware["FINGER"] = "FINGER";
+    BiometricsHardware["IRIS"] = "IRIS";
+    BiometricsHardware["FACE"] = "FACE";
 })(BiometricsHardware || (BiometricsHardware = {}));
 //# sourceMappingURL=definitions.js.map
