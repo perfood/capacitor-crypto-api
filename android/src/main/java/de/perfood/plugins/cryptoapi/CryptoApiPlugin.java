@@ -250,7 +250,7 @@ public class CryptoApiPlugin extends Plugin {
     public void getBiometricsStatus(PluginCall call) {
         String type = call.getString("type");
 
-        BiometryApi.BiometricsStatus status = biometry.getBiometricsStatus(this.getActivity(), this.getAuthenticationType(type));
+        String status = biometry.getBiometricsStatus(this.getActivity(), this.getAuthenticationType(type));
 
         JSObject ret = new JSObject();
         ret.put("status", status);

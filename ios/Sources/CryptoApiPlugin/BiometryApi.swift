@@ -1,60 +1,45 @@
 import Foundation
 import LocalAuthentication
 
-@objc public enum BiometricsStatus: Int {
-    case SUCCESS
-    case HARDWARE_UNAVAILABLE
-    case NONE_ENROLLED
-    case UNKNOWN
-
-    public var stringValue: String {
-        switch self {
-            case .SUCCESS:
-                return "SUCCESS"
-            case .HARDWARE_UNAVAILABLE:
-                return "HARDWARE_UNAVAILABLE"
-            case .NONE_ENROLLED:
-                return "NONE_ENROLLED"
-            case .UNKNOWN:
-                return "UNKNOWN"
-        }
-    }
-}
-
 @objc public class BiometryApi: NSObject {
      struct Constants {
-        static let FINGER = "FINGER"
-        static let FACE = "FACE"
+        static let HARDWARE_FINGER = "FINGER"
+        static let HARDWARE_FACE = "FACE"
+
+        static let STATUS_SUCCESS = "SUCCESS"
+        static let STATUS_HARDWARE_UNAVAILABLE = "HARDWARE_UNAVAILABLE"
+        static let STATUS_NONE_ENROLLED = "NONE_ENROLLED"
+        static let STATUS_UNKNOWN = "UNKNOWN"
     }
 
     @objc public func isBiometricsEnabled(_ policy: LAPolicy) -> Bool {
         print("BiometryApi.isBiometricsEnabled", policy)
-        return getBiometricsStatus(policy) == .SUCCESS
+        return getBiometricsStatus(policy) == Constants.STATUS_SUCCESS
     }
 
-    @objc public func getBiometricsStatus(_ policy: LAPolicy) -> BiometricsStatus {
+    @objc public func getBiometricsStatus(_ policy: LAPolicy) -> String {
         print("BiometryApi.getBiometricsStatus", policy)
 
         let context = LAContext()
         var error: NSError?
 
         if context.canEvaluatePolicy(policy, error: &error) {
-            return .SUCCESS
+            return Constants.STATUS_SUCCESS
         }
 
         if let laError = error {
             switch laError.code {
                 case LAError.biometryNotAvailable.rawValue:
-                    return .HARDWARE_UNAVAILABLE
+                    return Constants.STATUS_HARDWARE_UNAVAILABLE
                 case LAError.biometryNotEnrolled.rawValue:
-                    return .NONE_ENROLLED
+                    return Constants.STATUS_NONE_ENROLLED
 
                 default:
-                    return .UNKNOWN
+                    return Constants.STATUS_UNKNOWN
             }
         }
 
-        return .UNKNOWN
+        return Constants.STATUS_UNKNOWN
     }
 
     @objc public func getAvailableHardware() -> [String] {
@@ -65,9 +50,9 @@ import LocalAuthentication
 
         switch context.biometryType {
             case .faceID:
-                return [Constants.FACE]
+                return [Constants.HARDWARE_FACE]
             case .touchID:
-                return [Constants.FINGER]
+                return [Constants.HARDWARE_FINGER]
             default:
                 return []
         }        

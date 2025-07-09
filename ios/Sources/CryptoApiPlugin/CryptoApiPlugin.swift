@@ -158,7 +158,7 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         let status = biometry.getBiometricsStatus(getAuthenticationPolicy(type))
 
         call.resolve([
-            "status": status.stringValue
+            "status": status
         ])
     }
 

@@ -27,38 +27,34 @@ public class BiometryApi {
         void onError(String error);
     }
 
-    public enum BiometricsStatus {
-        SUCCESS,
-        HARDWARE_UNAVAILABLE,
-        NONE_ENROLLED,
-        UNKNOWN
-    }
+    private static final String STATUS_SUCCESS = "SUCCESS";
+    private static final String STATUS_HARDWARE_UNAVAILABLE = "HARDWARE_UNAVAILABLE";
+    private static final String STATUS_NONE_ENROLLED = "NONE_ENROLLED";
+    private static final String STATUS_UNKNOWN = "UNKNOWN";
 
-    public enum BiometricHardware {
-        FINGER,
-        IRIS,
-        FACE
-    }
+    private static final String HARDWARE_FINGER = "FINGER";
+    private static final String HARDWARE_IRIS = "IRIS";
+    private static final String HARDWARE_FACE = "FACE";
 
     public boolean isBiometricsEnabled(Activity activity, int authenticationType) {
         Log.i("BiometryApi.isBiometricsEnabled", "authenticationType: " + authenticationType);
-        return this.getBiometricsStatus(activity, authenticationType) == BiometricsStatus.SUCCESS;
+        return this.getBiometricsStatus(activity, authenticationType) == this.STATUS_SUCCESS;
     }
 
-    public BiometricsStatus getBiometricsStatus(Activity activity, int authenticationType) {
+    public String getBiometricsStatus(Activity activity, int authenticationType) {
         Log.i("BiometryApi.getBiometricsStatus", "authenticationType: " + authenticationType);
         BiometricManager biometricManager = BiometricManager.from(activity.getApplicationContext());
         int canAuthenticate = biometricManager.canAuthenticate(authenticationType);
         switch (canAuthenticate) {
             case BiometricManager.BIOMETRIC_SUCCESS:
-                return BiometricsStatus.SUCCESS;
+                return this.STATUS_SUCCESS;
             case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
             case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
-                return BiometricsStatus.HARDWARE_UNAVAILABLE;
+                return this.STATUS_HARDWARE_UNAVAILABLE;
             case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
-                return BiometricsStatus.NONE_ENROLLED;
+                return this.STATUS_NONE_ENROLLED;
             default:
-                return BiometricsStatus.UNKNOWN;
+                return this.STATUS_UNKNOWN;
         }
     }
 
@@ -77,23 +73,23 @@ public class BiometryApi {
         PackageManager packageManager = activity.getPackageManager();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) hardwareArray.put(BiometricHardware.FINGER);
+            if (packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) hardwareArray.put(this.HARDWARE_FINGER);
         }
 
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_IRIS)) {
-            hardwareArray.put(BiometricHardware.IRIS);
+            hardwareArray.put(this.HARDWARE_IRIS);
         } else {
             // check if Samsung's Iris service is present
             try {
                 PackageInfo irisSamsung = packageManager.getPackageInfo("com.samsung.android.server.iris", PackageManager.GET_META_DATA);
-                hardwareArray.put(BiometricHardware.IRIS);
+                hardwareArray.put(this.HARDWARE_IRIS);
             } catch (PackageManager.NameNotFoundException e) {
                 // do nada
             }
         }
 
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_FACE)) {
-            hardwareArray.put(BiometricHardware.FACE);
+            hardwareArray.put(this.HARDWARE_FACE);
         } else {
             // check if Samsung's Face service is present
             try {
@@ -101,7 +97,7 @@ public class BiometryApi {
                     "com.samsung.android.bio.face.service",
                     PackageManager.GET_META_DATA
                 );
-                hardwareArray.put(BiometricHardware.FACE);
+                hardwareArray.put(this.HARDWARE_FACE);
             } catch (PackageManager.NameNotFoundException e) {
                 // do nada
             }
