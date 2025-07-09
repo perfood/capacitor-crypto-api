@@ -33,8 +33,6 @@ import {
   PRIVATE_KEY_FORMAT,
   PUBLIC_KEY_FORMAT,
   SECRET_KEY_LENGHT,
-  BiometricsHardware,
-  BiometricsStatus,
 } from './definitions';
 import { arrayBufferToBase64, base64ToArrayBuffer, derToP1363, p1363ToDer } from './utils';
 
@@ -244,14 +242,14 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     console.log('CryptoApi.isBiometricsEnabled', options);
 
     return {
-      status: BiometricsStatus.UNKNOWN,
+      status: 'UNKNOWN',
     };
     // throw new Error('Biometry is only available on mobile devices');
   }
 
   async getAvailableHardware(): Promise<AvailableHardwareResponse> {
     return {
-      hardware: [BiometricsHardware.FINGER],
+      hardware: ['FINGER'],
     };
     // throw new Error('Biometry is only available on mobile devices');
   }

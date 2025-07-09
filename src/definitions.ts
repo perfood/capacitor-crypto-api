@@ -35,6 +35,10 @@ export const IV_LENGTH = 12;
 
 export type BiometryType = 'BIOMETRY' | 'BIOMETRY_OR_PASSCODE' | 'PASSCODE';
 
+export type BiometricsStatus = 'SUCCESS' | 'HARDWARE_UNAVAILABLE' | 'NONE_ENROLLED' | 'UNKNOWN';
+
+export type BiometricsHardware = 'FINGER' | 'IRIS' | 'FACE';
+
 export interface GetTagsResponse {
   /**
    * The key-pair tags.
@@ -218,24 +222,11 @@ export interface BiometricsStatusOptions {
   type: BiometryType;
 }
 
-export enum BiometricsStatus {
-  SUCCESS = 'SUCCESS',
-  HARDWARE_UNAVAILABLE = 'HARDWARE_UNAVAILABLE',
-  NONE_ENROLLED = 'NONE_ENROLLED',
-  UNKNOWN = 'UNKNOWN',
-}
-
 export interface BiometricsStatusResponse {
   /**
    * Status of biometry on the device.
    */
   status: BiometricsStatus;
-}
-
-export enum BiometricsHardware {
-  FINGER = "FINGER",
-  IRIS = "IRIS",
-  FACE = "FACE",
 }
 
 export interface AvailableHardwareResponse {

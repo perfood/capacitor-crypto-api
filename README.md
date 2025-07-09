@@ -56,7 +56,6 @@ npx cap sync
 * [`isDevicePasscodeSet()`](#isdevicepasscodeset)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
-* [Enums](#enums)
 
 </docgen-index>
 
@@ -451,25 +450,13 @@ Is the device passcode set on the device?
 <code>'BIOMETRY' | 'BIOMETRY_OR_PASSCODE' | 'PASSCODE'</code>
 
 
-### Enums
-
-
 #### BiometricsStatus
 
-| Members                    | Value                               |
-| -------------------------- | ----------------------------------- |
-| **`SUCCESS`**              | <code>'SUCCESS'</code>              |
-| **`HARDWARE_UNAVAILABLE`** | <code>'HARDWARE_UNAVAILABLE'</code> |
-| **`NONE_ENROLLED`**        | <code>'NONE_ENROLLED'</code>        |
-| **`UNKNOWN`**              | <code>'UNKNOWN'</code>              |
+<code>'SUCCESS' | 'HARDWARE_UNAVAILABLE' | 'NONE_ENROLLED' | 'UNKNOWN'</code>
 
 
 #### BiometricsHardware
 
-| Members      | Value                 |
-| ------------ | --------------------- |
-| **`FINGER`** | <code>"FINGER"</code> |
-| **`IRIS`**   | <code>"IRIS"</code>   |
-| **`FACE`**   | <code>"FACE"</code>   |
+<code>'FINGER' | 'IRIS' | 'FACE'</code>
 
 </docgen-api>

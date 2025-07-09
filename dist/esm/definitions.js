@@ -25,17 +25,4 @@ export const CRYPTO_API_AES_GCM_ALGORITHM = 'AES-GCM';
 export const CRYPTO_API_ECDH_ALGORITHM = 'ECDH';
 export const SECRET_KEY_LENGHT = 256;
 export const IV_LENGTH = 12;
-export var BiometricsStatus;
-(function (BiometricsStatus) {
-    BiometricsStatus["SUCCESS"] = "SUCCESS";
-    BiometricsStatus["HARDWARE_UNAVAILABLE"] = "HARDWARE_UNAVAILABLE";
-    BiometricsStatus["NONE_ENROLLED"] = "NONE_ENROLLED";
-    BiometricsStatus["UNKNOWN"] = "UNKNOWN";
-})(BiometricsStatus || (BiometricsStatus = {}));
-export var BiometricsHardware;
-(function (BiometricsHardware) {
-    BiometricsHardware["FINGER"] = "FINGER";
-    BiometricsHardware["IRIS"] = "IRIS";
-    BiometricsHardware["FACE"] = "FACE";
-})(BiometricsHardware || (BiometricsHardware = {}));
 //# sourceMappingURL=definitions.js.map

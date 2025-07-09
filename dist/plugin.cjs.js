@@ -29,19 +29,6 @@ const CRYPTO_API_AES_GCM_ALGORITHM = 'AES-GCM';
 const CRYPTO_API_ECDH_ALGORITHM = 'ECDH';
 const SECRET_KEY_LENGHT = 256;
 const IV_LENGTH = 12;
-exports.BiometricsStatus = void 0;
-(function (BiometricsStatus) {
-    BiometricsStatus["SUCCESS"] = "SUCCESS";
-    BiometricsStatus["HARDWARE_UNAVAILABLE"] = "HARDWARE_UNAVAILABLE";
-    BiometricsStatus["NONE_ENROLLED"] = "NONE_ENROLLED";
-    BiometricsStatus["UNKNOWN"] = "UNKNOWN";
-})(exports.BiometricsStatus || (exports.BiometricsStatus = {}));
-exports.BiometricsHardware = void 0;
-(function (BiometricsHardware) {
-    BiometricsHardware["FINGER"] = "FINGER";
-    BiometricsHardware["IRIS"] = "IRIS";
-    BiometricsHardware["FACE"] = "FACE";
-})(exports.BiometricsHardware || (exports.BiometricsHardware = {}));
 
 /**
  * Convert a base64 string to an ArrayBuffer.
@@ -235,13 +222,13 @@ class CryptoApiWeb extends core.WebPlugin {
     async getBiometricsStatus(options) {
         console.log('CryptoApi.isBiometricsEnabled', options);
         return {
-            status: exports.BiometricsStatus.UNKNOWN,
+            status: 'UNKNOWN',
         };
         // throw new Error('Biometry is only available on mobile devices');
     }
     async getAvailableHardware() {
         return {
-            hardware: [exports.BiometricsHardware.FINGER],
+            hardware: ['FINGER'],
         };
         // throw new Error('Biometry is only available on mobile devices');
     }

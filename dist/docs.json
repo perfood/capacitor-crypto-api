@@ -701,62 +701,7 @@
       ]
     }
   ],
-  "enums": [
-    {
-      "name": "BiometricsStatus",
-      "slug": "biometricsstatus",
-      "members": [
-        {
-          "name": "SUCCESS",
-          "value": "'SUCCESS'",
-          "tags": [],
-          "docs": ""
-        },
-        {
-          "name": "HARDWARE_UNAVAILABLE",
-          "value": "'HARDWARE_UNAVAILABLE'",
-          "tags": [],
-          "docs": ""
-        },
-        {
-          "name": "NONE_ENROLLED",
-          "value": "'NONE_ENROLLED'",
-          "tags": [],
-          "docs": ""
-        },
-        {
-          "name": "UNKNOWN",
-          "value": "'UNKNOWN'",
-          "tags": [],
-          "docs": ""
-        }
-      ]
-    },
-    {
-      "name": "BiometricsHardware",
-      "slug": "biometricshardware",
-      "members": [
-        {
-          "name": "FINGER",
-          "value": "\"FINGER\"",
-          "tags": [],
-          "docs": ""
-        },
-        {
-          "name": "IRIS",
-          "value": "\"IRIS\"",
-          "tags": [],
-          "docs": ""
-        },
-        {
-          "name": "FACE",
-          "value": "\"FACE\"",
-          "tags": [],
-          "docs": ""
-        }
-      ]
-    }
-  ],
+  "enums": [],
   "typeAliases": [
     {
       "name": "BiometryType",
@@ -773,6 +718,48 @@
         },
         {
           "text": "'PASSCODE'",
+          "complexTypes": []
+        }
+      ]
+    },
+    {
+      "name": "BiometricsStatus",
+      "slug": "biometricsstatus",
+      "docs": "",
+      "types": [
+        {
+          "text": "'SUCCESS'",
+          "complexTypes": []
+        },
+        {
+          "text": "'HARDWARE_UNAVAILABLE'",
+          "complexTypes": []
+        },
+        {
+          "text": "'NONE_ENROLLED'",
+          "complexTypes": []
+        },
+        {
+          "text": "'UNKNOWN'",
+          "complexTypes": []
+        }
+      ]
+    },
+    {
+      "name": "BiometricsHardware",
+      "slug": "biometricshardware",
+      "docs": "",
+      "types": [
+        {
+          "text": "'FINGER'",
+          "complexTypes": []
+        },
+        {
+          "text": "'IRIS'",
+          "complexTypes": []
+        },
+        {
+          "text": "'FACE'",
           "complexTypes": []
         }
       ]

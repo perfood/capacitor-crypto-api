@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import { CRYPTO_API_AES_GCM_ALGORITHM, CRYPTO_API_ECDH_KEY_ALGORITHM, CRYPTO_API_ECDH_ALGORITHM, CRYPTO_API_ECDSA_KEY_ALGORITHM, CRYPTO_API_ECDSA_SIGN_ALGORITHM, IV_LENGTH, PRIVATE_KEY_FORMAT, PUBLIC_KEY_FORMAT, SECRET_KEY_LENGHT, BiometricsHardware, BiometricsStatus, } from './definitions';
+import { CRYPTO_API_AES_GCM_ALGORITHM, CRYPTO_API_ECDH_KEY_ALGORITHM, CRYPTO_API_ECDH_ALGORITHM, CRYPTO_API_ECDSA_KEY_ALGORITHM, CRYPTO_API_ECDSA_SIGN_ALGORITHM, IV_LENGTH, PRIVATE_KEY_FORMAT, PUBLIC_KEY_FORMAT, SECRET_KEY_LENGHT, } from './definitions';
 import { arrayBufferToBase64, base64ToArrayBuffer, derToP1363, p1363ToDer } from './utils';
 const LabelECDSA = 'CryptoApiECDSA:';
 const LabelECDH = 'CryptoApiECDH:';
@@ -139,13 +139,13 @@ export class CryptoApiWeb extends WebPlugin {
     async getBiometricsStatus(options) {
         console.log('CryptoApi.isBiometricsEnabled', options);
         return {
-            status: BiometricsStatus.UNKNOWN,
+            status: 'UNKNOWN',
         };
         // throw new Error('Biometry is only available on mobile devices');
     }
     async getAvailableHardware() {
         return {
-            hardware: [BiometricsHardware.FINGER],
+            hardware: ['FINGER'],
         };
         // throw new Error('Biometry is only available on mobile devices');
     }
