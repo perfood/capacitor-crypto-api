@@ -18,9 +18,9 @@ import org.json.JSONArray;
 @CapacitorPlugin(name = "CryptoApi")
 public class CryptoApiPlugin extends Plugin {
 
-    private static final CryptoApi implementation = new CryptoApi();
-    private static final BiometryApi biometry = new BiometryApi();
     private static final Utils utils = new Utils();
+    private final CryptoApi implementation = new CryptoApi(this.getContext());
+    private final BiometryApi biometry = new BiometryApi(this.getActivity(), this.getContext());
 
     public static final String BIOMETRY = "BIOMETRY";
     public static final String BIOMETRY_OR_PASSCODE = "BIOMETRY_OR_PASSCODE";
@@ -56,10 +56,9 @@ public class CryptoApiPlugin extends Plugin {
         String publicKey;
 
         if (type != null) {
-            boolean hasStrongBox = biometry.hasSecureHardware(this.getContext());
-            publicKey = implementation.generateKey(tag, algorithm, hasStrongBox, type);
+            publicKey = implementation.generateKey(tag, algorithm, type);
         } else {
-            publicKey = implementation.generateKey(tag, algorithm, false);
+            publicKey = implementation.generateKey(tag, algorithm);
         }
 
         JSObject ret = new JSObject();
@@ -109,8 +108,6 @@ public class CryptoApiPlugin extends Plugin {
         } catch (InvalidKeyException e) { // UserNotAuthenticatedException belongs to InvalidKeyException
             // key is secured with biometry and needs authentication
             biometry.authenticate(
-                this.getActivity(),
-                this.getContext(),
                 this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY),
                 new BiometryApi.AuthenticationCallback() {
                     @Override
@@ -163,8 +160,6 @@ public class CryptoApiPlugin extends Plugin {
         } catch (InvalidKeyException e) { // UserNotAuthenticatedException belongs to InvalidKeyException
             // key is secured with biometry and needs authentication
             biometry.authenticate(
-                this.getActivity(),
-                this.getContext(),
                 this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY),
                 new BiometryApi.AuthenticationCallback() {
                     @Override
@@ -205,8 +200,6 @@ public class CryptoApiPlugin extends Plugin {
         } catch (InvalidKeyException e) { // UserNotAuthenticatedException belongs to InvalidKeyException
             // key is secured with biometry and needs authentication
             biometry.authenticate(
-                this.getActivity(),
-                this.getContext(),
                 this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY),
                 new BiometryApi.AuthenticationCallback() {
                     @Override
@@ -236,7 +229,7 @@ public class CryptoApiPlugin extends Plugin {
     public void isBiometricsEnabled(PluginCall call) {
         String type = call.getString("type");
 
-        boolean isEnabled = biometry.isBiometricsEnabled(this.getActivity(), this.getAuthenticationType(type));
+        boolean isEnabled = biometry.isBiometricsEnabled(this.getAuthenticationType(type));
 
         JSObject ret = new JSObject();
         ret.put("isEnabled", isEnabled);
@@ -247,7 +240,7 @@ public class CryptoApiPlugin extends Plugin {
     public void getBiometricsStatus(PluginCall call) {
         String type = call.getString("type");
 
-        String status = biometry.getBiometricsStatus(this.getActivity(), this.getAuthenticationType(type));
+        String status = biometry.getBiometricsStatus(this.getAuthenticationType(type));
 
         JSObject ret = new JSObject();
         ret.put("status", status);
@@ -256,7 +249,7 @@ public class CryptoApiPlugin extends Plugin {
 
     @PluginMethod
     public void getAvailableHardware(PluginCall call) {
-        JSONArray hardware = biometry.getAvailableHardware(this.getActivity());
+        JSONArray hardware = biometry.getAvailableHardware();
 
         JSObject ret = new JSObject();
         ret.put("hardware", hardware);
@@ -265,7 +258,7 @@ public class CryptoApiPlugin extends Plugin {
 
     @PluginMethod
     public void isDevicePasscodeSet(PluginCall call) {
-        boolean isDevicePasscodeSet = biometry.isDevicePasscodeSet(this.getActivity());
+        boolean isDevicePasscodeSet = biometry.isDevicePasscodeSet();
 
         JSObject ret = new JSObject();
         ret.put("isDevicePasscodeSet", isDevicePasscodeSet);
@@ -274,7 +267,7 @@ public class CryptoApiPlugin extends Plugin {
 
     @PluginMethod
     public void hasSecureHardware(PluginCall call) {
-        boolean hasSecureHardware = biometry.hasSecureHardware(this.getContext());
+        boolean hasSecureHardware = implementation.hasSecureHardware();
 
         JSObject ret = new JSObject();
         ret.put("hasSecureHardware", hasSecureHardware);

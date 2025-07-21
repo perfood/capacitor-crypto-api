@@ -1,5 +1,6 @@
 package de.perfood.plugins.cryptoapi;
 
+import android.content.Context;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
@@ -48,6 +49,12 @@ public class CryptoApi {
     private static final String AES_MODE = "AES/GCM/NoPadding";
     private static final int IV_LENGTH = 12; // 96 bits for GCM
     private static final int GCM_TAG_LENGTH = 128; // bits
+    
+    private static Context context;
+
+    public CryptoApi(Context context) {
+        this.context = context;
+    }
 
     public List<String> getTags(String algorithm) {
         Log.i("CryptoApi.getTags", algorithm);
@@ -73,7 +80,7 @@ public class CryptoApi {
         }
     }
 
-    public String generateKey(String tag, String algorithm, boolean hasStrongBox, String... type) {
+    public String generateKey(String tag, String algorithm, String... type) {
         Log.i("CryptoApi.generateKey", tag + " " + algorithm + " " + type);
 
         // we do not support ecdh below android 12
@@ -107,10 +114,9 @@ public class CryptoApi {
                 builder.setInvalidatedByBiometricEnrollment(true);
                 builder.setUserAuthenticationRequired(true);
                 builder.setUserAuthenticationParameters(5, this.getKeyProperties(type[0])); // 5 seconds for which this key is authorized to be used after the user is successfully authenticated
-                if (hasStrongBox) {
-                    builder.setIsStrongBoxBacked(true);
-                }
             }
+
+            builder.setIsStrongBoxBacked(this.hasSecureHardware());
 
             keyPairGenerator.initialize(builder.build());
             keyPairGenerator.generateKeyPair();
@@ -258,7 +264,7 @@ public class CryptoApi {
 
             if (privateKeyEntry == null) {
                 Log.i("CryptoApi.deriveSecret", "No private key entry found for tag. Generating new one...");
-                this.generateKey(tag, "ecdh", false);
+                this.generateKey(tag, "ecdh");
                 privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDH);
                 if (privateKeyEntry == null) {
                     return null;
@@ -281,6 +287,13 @@ public class CryptoApi {
 
             return null;
         }
+    }
+
+    public boolean hasSecureHardware() {
+        boolean deviceSupportsStrongBox =
+            (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+                this.context.getPackageManager().hasSystemFeature("android.hardware.strongbox_keystore"));
+        return deviceSupportsStrongBox;
     }
 
     private KeyStore.PrivateKeyEntry getPrivateKeyEntry(String tag, String label) {

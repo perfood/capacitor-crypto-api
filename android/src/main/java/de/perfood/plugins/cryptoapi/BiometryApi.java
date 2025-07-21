@@ -36,14 +36,22 @@ public class BiometryApi {
     private static final String HARDWARE_IRIS = "IRIS";
     private static final String HARDWARE_FACE = "FACE";
 
-    public boolean isBiometricsEnabled(Activity activity, int authenticationType) {
-        Log.i("BiometryApi.isBiometricsEnabled", "authenticationType: " + authenticationType);
-        return this.getBiometricsStatus(activity, authenticationType) == this.STATUS_SUCCESS;
+    private static Activity activity;
+    private static Context context;
+
+    public BiometryApi(Activity activity, Context context) {
+        this.context = context;
+        this.activity = activity;
     }
 
-    public String getBiometricsStatus(Activity activity, int authenticationType) {
+    public boolean isBiometricsEnabled(int authenticationType) {
+        Log.i("BiometryApi.isBiometricsEnabled", "authenticationType: " + authenticationType);
+        return this.getBiometricsStatus(authenticationType) == this.STATUS_SUCCESS;
+    }
+
+    public String getBiometricsStatus(int authenticationType) {
         Log.i("BiometryApi.getBiometricsStatus", "authenticationType: " + authenticationType);
-        BiometricManager biometricManager = BiometricManager.from(activity.getApplicationContext());
+        BiometricManager biometricManager = BiometricManager.from(this.activity.getApplicationContext());
         int canAuthenticate = biometricManager.canAuthenticate(authenticationType);
         switch (canAuthenticate) {
             case BiometricManager.BIOMETRIC_SUCCESS:
@@ -58,9 +66,9 @@ public class BiometryApi {
         }
     }
 
-    public boolean isDevicePasscodeSet(Activity activity) {
+    public boolean isDevicePasscodeSet() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            KeyguardManager manager = (KeyguardManager) activity.getSystemService(Context.KEYGUARD_SERVICE);
+            KeyguardManager manager = (KeyguardManager) this.activity.getSystemService(Context.KEYGUARD_SERVICE);
             return manager.isDeviceSecure();
         }
 
@@ -68,9 +76,9 @@ public class BiometryApi {
         return false;
     }
 
-    public JSONArray getAvailableHardware(Activity activity) {
+    public JSONArray getAvailableHardware() {
         JSONArray hardwareArray = new JSONArray();
-        PackageManager packageManager = activity.getPackageManager();
+        PackageManager packageManager = this.activity.getPackageManager();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) hardwareArray.put(this.HARDWARE_FINGER);
@@ -107,11 +115,11 @@ public class BiometryApi {
     }
 
     // only works if BiometricManager.BIOMETRIC_SUCCESS
-    public void authenticate(Activity activity, Context context, int authenticationType, AuthenticationCallback authCallback) {
+    public void authenticate(int authenticationType, AuthenticationCallback authCallback) {
         Log.i("BiometryApi.authenticate", "authenticationType: " + authenticationType);
 
-        FragmentActivity fragmentActivity = (FragmentActivity) activity;
-        Executor executor = ContextCompat.getMainExecutor(context);
+        FragmentActivity fragmentActivity = (FragmentActivity) this.activity;
+        Executor executor = ContextCompat.getMainExecutor(this.context);
 
         BiometricPrompt.AuthenticationCallback callback = new BiometricPrompt.AuthenticationCallback() {
             @Override
@@ -149,12 +157,5 @@ public class BiometryApi {
             BiometricPrompt.PromptInfo promptInfo = builder.build();
             prompt.authenticate(promptInfo);
         });
-    }
-
-    public boolean hasSecureHardware(Context context) {
-        boolean deviceSupportsStrongBox =
-            (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
-                context.getPackageManager().hasSystemFeature("android.hardware.strongbox_keystore"));
-        return deviceSupportsStrongBox;
     }
 }

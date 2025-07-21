@@ -23,7 +23,8 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "isBiometricsEnabled", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getBiometricsStatus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getAvailableHardware", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "isDevicePasscodeSet", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "isDevicePasscodeSet", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "hasSecureHardware", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
     private let biometry = BiometryApi()
