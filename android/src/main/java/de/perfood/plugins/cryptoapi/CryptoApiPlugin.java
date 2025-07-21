@@ -19,12 +19,19 @@ import org.json.JSONArray;
 public class CryptoApiPlugin extends Plugin {
 
     private static final Utils utils = new Utils();
-    private final CryptoApi implementation = new CryptoApi(this.getContext());
-    private final BiometryApi biometry = new BiometryApi(this.getActivity(), this.getContext());
+    private static CryptoApi implementation;
+    private static BiometryApi biometry;
 
     public static final String BIOMETRY = "BIOMETRY";
     public static final String BIOMETRY_OR_PASSCODE = "BIOMETRY_OR_PASSCODE";
     public static final String PASSCODE = "PASSCODE";
+
+    @Override
+    public void load() {
+        super.load();
+        this.implementation = new CryptoApi(getContext());
+        this.biometry = new BiometryApi(this.getActivity(), this.getContext());
+    }
 
     @PluginMethod
     public void getECDSATags(PluginCall call) {

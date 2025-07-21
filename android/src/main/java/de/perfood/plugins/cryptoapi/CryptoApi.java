@@ -49,7 +49,7 @@ public class CryptoApi {
     private static final String AES_MODE = "AES/GCM/NoPadding";
     private static final int IV_LENGTH = 12; // 96 bits for GCM
     private static final int GCM_TAG_LENGTH = 128; // bits
-    
+
     private static Context context;
 
     public CryptoApi(Context context) {
