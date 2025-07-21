@@ -73,7 +73,7 @@ public class CryptoApi {
         }
     }
 
-    public String generateKey(String tag, String algorithm, String... type) {
+    public String generateKey(String tag, String algorithm, boolean hasStrongBox, String... type) {
         Log.i("CryptoApi.generateKey", tag + " " + algorithm + " " + type);
 
         // we do not support ecdh below android 12
@@ -107,7 +107,7 @@ public class CryptoApi {
                 builder.setInvalidatedByBiometricEnrollment(true);
                 builder.setUserAuthenticationRequired(true);
                 builder.setUserAuthenticationParameters(5, this.getKeyProperties(type[0])); // 5 seconds for which this key is authorized to be used after the user is successfully authenticated
-                if (!utils.isEmulator()) {
+                if (hasStrongBox) {
                     builder.setIsStrongBoxBacked(true);
                 }
             }
@@ -258,7 +258,7 @@ public class CryptoApi {
 
             if (privateKeyEntry == null) {
                 Log.i("CryptoApi.deriveSecret", "No private key entry found for tag. Generating new one...");
-                this.generateKey(tag, "ecdh");
+                this.generateKey(tag, "ecdh", false);
                 privateKeyEntry = this.getPrivateKeyEntry(tag, CryptoApi.LabelECDH);
                 if (privateKeyEntry == null) {
                     return null;

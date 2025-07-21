@@ -243,6 +243,13 @@ export interface DevicePasscodeResponse {
   isDevicePasscodeSet: boolean;
 }
 
+export interface SecureHardwareResponse {
+  /**
+   * Whether the device has secure hardware.
+   */
+  hasSecureHardware: boolean;
+}
+
 export interface CryptoApiPlugin {
   /**
    * Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
@@ -326,4 +333,9 @@ export interface CryptoApiPlugin {
    * Is the device passcode set on the device?
    */
   isDevicePasscodeSet(): Promise<DevicePasscodeResponse>;
+
+  /**
+   * Does the device have secure hardware like StrongBox?
+   */
+  hasSecureHardware(): Promise<SecureHardwareResponse>;
 }

@@ -127,33 +127,30 @@ export class CryptoApiWeb extends WebPlugin {
     }
     async isBiometricsEnabled(options) {
         console.log('CryptoApi.isBiometricsEnabled', options);
-        // const isWebAuthnSupported = !!(
-        //   window.PublicKeyCredential &&
-        //   typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function'
-        // );
         return {
             isEnabled: true,
         };
-        // throw new Error('Biometry is only available on mobile devices');
     }
     async getBiometricsStatus(options) {
         console.log('CryptoApi.isBiometricsEnabled', options);
         return {
             status: 'UNKNOWN',
         };
-        // throw new Error('Biometry is only available on mobile devices');
     }
     async getAvailableHardware() {
         return {
             hardware: ['FINGER'],
         };
-        // throw new Error('Biometry is only available on mobile devices');
     }
     async isDevicePasscodeSet() {
         return {
             isDevicePasscodeSet: true,
         };
-        // throw new Error('Biometry is only available on mobile devices');
+    }
+    async hasSecureHardware() {
+        return {
+            hasSecureHardware: false,
+        };
     }
     async importKey(algorithm, format, privateKeyBase64, keyUsages) {
         const keyData = base64ToArrayBuffer(privateKeyBase64);

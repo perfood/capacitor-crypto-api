@@ -56,13 +56,10 @@ public class CryptoApiPlugin extends Plugin {
         String publicKey;
 
         if (type != null) {
-            if (!utils.isEmulator() && !biometry.deviceSupportsStrongBox(this.getContext())) {
-                call.reject("Error generating biometric secured key on android. StrongBox is not supported.");
-                return;
-            }
-            publicKey = implementation.generateKey(tag, algorithm, type);
+            boolean hasStrongBox = biometry.hasSecureHardware(this.getContext());
+            publicKey = implementation.generateKey(tag, algorithm, hasStrongBox, type);
         } else {
-            publicKey = implementation.generateKey(tag, algorithm);
+            publicKey = implementation.generateKey(tag, algorithm, false);
         }
 
         JSObject ret = new JSObject();
@@ -272,6 +269,15 @@ public class CryptoApiPlugin extends Plugin {
 
         JSObject ret = new JSObject();
         ret.put("isDevicePasscodeSet", isDevicePasscodeSet);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void hasSecureHardware(PluginCall call) {
+        boolean hasSecureHardware = biometry.hasSecureHardware(this.getContext());
+
+        JSObject ret = new JSObject();
+        ret.put("hasSecureHardware", hasSecureHardware);
         call.resolve(ret);
     }
 

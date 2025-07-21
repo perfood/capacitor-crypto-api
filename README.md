@@ -54,6 +54,7 @@ npx cap sync
 * [`getBiometricsStatus(...)`](#getbiometricsstatus)
 * [`getAvailableHardware()`](#getavailablehardware)
 * [`isDevicePasscodeSet()`](#isdevicepasscodeset)
+* [`hasSecureHardware()`](#hassecurehardware)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -283,6 +284,19 @@ Is the device passcode set on the device?
 --------------------
 
 
+### hasSecureHardware()
+
+```typescript
+hasSecureHardware() => Promise<SecureHardwareResponse>
+```
+
+Does the device have secure hardware like StrongBox?
+
+**Returns:** <code>Promise&lt;<a href="#securehardwareresponse">SecureHardwareResponse</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -440,6 +454,13 @@ Is the device passcode set on the device?
 | Prop                      | Type                 | Description                     |
 | ------------------------- | -------------------- | ------------------------------- |
 | **`isDevicePasscodeSet`** | <code>boolean</code> | Whether device passcode is set. |
+
+
+#### SecureHardwareResponse
+
+| Prop                    | Type                 | Description                             |
+| ----------------------- | -------------------- | --------------------------------------- |
+| **`hasSecureHardware`** | <code>boolean</code> | Whether the device has secure hardware. |
 
 
 ### Type Aliases

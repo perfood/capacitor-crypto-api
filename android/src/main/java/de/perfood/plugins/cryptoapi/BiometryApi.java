@@ -151,10 +151,10 @@ public class BiometryApi {
         });
     }
 
-    public boolean deviceSupportsStrongBox(Context context) {
-        return (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
-            context.getPackageManager().hasSystemFeature("android.hardware.strongbox_keystore")
-        );
+    public boolean hasSecureHardware(Context context) {
+        boolean deviceSupportsStrongBox =
+            (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+                context.getPackageManager().hasSystemFeature("android.hardware.strongbox_keystore"));
+        return deviceSupportsStrongBox;
     }
 }

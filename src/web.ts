@@ -18,6 +18,7 @@ import type {
   GetTagsResponse,
   LoadKeyOptions,
   LoadKeyResponse,
+  SecureHardwareResponse,
   SignOptions,
   SignResponse,
   VerifyOptions,
@@ -227,15 +228,9 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async isBiometricsEnabled(options: BiometricsEnabledOptions): Promise<BiometricsEnabledResponse> {
     console.log('CryptoApi.isBiometricsEnabled', options);
 
-    // const isWebAuthnSupported = !!(
-    //   window.PublicKeyCredential &&
-    //   typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function'
-    // );
-
     return {
       isEnabled: true,
     };
-    // throw new Error('Biometry is only available on mobile devices');
   }
 
   async getBiometricsStatus(options: BiometricsStatusOptions): Promise<BiometricsStatusResponse> {
@@ -244,21 +239,24 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     return {
       status: 'UNKNOWN',
     };
-    // throw new Error('Biometry is only available on mobile devices');
   }
 
   async getAvailableHardware(): Promise<AvailableHardwareResponse> {
     return {
       hardware: ['FINGER'],
     };
-    // throw new Error('Biometry is only available on mobile devices');
   }
 
   async isDevicePasscodeSet(): Promise<DevicePasscodeResponse> {
     return {
       isDevicePasscodeSet: true,
     };
-    // throw new Error('Biometry is only available on mobile devices');
+  }
+
+  async hasSecureHardware(): Promise<SecureHardwareResponse> {
+    return {
+      hasSecureHardware: false,
+    };
   }
 
   private async importKey(

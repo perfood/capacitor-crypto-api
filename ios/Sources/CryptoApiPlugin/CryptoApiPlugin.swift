@@ -182,6 +182,14 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         ])
     }
 
+    @objc func hasSecureHardware(_ call: CAPPluginCall) {
+        print("CryptoApiPlugin.hasSecureHardware")
+
+        call.resolve([
+            "hasSecureHardware": true // hardware is always secure on iOS devices
+        ])
+    }
+
     private func getAuthenticationPolicy(_ type: String) -> LAPolicy {
         switch type {
             case "BIOMETRY":

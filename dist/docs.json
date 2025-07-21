@@ -247,6 +247,18 @@
           "DevicePasscodeResponse"
         ],
         "slug": "isdevicepasscodeset"
+      },
+      {
+        "name": "hasSecureHardware",
+        "signature": "() => Promise<SecureHardwareResponse>",
+        "parameters": [],
+        "returns": "Promise<SecureHardwareResponse>",
+        "tags": [],
+        "docs": "Does the device have secure hardware like StrongBox?",
+        "complexTypes": [
+          "SecureHardwareResponse"
+        ],
+        "slug": "hassecurehardware"
       }
     ],
     "properties": []
@@ -695,6 +707,22 @@
           "name": "isDevicePasscodeSet",
           "tags": [],
           "docs": "Whether device passcode is set.",
+          "complexTypes": [],
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "SecureHardwareResponse",
+      "slug": "securehardwareresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "hasSecureHardware",
+          "tags": [],
+          "docs": "Whether the device has secure hardware.",
           "complexTypes": [],
           "type": "boolean"
         }
