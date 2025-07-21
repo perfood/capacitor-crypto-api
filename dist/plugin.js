@@ -210,7 +210,7 @@ var capacitorCryptoApi = (function (exports, core) {
         async isBiometricsEnabled(options) {
             console.log('CryptoApi.isBiometricsEnabled', options);
             return {
-                isEnabled: true,
+                isEnabled: false,
             };
         }
         async getBiometricsStatus(options) {
@@ -221,12 +221,12 @@ var capacitorCryptoApi = (function (exports, core) {
         }
         async getAvailableHardware() {
             return {
-                hardware: ['FINGER'],
+                hardware: [],
             };
         }
         async isDevicePasscodeSet() {
             return {
-                isDevicePasscodeSet: true,
+                isDevicePasscodeSet: false,
             };
         }
         async hasSecureHardware() {

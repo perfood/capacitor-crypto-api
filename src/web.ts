@@ -229,7 +229,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     console.log('CryptoApi.isBiometricsEnabled', options);
 
     return {
-      isEnabled: true,
+      isEnabled: false,
     };
   }
 
@@ -243,13 +243,13 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
 
   async getAvailableHardware(): Promise<AvailableHardwareResponse> {
     return {
-      hardware: ['FINGER'],
+      hardware: [],
     };
   }
 
   async isDevicePasscodeSet(): Promise<DevicePasscodeResponse> {
     return {
-      isDevicePasscodeSet: true,
+      isDevicePasscodeSet: false,
     };
   }
 

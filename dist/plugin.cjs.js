@@ -211,7 +211,7 @@ class CryptoApiWeb extends core.WebPlugin {
     async isBiometricsEnabled(options) {
         console.log('CryptoApi.isBiometricsEnabled', options);
         return {
-            isEnabled: true,
+            isEnabled: false,
         };
     }
     async getBiometricsStatus(options) {
@@ -222,12 +222,12 @@ class CryptoApiWeb extends core.WebPlugin {
     }
     async getAvailableHardware() {
         return {
-            hardware: ['FINGER'],
+            hardware: [],
         };
     }
     async isDevicePasscodeSet() {
         return {
-            isDevicePasscodeSet: true,
+            isDevicePasscodeSet: false,
         };
     }
     async hasSecureHardware() {

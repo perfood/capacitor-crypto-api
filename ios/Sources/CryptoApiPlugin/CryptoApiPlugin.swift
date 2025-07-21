@@ -51,7 +51,7 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         let type = call.getString("type") ?? ""
 
         let publicKey = implementation.generateKey(tag, algorithm, type)
-       
+
         call.resolve([
             "publicKey": publicKey
         ])
@@ -193,11 +193,11 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private func getAuthenticationPolicy(_ type: String) -> LAPolicy {
         switch type {
-            case "BIOMETRY":
-                return .deviceOwnerAuthenticationWithBiometrics
+        case "BIOMETRY":
+            return .deviceOwnerAuthenticationWithBiometrics
 
-            default:
-                return .deviceOwnerAuthentication
+        default:
+            return .deviceOwnerAuthentication
         }
     }
 }

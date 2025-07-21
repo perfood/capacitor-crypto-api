@@ -275,17 +275,17 @@ import LocalAuthentication
 
     private func getAccessControlFlags(_ type: String) -> SecAccessControlCreateFlags {
         switch type {
-            case "BIOMETRY":
-                return [.privateKeyUsage, .biometryCurrentSet]
+        case "BIOMETRY":
+            return [.privateKeyUsage, .biometryCurrentSet]
 
-            case "BIOMETRY_OR_PASSCODE":
-                return [.privateKeyUsage, .userPresence]
+        case "BIOMETRY_OR_PASSCODE":
+            return [.privateKeyUsage, .userPresence]
 
-            case "PASSCODE":
-                return [.privateKeyUsage, .devicePasscode]
-                
-            default:
-                return .privateKeyUsage
+        case "PASSCODE":
+            return [.privateKeyUsage, .devicePasscode]
+
+        default:
+            return .privateKeyUsage
 
         }
     }

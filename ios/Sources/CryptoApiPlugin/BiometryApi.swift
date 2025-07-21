@@ -2,7 +2,7 @@ import Foundation
 import LocalAuthentication
 
 @objc public class BiometryApi: NSObject {
-     struct Constants {
+    struct Constants {
         static let HARDWARE_FINGER = "FINGER"
         static let HARDWARE_FACE = "FACE"
 
@@ -29,13 +29,13 @@ import LocalAuthentication
 
         if let laError = error {
             switch laError.code {
-                case LAError.biometryNotAvailable.rawValue:
-                    return Constants.STATUS_HARDWARE_UNAVAILABLE
-                case LAError.biometryNotEnrolled.rawValue:
-                    return Constants.STATUS_NONE_ENROLLED
+            case LAError.biometryNotAvailable.rawValue:
+                return Constants.STATUS_HARDWARE_UNAVAILABLE
+            case LAError.biometryNotEnrolled.rawValue:
+                return Constants.STATUS_NONE_ENROLLED
 
-                default:
-                    return Constants.STATUS_UNKNOWN
+            default:
+                return Constants.STATUS_UNKNOWN
             }
         }
 
@@ -49,13 +49,13 @@ import LocalAuthentication
         var error: NSError?
 
         switch context.biometryType {
-            case .faceID:
-                return [Constants.HARDWARE_FACE]
-            case .touchID:
-                return [Constants.HARDWARE_FINGER]
-            default:
-                return []
-        }        
+        case .faceID:
+            return [Constants.HARDWARE_FACE]
+        case .touchID:
+            return [Constants.HARDWARE_FINGER]
+        default:
+            return []
+        }
     }
 
     @objc public func isDevicePasscodeSet() -> Bool {
@@ -64,7 +64,7 @@ import LocalAuthentication
         let context = LAContext()
         var error: NSError?
 
-        return context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)     
+        return context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
     }
 
 }
