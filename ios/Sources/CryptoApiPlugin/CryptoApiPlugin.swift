@@ -85,15 +85,29 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         let tag = call.getString("tag") ?? ""
         let data = call.getString("data") ?? ""
 
-        guard let signature = implementation.sign(tag, data) else {
-            call.resolve([:])
+        do {
+            let signature = try implementation.sign(tag, data)
 
-            return
+            call.resolve([
+                "signature": signature
+            ])
+        } catch let nsError as NSError {
+            if nsError.domain == LAError.errorDomain {
+                switch LAError.Code(rawValue: nsError.code) {
+                case .userCancel:
+                    call.reject("user_cancelled", "Benutzer hat abgebrochen.")
+                case .biometryLockout:
+                    call.reject("lockout", "Biometrie gesperrt.")
+                default:
+                    call.reject("signing_failed", nsError.localizedDescription)
+                }
+            } else {
+                call.reject("signing_failed", nsError.localizedDescription)
+            }
+        } catch {
+            call.reject("signing_failed", error.localizedDescription)
         }
 
-        call.resolve([
-            "signature": signature
-        ])
     }
 
     @objc func verify(_ call: CAPPluginCall) {

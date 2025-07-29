@@ -131,7 +131,13 @@ public class BiometryApi {
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
-                authCallback.onError("Authentication error: " + errString);
+
+                if (errorCode == BiometricPrompt.ERROR_USER_CANCELED || errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                    authCallback.onError("user_cancelled");
+                } else if (errorCode == BiometricPrompt.ERROR_LOCKOUT) {
+                    authCallback.onError("lockout");
+                }
+                authCallback.onError("signing_failed");
             }
 
             @Override

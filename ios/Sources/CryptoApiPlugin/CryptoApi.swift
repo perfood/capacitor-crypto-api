@@ -101,12 +101,12 @@ import LocalAuthentication
         SecItemDelete(query as CFDictionary)
     }
 
-    @objc public func sign(_ tag: String, _ data: String) -> String? {
+    @objc public func sign(_ tag: String, _ data: String) throws -> String {
         print("CryptoApi.sign", tag, data)
 
         let context = LAContext()
         guard let privateKey = getPrivateKey(tag, "ecdsa", context) else {
-            return nil
+            throw NSError(domain: "Crypto", code: -1, userInfo: [NSLocalizedDescriptionKey: "Key not found"])
         }
 
         var error: Unmanaged<CFError>?
@@ -114,7 +114,12 @@ import LocalAuthentication
                                                     .ecdsaSignatureMessageX962SHA256,
                                                     data.data(using: .utf8)! as CFData,
                                                     &error) as Data? else {
-            return nil
+
+            if let cfErr = error?.takeRetainedValue() {
+                throw cfErr as Error
+            } else {
+                throw NSError(domain: "Crypto", code: -2, userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
+            }
         }
 
         return signature.base64EncodedString()
