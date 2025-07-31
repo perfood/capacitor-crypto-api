@@ -36,10 +36,10 @@ public class BiometryApi {
     private static final String HARDWARE_IRIS = "IRIS";
     private static final String HARDWARE_FACE = "FACE";
 
-    private static Activity activity;
+    private static FragmentActivity activity;
     private static Context context;
 
-    public BiometryApi(Activity activity, Context context) {
+    public BiometryApi(FragmentActivity activity, Context context) {
         this.context = context;
         this.activity = activity;
     }
@@ -136,8 +136,9 @@ public class BiometryApi {
                     authCallback.onError("user_cancelled");
                 } else if (errorCode == BiometricPrompt.ERROR_LOCKOUT) {
                     authCallback.onError("lockout");
+                } else {
+                    authCallback.onError("signing_failed");
                 }
-                authCallback.onError("signing_failed");
             }
 
             @Override
