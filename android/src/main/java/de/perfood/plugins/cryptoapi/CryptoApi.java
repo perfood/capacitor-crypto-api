@@ -1,9 +1,11 @@
 package de.perfood.plugins.cryptoapi;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.security.keystore.StrongBoxUnavailableException;
 import android.util.Base64;
 import android.util.Log;
 import com.getcapacitor.JSObject;
@@ -116,8 +118,18 @@ public class CryptoApi {
                 builder.setUserAuthenticationParameters(5, this.getKeyProperties(type[0])); // 5 seconds for which this key is authorized to be used after the user is successfully authenticated
             }
 
-            builder.setIsStrongBoxBacked(this.hasSecureHardware());
+            if (this.hasSecureHardware()) {
+                builder.setIsStrongBoxBacked(true);
+                try {
+                    keyPairGenerator.initialize(builder.build());
+                    keyPairGenerator.generateKeyPair();
+                } catch (StrongBoxUnavailableException e) {
+                    Log.e("CryptoApi.generateKey", "StrongBox is available but cannot be used at runtime, fallback to TEE", e);
+                }
+            }
 
+            // Fallback without StrongBox
+            builder.setIsStrongBoxBacked(false);
             keyPairGenerator.initialize(builder.build());
             keyPairGenerator.generateKeyPair();
 
@@ -248,7 +260,8 @@ public class CryptoApi {
             | BadPaddingException
             | IllegalBlockSizeException
             | InvalidKeyException
-            | InvalidAlgorithmParameterException e
+            | InvalidAlgorithmParameterException
+            | NullPointerException e
         ) {
             Log.e("CryptoApi.decrypt", "Error:", e);
 
@@ -292,7 +305,7 @@ public class CryptoApi {
     public boolean hasSecureHardware() {
         boolean deviceSupportsStrongBox =
             (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
-                this.context.getPackageManager().hasSystemFeature("android.hardware.strongbox_keystore"));
+                this.context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE));
         return deviceSupportsStrongBox;
     }
 
