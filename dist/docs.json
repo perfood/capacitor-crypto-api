@@ -259,6 +259,44 @@
           "SecureHardwareResponse"
         ],
         "slug": "hassecurehardware"
+      },
+      {
+        "name": "registerPasskey",
+        "signature": "(options: RegisterPasskeyOptions) => Promise<RegisterPasskeyResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "RegisterPasskeyOptions"
+          }
+        ],
+        "returns": "Promise<RegisterPasskeyResult>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "RegisterPasskeyResult",
+          "RegisterPasskeyOptions"
+        ],
+        "slug": "registerpasskey"
+      },
+      {
+        "name": "authenticateWithPasskey",
+        "signature": "(options: AuthenticateWithPasskeyOptions) => Promise<AuthenticateWithPasskeyResult>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "AuthenticateWithPasskeyOptions"
+          }
+        ],
+        "returns": "Promise<AuthenticateWithPasskeyResult>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "AuthenticateWithPasskeyResult",
+          "AuthenticateWithPasskeyOptions"
+        ],
+        "slug": "authenticatewithpasskey"
       }
     ],
     "properties": []
@@ -725,6 +763,264 @@
           "docs": "Whether the device has secure hardware.",
           "complexTypes": [],
           "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "RegisterPasskeyResult",
+      "slug": "registerpasskeyresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "attestationObject",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "ArrayBuffer"
+          ],
+          "type": "ArrayBuffer"
+        },
+        {
+          "name": "clientDataJSON",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "ArrayBuffer"
+          ],
+          "type": "ArrayBuffer"
+        }
+      ]
+    },
+    {
+      "name": "ArrayBuffer",
+      "slug": "arraybuffer",
+      "docs": "Represents a raw buffer of binary data, which is used to store data for the\r\ndifferent typed arrays. ArrayBuffers cannot be read from or written to directly,\r\nbut can be passed to a typed array or DataView Object to interpret the raw\r\nbuffer as needed.",
+      "tags": [],
+      "methods": [
+        {
+          "name": "slice",
+          "signature": "(begin: number, end?: number | undefined) => ArrayBuffer",
+          "parameters": [
+            {
+              "name": "begin",
+              "docs": "",
+              "type": "number"
+            },
+            {
+              "name": "end",
+              "docs": "",
+              "type": "number | undefined"
+            }
+          ],
+          "returns": "ArrayBuffer",
+          "tags": [],
+          "docs": "Returns a section of an ArrayBuffer.",
+          "complexTypes": [
+            "ArrayBuffer"
+          ],
+          "slug": "slice"
+        }
+      ],
+      "properties": [
+        {
+          "name": "byteLength",
+          "tags": [],
+          "docs": "Read-only. The length of the ArrayBuffer (in bytes).",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "RegisterPasskeyOptions",
+      "slug": "registerpasskeyoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "challenge",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BufferSource"
+          ],
+          "type": "BufferSource"
+        },
+        {
+          "name": "rp",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "{ id: string; name: string; }"
+        },
+        {
+          "name": "user",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BufferSource"
+          ],
+          "type": "{ id: any; name: string; displayName: string; }"
+        },
+        {
+          "name": "pubKeyCredParams",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "PublicKeyCredentialParameters"
+          ],
+          "type": "PublicKeyCredentialParameters[]"
+        },
+        {
+          "name": "authenticatorSelection",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "{ residentKey: 'required'; userVerification: 'preferred'; }"
+        },
+        {
+          "name": "extensions",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "{ credProps: boolean; }"
+        }
+      ]
+    },
+    {
+      "name": "PublicKeyCredentialParameters",
+      "slug": "publickeycredentialparameters",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "'public-key'"
+        },
+        {
+          "name": "alg",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "-7"
+        }
+      ]
+    },
+    {
+      "name": "AuthenticateWithPasskeyResult",
+      "slug": "authenticatewithpasskeyresult",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "authenticatorData",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "ArrayBuffer"
+          ],
+          "type": "ArrayBuffer"
+        },
+        {
+          "name": "clientDataJSON",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "ArrayBuffer"
+          ],
+          "type": "ArrayBuffer"
+        },
+        {
+          "name": "signature",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "ArrayBuffer"
+          ],
+          "type": "ArrayBuffer"
+        },
+        {
+          "name": "userHandle",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "ArrayBuffer"
+          ],
+          "type": "ArrayBuffer | null"
+        }
+      ]
+    },
+    {
+      "name": "AuthenticateWithPasskeyOptions",
+      "slug": "authenticatewithpasskeyoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "challenge",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BufferSource"
+          ],
+          "type": "BufferSource"
+        },
+        {
+          "name": "rpId",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "allowCredentials",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "Credential"
+          ],
+          "type": "Credential[]"
+        },
+        {
+          "name": "userVerification",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "'required'"
+        }
+      ]
+    },
+    {
+      "name": "Credential",
+      "slug": "credential",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "'public-key'"
+        },
+        {
+          "name": "id",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "BufferSource"
+          ],
+          "type": "BufferSource"
         }
       ]
     }

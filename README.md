@@ -55,6 +55,8 @@ npx cap sync
 * [`getAvailableHardware()`](#getavailablehardware)
 * [`isDevicePasscodeSet()`](#isdevicepasscodeset)
 * [`hasSecureHardware()`](#hassecurehardware)
+* [`registerPasskey(...)`](#registerpasskey)
+* [`authenticateWithPasskey(...)`](#authenticatewithpasskey)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -297,6 +299,36 @@ Does the device have secure hardware like StrongBox?
 --------------------
 
 
+### registerPasskey(...)
+
+```typescript
+registerPasskey(options: RegisterPasskeyOptions) => Promise<RegisterPasskeyResult>
+```
+
+| Param         | Type                                                                      |
+| ------------- | ------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#registerpasskeyoptions">RegisterPasskeyOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#registerpasskeyresult">RegisterPasskeyResult</a>&gt;</code>
+
+--------------------
+
+
+### authenticateWithPasskey(...)
+
+```typescript
+authenticateWithPasskey(options: AuthenticateWithPasskeyOptions) => Promise<AuthenticateWithPasskeyResult>
+```
+
+| Param         | Type                                                                                      |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#authenticatewithpasskeyoptions">AuthenticateWithPasskeyOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#authenticatewithpasskeyresult">AuthenticateWithPasskeyResult</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -461,6 +493,78 @@ Does the device have secure hardware like StrongBox?
 | Prop                    | Type                 | Description                             |
 | ----------------------- | -------------------- | --------------------------------------- |
 | **`hasSecureHardware`** | <code>boolean</code> | Whether the device has secure hardware. |
+
+
+#### RegisterPasskeyResult
+
+| Prop                    | Type                                                |
+| ----------------------- | --------------------------------------------------- |
+| **`attestationObject`** | <code><a href="#arraybuffer">ArrayBuffer</a></code> |
+| **`clientDataJSON`**    | <code><a href="#arraybuffer">ArrayBuffer</a></code> |
+
+
+#### ArrayBuffer
+
+Represents a raw buffer of binary data, which is used to store data for the
+different typed arrays. ArrayBuffers cannot be read from or written to directly,
+but can be passed to a typed array or DataView Object to interpret the raw
+buffer as needed.
+
+| Prop             | Type                | Description                                                                     |
+| ---------------- | ------------------- | ------------------------------------------------------------------------------- |
+| **`byteLength`** | <code>number</code> | Read-only. The length of the <a href="#arraybuffer">ArrayBuffer</a> (in bytes). |
+
+| Method    | Signature                                                                               | Description                                                     |
+| --------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **slice** | (begin: number, end?: number \| undefined) =&gt; <a href="#arraybuffer">ArrayBuffer</a> | Returns a section of an <a href="#arraybuffer">ArrayBuffer</a>. |
+
+
+#### RegisterPasskeyOptions
+
+| Prop                         | Type                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| **`challenge`**              | <code>BufferSource</code>                                                |
+| **`rp`**                     | <code>{ id: string; name: string; }</code>                               |
+| **`user`**                   | <code>{ id: any; name: string; displayName: string; }</code>             |
+| **`pubKeyCredParams`**       | <code>PublicKeyCredentialParameters[]</code>                             |
+| **`authenticatorSelection`** | <code>{ residentKey: 'required'; userVerification: 'preferred'; }</code> |
+| **`extensions`**             | <code>{ credProps: boolean; }</code>                                     |
+
+
+#### PublicKeyCredentialParameters
+
+| Prop       | Type                      |
+| ---------- | ------------------------- |
+| **`type`** | <code>'public-key'</code> |
+| **`alg`**  | <code>-7</code>           |
+
+
+#### AuthenticateWithPasskeyResult
+
+| Prop                    | Type                                                        |
+| ----------------------- | ----------------------------------------------------------- |
+| **`authenticatorData`** | <code><a href="#arraybuffer">ArrayBuffer</a></code>         |
+| **`clientDataJSON`**    | <code><a href="#arraybuffer">ArrayBuffer</a></code>         |
+| **`signature`**         | <code><a href="#arraybuffer">ArrayBuffer</a></code>         |
+| **`userHandle`**        | <code><a href="#arraybuffer">ArrayBuffer</a> \| null</code> |
+
+
+#### AuthenticateWithPasskeyOptions
+
+| Prop                   | Type                      |
+| ---------------------- | ------------------------- |
+| **`challenge`**        | <code>BufferSource</code> |
+| **`rpId`**             | <code>string</code>       |
+| **`allowCredentials`** | <code>Credential[]</code> |
+| **`userVerification`** | <code>'required'</code>   |
+
+
+#### Credential
+
+| Prop       | Type                      |
+| ---------- | ------------------------- |
+| **`type`** | <code>'public-key'</code> |
+| **`id`**   | <code>BufferSource</code> |
 
 
 ### Type Aliases

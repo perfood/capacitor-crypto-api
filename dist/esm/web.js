@@ -152,6 +152,30 @@ export class CryptoApiWeb extends WebPlugin {
             hasSecureHardware: false,
         };
     }
+    async registerPasskey(options) {
+        const publicKeyCredential = (await navigator.credentials.create({ publicKey: options }));
+        if (!publicKeyCredential) {
+            throw new Error('No response from authenticator');
+        }
+        const response = publicKeyCredential.response;
+        return {
+            attestationObject: response.attestationObject,
+            clientDataJSON: response.clientDataJSON,
+        };
+    }
+    async authenticateWithPasskey(options) {
+        const publicKeyCredential = (await navigator.credentials.get({ publicKey: options }));
+        if (!publicKeyCredential) {
+            throw new Error('No response from authenticator');
+        }
+        const response = publicKeyCredential.response;
+        return {
+            authenticatorData: response.authenticatorData,
+            clientDataJSON: response.clientDataJSON,
+            signature: response.signature,
+            userHandle: response.userHandle,
+        };
+    }
     async importKey(algorithm, format, privateKeyBase64, keyUsages) {
         const keyData = base64ToArrayBuffer(privateKeyBase64);
         const keyAlgorithm = algorithm == 'ecdsa' ? CRYPTO_API_ECDSA_KEY_ALGORITHM : CRYPTO_API_ECDH_KEY_ALGORITHM;

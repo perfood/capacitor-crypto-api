@@ -1,6 +1,8 @@
 import { WebPlugin } from '@capacitor/core';
 
 import type {
+  AuthenticateWithPasskeyOptions,
+  AuthenticateWithPasskeyResult,
   AvailableHardwareResponse,
   BiometricsEnabledOptions,
   BiometricsEnabledResponse,
@@ -18,6 +20,8 @@ import type {
   GetTagsResponse,
   LoadKeyOptions,
   LoadKeyResponse,
+  RegisterPasskeyOptions,
+  RegisterPasskeyResult,
   SecureHardwareResponse,
   SignOptions,
   SignResponse,
@@ -256,6 +260,38 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async hasSecureHardware(): Promise<SecureHardwareResponse> {
     return {
       hasSecureHardware: false,
+    };
+  }
+
+  async registerPasskey(options: RegisterPasskeyOptions): Promise<RegisterPasskeyResult> {
+    const publicKeyCredential = (await navigator.credentials.create({ publicKey: options })) as PublicKeyCredential;
+
+    if (!publicKeyCredential) {
+      throw new Error('No response from authenticator');
+    }
+
+    const response = publicKeyCredential.response as AuthenticatorAttestationResponse;
+
+    return {
+      attestationObject: response.attestationObject,
+      clientDataJSON: response.clientDataJSON,
+    };
+  }
+
+  async authenticateWithPasskey(options: AuthenticateWithPasskeyOptions): Promise<AuthenticateWithPasskeyResult> {
+    const publicKeyCredential = (await navigator.credentials.get({ publicKey: options })) as PublicKeyCredential;
+
+    if (!publicKeyCredential) {
+      throw new Error('No response from authenticator');
+    }
+
+    const response = publicKeyCredential.response as AuthenticatorAssertionResponse;
+
+    return {
+      authenticatorData: response.authenticatorData,
+      clientDataJSON: response.clientDataJSON,
+      signature: response.signature,
+      userHandle: response.userHandle,
     };
   }
 

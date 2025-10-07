@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import type { AvailableHardwareResponse, BiometricsEnabledOptions, BiometricsEnabledResponse, BiometricsStatusOptions, BiometricsStatusResponse, CryptoApiPlugin, DecryptOptions, DecryptResponse, DeleteKeyOptions, DevicePasscodeResponse, EncryptOptions, EncryptResponse, GenerateKeyOptions, GenerateKeyResponse, GetTagsResponse, LoadKeyOptions, LoadKeyResponse, SecureHardwareResponse, SignOptions, SignResponse, VerifyOptions, VerifyResponse } from './definitions';
+import type { AuthenticateWithPasskeyOptions, AuthenticateWithPasskeyResult, AvailableHardwareResponse, BiometricsEnabledOptions, BiometricsEnabledResponse, BiometricsStatusOptions, BiometricsStatusResponse, CryptoApiPlugin, DecryptOptions, DecryptResponse, DeleteKeyOptions, DevicePasscodeResponse, EncryptOptions, EncryptResponse, GenerateKeyOptions, GenerateKeyResponse, GetTagsResponse, LoadKeyOptions, LoadKeyResponse, RegisterPasskeyOptions, RegisterPasskeyResult, SecureHardwareResponse, SignOptions, SignResponse, VerifyOptions, VerifyResponse } from './definitions';
 export declare class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     getECDSATags(): Promise<GetTagsResponse>;
     getECDHTags(): Promise<GetTagsResponse>;
@@ -15,6 +15,8 @@ export declare class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     getAvailableHardware(): Promise<AvailableHardwareResponse>;
     isDevicePasscodeSet(): Promise<DevicePasscodeResponse>;
     hasSecureHardware(): Promise<SecureHardwareResponse>;
+    registerPasskey(options: RegisterPasskeyOptions): Promise<RegisterPasskeyResult>;
+    authenticateWithPasskey(options: AuthenticateWithPasskeyOptions): Promise<AuthenticateWithPasskeyResult>;
     private importKey;
     private deriveKey;
     private getLabel;

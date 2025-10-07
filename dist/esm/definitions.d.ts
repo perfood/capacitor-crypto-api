@@ -220,6 +220,50 @@ export interface SecureHardwareResponse {
      */
     hasSecureHardware: boolean;
 }
+export interface RegisterPasskeyOptions {
+    challenge: BufferSource;
+    rp: {
+        id: string;
+        name: string;
+    };
+    user: {
+        id: BufferSource;
+        name: string;
+        displayName: string;
+    };
+    pubKeyCredParams: PublicKeyCredentialParameters[];
+    authenticatorSelection: {
+        residentKey: 'required';
+        userVerification: 'preferred';
+    };
+    extensions: {
+        credProps: boolean;
+    };
+}
+interface PublicKeyCredentialParameters {
+    type: 'public-key';
+    alg: -7;
+}
+export interface RegisterPasskeyResult {
+    attestationObject: ArrayBuffer;
+    clientDataJSON: ArrayBuffer;
+}
+export interface AuthenticateWithPasskeyOptions {
+    challenge: BufferSource;
+    rpId: string;
+    allowCredentials: Credential[];
+    userVerification: 'required';
+}
+export interface Credential {
+    type: 'public-key';
+    id: BufferSource;
+}
+export interface AuthenticateWithPasskeyResult {
+    authenticatorData: ArrayBuffer;
+    clientDataJSON: ArrayBuffer;
+    signature: ArrayBuffer;
+    userHandle: ArrayBuffer | null;
+}
 export interface CryptoApiPlugin {
     /**
      * Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
@@ -295,4 +339,7 @@ export interface CryptoApiPlugin {
      * Does the device have secure hardware like StrongBox?
      */
     hasSecureHardware(): Promise<SecureHardwareResponse>;
+    registerPasskey(options: RegisterPasskeyOptions): Promise<RegisterPasskeyResult>;
+    authenticateWithPasskey(options: AuthenticateWithPasskeyOptions): Promise<AuthenticateWithPasskeyResult>;
 }
+export {};
