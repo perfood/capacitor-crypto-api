@@ -14,6 +14,7 @@ import java.security.SignatureException;
 import java.util.List;
 import javax.crypto.SecretKey;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 @CapacitorPlugin(name = "CryptoApi")
 public class CryptoApiPlugin extends Plugin {
@@ -21,6 +22,7 @@ public class CryptoApiPlugin extends Plugin {
     private static final Utils utils = new Utils();
     private static CryptoApi implementation;
     private static BiometryApi biometry;
+    private static PasskeyApi passkey;
 
     public static final String BIOMETRY = "BIOMETRY";
     public static final String BIOMETRY_OR_PASSCODE = "BIOMETRY_OR_PASSCODE";
@@ -31,6 +33,7 @@ public class CryptoApiPlugin extends Plugin {
         super.load();
         this.implementation = new CryptoApi(getContext());
         this.biometry = new BiometryApi(this.getActivity(), this.getContext());
+        this.passkey = new PasskeyApi(this.getContext());
     }
 
     @PluginMethod
@@ -279,6 +282,23 @@ public class CryptoApiPlugin extends Plugin {
         JSObject ret = new JSObject();
         ret.put("hasSecureHardware", hasSecureHardware);
         call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void registerPasskey(PluginCall call) {
+        JSONObject json = call.getData();
+        String jsonString = json.toString();
+
+        passkey.createPasskey(jsonString, call);
+    }
+
+    @PluginMethod
+    public void authenticateWithPasskey(PluginCall call) {
+        JSONObject json = call.getData();
+        String jsonString = json.toString();
+
+        JSObject result = passkey.authenticateWithPasskey(jsonString);
+        call.resolve(result);
     }
 
     private int getAuthenticationType(String type) {

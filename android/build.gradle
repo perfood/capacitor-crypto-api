@@ -4,6 +4,7 @@ ext {
     androidxJunitVersion = project.hasProperty('androidxJunitVersion') ? rootProject.ext.androidxJunitVersion : '1.2.1'
     androidxEspressoCoreVersion = project.hasProperty('androidxEspressoCoreVersion') ? rootProject.ext.androidxEspressoCoreVersion : '3.6.1'
     androidxBiometricVersion = project.hasProperty('androidxBiometricVersion') ? rootProject.ext.androidxBiometricVersion : '1.1.0'
+    androidxCredentialsVersion = project.hasProperty('androidxCredentialsVersion') ? rootProject.ext.androidxCredentialsVersion : '1.6.0-beta02'
 }
 
 buildscript {
@@ -54,6 +55,9 @@ dependencies {
     implementation project(':capacitor-android')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.biometric:biometric:$androidxBiometricVersion" 
+    implementation "androidx.credentials:credentials:$androidxCredentialsVersion"
+    implementation "androidx.credentials:credentials-play-services-auth:$androidxCredentialsVersion"
+    implementation 'androidx.credentials:credentials:1.5.0'
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
