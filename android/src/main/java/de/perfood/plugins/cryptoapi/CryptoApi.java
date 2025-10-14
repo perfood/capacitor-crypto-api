@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyInfo;
 import android.security.keystore.KeyProperties;
 import android.security.keystore.StrongBoxUnavailableException;
 import android.util.Base64;
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -118,23 +120,52 @@ public class CryptoApi {
                 builder.setUserAuthenticationParameters(5, this.getKeyProperties(type[0])); // 5 seconds for which this key is authorized to be used after the user is successfully authenticated
             }
 
+            // Generate the key (StrongBox preferred, fallback to TEE)
+            KeyPair keyPair = null;
+            boolean keyGenerated = false;
+
             if (this.hasSecureHardware()) {
                 builder.setIsStrongBoxBacked(true);
                 try {
                     keyPairGenerator.initialize(builder.build());
-                    keyPairGenerator.generateKeyPair();
+                    keyPair = keyPairGenerator.generateKeyPair();
+                    keyGenerated = true;
                 } catch (StrongBoxUnavailableException e) {
-                    Log.e("CryptoApi.generateKey", "StrongBox is available but cannot be used at runtime, fallback to TEE", e);
+                    Log.e("CryptoApi.generateKey", "StrongBox not available, trying TEE...", e);
                 }
             }
 
-            // Fallback without StrongBox
-            builder.setIsStrongBoxBacked(false);
-            keyPairGenerator.initialize(builder.build());
-            keyPairGenerator.generateKeyPair();
+            // Try TEE fallback only if StrongBox failed
+            if (!keyGenerated) {
+                builder.setIsStrongBoxBacked(false);
+                keyPairGenerator.initialize(builder.build());
+                keyPair = keyPairGenerator.generateKeyPair();
+            }
+
+            // check if key is hardware-backed (StrongBox or TEE)
+            PrivateKey privateKey = keyPair.getPrivate();
+            KeyFactory keyFactory = KeyFactory.getInstance(privateKey.getAlgorithm(), "AndroidKeyStore");
+            KeyInfo keyInfo = (KeyInfo) keyFactory.getKeySpec(privateKey, KeyInfo.class);
+
+            if (!keyInfo.isInsideSecureHardware()) {
+                Log.e("CryptoApi.generateKey", "Key not inside secure hardware. Deleting key...");
+                KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+                keyStore.load(null);
+                keyStore.deleteEntry(label + tag);
+                return null;
+            }
 
             return getPublicKeyBase64(tag, algorithm);
-        } catch (Error | InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException e) {
+        } catch (
+            Error
+            | InvalidAlgorithmParameterException
+            | NoSuchAlgorithmException
+            | NoSuchProviderException
+            | KeyStoreException
+            | CertificateException
+            | InvalidKeySpecException
+            | IOException e
+        ) {
             Log.e("CryptoApi.generateKey", "Error:", e);
 
             return null;

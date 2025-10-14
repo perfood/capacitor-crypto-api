@@ -523,9 +523,9 @@ buffer as needed.
 
 | Prop                         | Type                                                                     |
 | ---------------------------- | ------------------------------------------------------------------------ |
-| **`challenge`**              | <code>BufferSource</code>                                                |
+| **`challenge`**              | <code>string</code>                                                      |
 | **`rp`**                     | <code>{ id: string; name: string; }</code>                               |
-| **`user`**                   | <code>{ id: any; name: string; displayName: string; }</code>             |
+| **`user`**                   | <code>{ id: string; name: string; displayName: string; }</code>          |
 | **`pubKeyCredParams`**       | <code>PublicKeyCredentialParameters[]</code>                             |
 | **`authenticatorSelection`** | <code>{ residentKey: 'required'; userVerification: 'preferred'; }</code> |
 | **`extensions`**             | <code>{ credProps: boolean; }</code>                                     |

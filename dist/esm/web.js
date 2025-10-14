@@ -153,7 +153,10 @@ export class CryptoApiWeb extends WebPlugin {
         };
     }
     async registerPasskey(options) {
-        const publicKeyCredential = (await navigator.credentials.create({ publicKey: options }));
+        const createOptions = Object.assign(Object.assign({}, options), { challenge: base64ToArrayBuffer(options.challenge), user: Object.assign(Object.assign({}, options.user), { id: base64ToArrayBuffer(options.user.id) }) });
+        const publicKeyCredential = (await navigator.credentials.create({
+            publicKey: createOptions,
+        }));
         if (!publicKeyCredential) {
             throw new Error('No response from authenticator');
         }

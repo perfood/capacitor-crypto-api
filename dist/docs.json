@@ -844,10 +844,8 @@
           "name": "challenge",
           "tags": [],
           "docs": "",
-          "complexTypes": [
-            "BufferSource"
-          ],
-          "type": "BufferSource"
+          "complexTypes": [],
+          "type": "string"
         },
         {
           "name": "rp",
@@ -860,10 +858,8 @@
           "name": "user",
           "tags": [],
           "docs": "",
-          "complexTypes": [
-            "BufferSource"
-          ],
-          "type": "{ id: any; name: string; displayName: string; }"
+          "complexTypes": [],
+          "type": "{ id: string; name: string; displayName: string; }"
         },
         {
           "name": "pubKeyCredParams",

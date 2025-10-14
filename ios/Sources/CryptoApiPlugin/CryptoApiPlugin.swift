@@ -25,9 +25,12 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getAvailableHardware", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "isDevicePasscodeSet", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "hasSecureHardware", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "registerPasskey", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "authenticateWithPasskey", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
     private let biometry = BiometryApi()
+    private let passkey = PasskeyApi()
 
     @objc func getECDSATags(_ call: CAPPluginCall) {
         let tags = implementation.getTags("ecdsa")
@@ -203,6 +206,22 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve([
             "hasSecureHardware": true // hardware is always secure on iOS devices
         ])
+    }
+
+    @objc func registerPasskey(_ call: CAPPluginCall) {
+        print("CryptoApiPlugin.registerPasskey")
+
+        let result = passkey.registerPasskey()
+
+        call.resolve(result)
+    }
+
+    @objc func authenticateWithPasskey(_ call: CAPPluginCall) {
+        print("CryptoApiPlugin.authenticateWithPasskey")
+
+        let result = passkey.authenticateWithPasskey()
+
+        call.resolve(result)
     }
 
     private func getAuthenticationPolicy(_ type: String) -> LAPolicy {

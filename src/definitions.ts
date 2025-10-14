@@ -251,10 +251,10 @@ export interface SecureHardwareResponse {
 }
 
 export interface RegisterPasskeyOptions {
-  challenge: BufferSource;
+  challenge: string;
   rp: { id: string; name: string }; // relyingParty
   user: {
-    id: BufferSource;
+    id: string;
     name: string;
     displayName: string;
   };

@@ -264,7 +264,17 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   }
 
   async registerPasskey(options: RegisterPasskeyOptions): Promise<RegisterPasskeyResult> {
-    const publicKeyCredential = (await navigator.credentials.create({ publicKey: options })) as PublicKeyCredential;
+    const createOptions = {
+      ...options,
+      challenge: base64ToArrayBuffer(options.challenge),
+      user: {
+        ...options.user,
+        id: base64ToArrayBuffer(options.user.id),
+      },
+    };
+    const publicKeyCredential = (await navigator.credentials.create({
+      publicKey: createOptions,
+    })) as PublicKeyCredential;
 
     if (!publicKeyCredential) {
       throw new Error('No response from authenticator');

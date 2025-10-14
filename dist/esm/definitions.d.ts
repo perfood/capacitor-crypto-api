@@ -221,13 +221,13 @@ export interface SecureHardwareResponse {
     hasSecureHardware: boolean;
 }
 export interface RegisterPasskeyOptions {
-    challenge: BufferSource;
+    challenge: string;
     rp: {
         id: string;
         name: string;
     };
     user: {
-        id: BufferSource;
+        id: string;
         name: string;
         displayName: string;
     };
