@@ -774,62 +774,39 @@
       "methods": [],
       "properties": [
         {
-          "name": "attestationObject",
+          "name": "id",
           "tags": [],
           "docs": "",
-          "complexTypes": [
-            "ArrayBuffer"
-          ],
-          "type": "ArrayBuffer"
+          "complexTypes": [],
+          "type": "string"
         },
         {
-          "name": "clientDataJSON",
+          "name": "rawId",
           "tags": [],
           "docs": "",
-          "complexTypes": [
-            "ArrayBuffer"
-          ],
-          "type": "ArrayBuffer"
-        }
-      ]
-    },
-    {
-      "name": "ArrayBuffer",
-      "slug": "arraybuffer",
-      "docs": "Represents a raw buffer of binary data, which is used to store data for the\r\ndifferent typed arrays. ArrayBuffers cannot be read from or written to directly,\r\nbut can be passed to a typed array or DataView Object to interpret the raw\r\nbuffer as needed.",
-      "tags": [],
-      "methods": [
-        {
-          "name": "slice",
-          "signature": "(begin: number, end?: number | undefined) => ArrayBuffer",
-          "parameters": [
-            {
-              "name": "begin",
-              "docs": "",
-              "type": "number"
-            },
-            {
-              "name": "end",
-              "docs": "",
-              "type": "number | undefined"
-            }
-          ],
-          "returns": "ArrayBuffer",
-          "tags": [],
-          "docs": "Returns a section of an ArrayBuffer.",
-          "complexTypes": [
-            "ArrayBuffer"
-          ],
-          "slug": "slice"
-        }
-      ],
-      "properties": [
-        {
-          "name": "byteLength",
-          "tags": [],
-          "docs": "Read-only. The length of the ArrayBuffer (in bytes).",
           "complexTypes": [],
-          "type": "number"
+          "type": "string"
+        },
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "response",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "{ attestationObject: string; clientDataJSON: string; }"
+        },
+        {
+          "name": "authenticatorAttachment",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string | undefined"
         }
       ]
     },
@@ -951,6 +928,46 @@
             "ArrayBuffer"
           ],
           "type": "ArrayBuffer | null"
+        }
+      ]
+    },
+    {
+      "name": "ArrayBuffer",
+      "slug": "arraybuffer",
+      "docs": "Represents a raw buffer of binary data, which is used to store data for the\r\ndifferent typed arrays. ArrayBuffers cannot be read from or written to directly,\r\nbut can be passed to a typed array or DataView Object to interpret the raw\r\nbuffer as needed.",
+      "tags": [],
+      "methods": [
+        {
+          "name": "slice",
+          "signature": "(begin: number, end?: number | undefined) => ArrayBuffer",
+          "parameters": [
+            {
+              "name": "begin",
+              "docs": "",
+              "type": "number"
+            },
+            {
+              "name": "end",
+              "docs": "",
+              "type": "number | undefined"
+            }
+          ],
+          "returns": "ArrayBuffer",
+          "tags": [],
+          "docs": "Returns a section of an ArrayBuffer.",
+          "complexTypes": [
+            "ArrayBuffer"
+          ],
+          "slug": "slice"
+        }
+      ],
+      "properties": [
+        {
+          "name": "byteLength",
+          "tags": [],
+          "docs": "Read-only. The length of the ArrayBuffer (in bytes).",
+          "complexTypes": [],
+          "type": "number"
         }
       ]
     },

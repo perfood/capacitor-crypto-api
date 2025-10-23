@@ -282,9 +282,20 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
 
     const response = publicKeyCredential.response as AuthenticatorAttestationResponse;
 
+    const authenticatorAttachment =
+      'authenticatorAttachment' in publicKeyCredential
+        ? (publicKeyCredential as any).authenticatorAttachment
+        : undefined;
+
     return {
-      attestationObject: response.attestationObject,
-      clientDataJSON: response.clientDataJSON,
+      id: publicKeyCredential.id,
+      rawId: this.bufferToBase64url(new Uint8Array(publicKeyCredential.rawId)),
+      type: publicKeyCredential.type,
+      response: {
+        attestationObject: this.bufferToBase64url(new Uint8Array(response.attestationObject)),
+        clientDataJSON: this.bufferToBase64url(new Uint8Array(response.clientDataJSON)),
+      },
+      authenticatorAttachment,
     };
   }
 
@@ -345,5 +356,14 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
 
   private getLabel(algorithm: 'ecdsa' | 'ecdh'): string {
     return algorithm === 'ecdsa' ? LabelECDSA : LabelECDH;
+  }
+
+  private bufferToBase64url(buffer: ArrayBuffer | Uint8Array): string {
+    const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
 }

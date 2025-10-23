@@ -497,26 +497,13 @@ authenticateWithPasskey(options: AuthenticateWithPasskeyOptions) => Promise<Auth
 
 #### RegisterPasskeyResult
 
-| Prop                    | Type                                                |
-| ----------------------- | --------------------------------------------------- |
-| **`attestationObject`** | <code><a href="#arraybuffer">ArrayBuffer</a></code> |
-| **`clientDataJSON`**    | <code><a href="#arraybuffer">ArrayBuffer</a></code> |
-
-
-#### ArrayBuffer
-
-Represents a raw buffer of binary data, which is used to store data for the
-different typed arrays. ArrayBuffers cannot be read from or written to directly,
-but can be passed to a typed array or DataView Object to interpret the raw
-buffer as needed.
-
-| Prop             | Type                | Description                                                                     |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------- |
-| **`byteLength`** | <code>number</code> | Read-only. The length of the <a href="#arraybuffer">ArrayBuffer</a> (in bytes). |
-
-| Method    | Signature                                                                               | Description                                                     |
-| --------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| **slice** | (begin: number, end?: number \| undefined) =&gt; <a href="#arraybuffer">ArrayBuffer</a> | Returns a section of an <a href="#arraybuffer">ArrayBuffer</a>. |
+| Prop                          | Type                                                                |
+| ----------------------------- | ------------------------------------------------------------------- |
+| **`id`**                      | <code>string</code>                                                 |
+| **`rawId`**                   | <code>string</code>                                                 |
+| **`type`**                    | <code>string</code>                                                 |
+| **`response`**                | <code>{ attestationObject: string; clientDataJSON: string; }</code> |
+| **`authenticatorAttachment`** | <code>string</code>                                                 |
 
 
 #### RegisterPasskeyOptions
@@ -547,6 +534,22 @@ buffer as needed.
 | **`clientDataJSON`**    | <code><a href="#arraybuffer">ArrayBuffer</a></code>         |
 | **`signature`**         | <code><a href="#arraybuffer">ArrayBuffer</a></code>         |
 | **`userHandle`**        | <code><a href="#arraybuffer">ArrayBuffer</a> \| null</code> |
+
+
+#### ArrayBuffer
+
+Represents a raw buffer of binary data, which is used to store data for the
+different typed arrays. ArrayBuffers cannot be read from or written to directly,
+but can be passed to a typed array or DataView Object to interpret the raw
+buffer as needed.
+
+| Prop             | Type                | Description                                                                     |
+| ---------------- | ------------------- | ------------------------------------------------------------------------------- |
+| **`byteLength`** | <code>number</code> | Read-only. The length of the <a href="#arraybuffer">ArrayBuffer</a> (in bytes). |
+
+| Method    | Signature                                                                               | Description                                                     |
+| --------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **slice** | (begin: number, end?: number \| undefined) =&gt; <a href="#arraybuffer">ArrayBuffer</a> | Returns a section of an <a href="#arraybuffer">ArrayBuffer</a>. |
 
 
 #### AuthenticateWithPasskeyOptions

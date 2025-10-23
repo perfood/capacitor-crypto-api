@@ -274,8 +274,14 @@ interface PublicKeyCredentialParameters {
 }
 
 export interface RegisterPasskeyResult {
-  attestationObject: ArrayBuffer;
-  clientDataJSON: ArrayBuffer;
+  id: string;
+  rawId: string;
+  type: string;
+  response: {
+    attestationObject: string;
+    clientDataJSON: string;
+  };
+  authenticatorAttachment?: string;
 }
 
 export interface AuthenticateWithPasskeyOptions {

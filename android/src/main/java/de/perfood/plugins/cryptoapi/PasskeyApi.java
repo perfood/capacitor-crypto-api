@@ -59,19 +59,13 @@ public class PasskeyApi {
                     if (response instanceof CreatePublicKeyCredentialResponse) {
                         CreatePublicKeyCredentialResponse pubKeyResponse = (CreatePublicKeyCredentialResponse) response;
 
-                        String registrationJson = pubKeyResponse.getRegistrationResponseJson();
                         try {
-                            JSONObject responseJson = new JSONObject(registrationJson);
-                            JSONObject responseObj = responseJson.getJSONObject("response");
+                            String registrationJson = pubKeyResponse.getRegistrationResponseJson();
+                            JSONObject json = new JSONObject(registrationJson);
+                            Log.i("PasskeyApi.createPasskey responseJson", json.toString());
+                            JSObject result = JSObject.fromJSONObject(json);
 
-                            String attestationObject = responseObj.getString("attestationObject");
-                            String clientDataJSON = responseObj.getString("clientDataJSON");
-
-                            JSObject resultObj = new JSObject();
-                            resultObj.put("attestationObject", attestationObject);
-                            resultObj.put("clientDataJSON", clientDataJSON);
-
-                            call.resolve(resultObj);
+                            call.resolve(result);
                         } catch (JSONException e) {
                             call.reject("Failed to parse credential response: " + e.getMessage());
                         }

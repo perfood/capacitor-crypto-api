@@ -243,9 +243,18 @@ var capacitorCryptoApi = (function (exports, core) {
                 throw new Error('No response from authenticator');
             }
             const response = publicKeyCredential.response;
+            const authenticatorAttachment = 'authenticatorAttachment' in publicKeyCredential
+                ? publicKeyCredential.authenticatorAttachment
+                : undefined;
             return {
-                attestationObject: response.attestationObject,
-                clientDataJSON: response.clientDataJSON,
+                id: publicKeyCredential.id,
+                rawId: this.bufferToBase64url(new Uint8Array(publicKeyCredential.rawId)),
+                type: publicKeyCredential.type,
+                response: {
+                    attestationObject: this.bufferToBase64url(new Uint8Array(response.attestationObject)),
+                    clientDataJSON: this.bufferToBase64url(new Uint8Array(response.clientDataJSON)),
+                },
+                authenticatorAttachment,
             };
         }
         async authenticateWithPasskey(options) {
@@ -286,6 +295,14 @@ var capacitorCryptoApi = (function (exports, core) {
         }
         getLabel(algorithm) {
             return algorithm === 'ecdsa' ? LabelECDSA : LabelECDH;
+        }
+        bufferToBase64url(buffer) {
+            const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
         }
     }
 
