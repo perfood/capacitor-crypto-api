@@ -528,38 +528,23 @@ authenticateWithPasskey(options: AuthenticateWithPasskeyOptions) => Promise<Auth
 
 #### AuthenticateWithPasskeyResult
 
-| Prop                    | Type                                                        |
-| ----------------------- | ----------------------------------------------------------- |
-| **`authenticatorData`** | <code><a href="#arraybuffer">ArrayBuffer</a></code>         |
-| **`clientDataJSON`**    | <code><a href="#arraybuffer">ArrayBuffer</a></code>         |
-| **`signature`**         | <code><a href="#arraybuffer">ArrayBuffer</a></code>         |
-| **`userHandle`**        | <code><a href="#arraybuffer">ArrayBuffer</a> \| null</code> |
-
-
-#### ArrayBuffer
-
-Represents a raw buffer of binary data, which is used to store data for the
-different typed arrays. ArrayBuffers cannot be read from or written to directly,
-but can be passed to a typed array or DataView Object to interpret the raw
-buffer as needed.
-
-| Prop             | Type                | Description                                                                     |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------- |
-| **`byteLength`** | <code>number</code> | Read-only. The length of the <a href="#arraybuffer">ArrayBuffer</a> (in bytes). |
-
-| Method    | Signature                                                                               | Description                                                     |
-| --------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| **slice** | (begin: number, end?: number \| undefined) =&gt; <a href="#arraybuffer">ArrayBuffer</a> | Returns a section of an <a href="#arraybuffer">ArrayBuffer</a>. |
+| Prop                          | Type                                                                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **`id`**                      | <code>string</code>                                                                                         |
+| **`rawId`**                   | <code>string</code>                                                                                         |
+| **`type`**                    | <code>string</code>                                                                                         |
+| **`response`**                | <code>{ authenticatorData: string; clientDataJSON: string; signature: string; userHandle?: string; }</code> |
+| **`authenticatorAttachment`** | <code>string</code>                                                                                         |
 
 
 #### AuthenticateWithPasskeyOptions
 
-| Prop                   | Type                      |
-| ---------------------- | ------------------------- |
-| **`challenge`**        | <code>BufferSource</code> |
-| **`rpId`**             | <code>string</code>       |
-| **`allowCredentials`** | <code>Credential[]</code> |
-| **`userVerification`** | <code>'required'</code>   |
+| Prop                     | Type                      |
+| ------------------------ | ------------------------- |
+| **`challenge`**          | <code>string</code>       |
+| **`rpId`**               | <code>string</code>       |
+| **`allowedCredentials`** | <code>Credential[]</code> |
+| **`userVerification`**   | <code>'required'</code>   |
 
 
 #### Credential
@@ -567,7 +552,7 @@ buffer as needed.
 | Prop       | Type                      |
 | ---------- | ------------------------- |
 | **`type`** | <code>'public-key'</code> |
-| **`id`**   | <code>BufferSource</code> |
+| **`id`**   | <code>string</code>       |
 
 
 ### Type Aliases

@@ -297,8 +297,7 @@ public class CryptoApiPlugin extends Plugin {
         JSONObject json = call.getData();
         String jsonString = json.toString();
 
-        JSObject result = passkey.authenticateWithPasskey(jsonString);
-        call.resolve(result);
+        passkey.authenticateWithPasskey(jsonString, call);
     }
 
     private int getAuthenticationType(String type) {

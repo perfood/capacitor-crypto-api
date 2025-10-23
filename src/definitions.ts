@@ -275,32 +275,38 @@ interface PublicKeyCredentialParameters {
 
 export interface RegisterPasskeyResult {
   id: string;
-  rawId: string;
+  rawId: string; // base64url
   type: string;
   response: {
-    attestationObject: string;
-    clientDataJSON: string;
+    attestationObject: string; // base64url
+    clientDataJSON: string; // base64url
   };
   authenticatorAttachment?: string;
 }
 
 export interface AuthenticateWithPasskeyOptions {
-  challenge: BufferSource;
+  challenge: string;
   rpId: string;
-  allowCredentials: Credential[];
+  allowedCredentials: Credential[];
   userVerification: 'required';
 }
 
 export interface Credential {
   type: 'public-key';
-  id: BufferSource;
+  id: string; // base64url
 }
 
 export interface AuthenticateWithPasskeyResult {
-  authenticatorData: ArrayBuffer;
-  clientDataJSON: ArrayBuffer;
-  signature: ArrayBuffer;
-  userHandle: ArrayBuffer | null;
+  id: string;
+  rawId: string; // base64url
+  type: string;
+  response: {
+    authenticatorData: string; // base64url
+    clientDataJSON: string; // base64url
+    signature: string; // base64url
+    userHandle?: string; // base64url
+  };
+  authenticatorAttachment?: string;
 }
 
 export interface CryptoApiPlugin {

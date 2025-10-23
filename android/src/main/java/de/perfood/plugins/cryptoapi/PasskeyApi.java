@@ -19,6 +19,7 @@ import androidx.credentials.exceptions.CreateCredentialException;
 import androidx.credentials.exceptions.GetCredentialException;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+import java.util.Collections;
 import java.util.concurrent.Executor;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,38 +58,37 @@ public class PasskeyApi {
                 @Override
                 public void onResult(CreateCredentialResponse response) {
                     if (response instanceof CreatePublicKeyCredentialResponse) {
-                        CreatePublicKeyCredentialResponse pubKeyResponse = (CreatePublicKeyCredentialResponse) response;
-
                         try {
+                            CreatePublicKeyCredentialResponse pubKeyResponse = (CreatePublicKeyCredentialResponse) response;
                             String registrationJson = pubKeyResponse.getRegistrationResponseJson();
+                            Log.i("PasskeyApi.createPasskey - responseJson:", registrationJson);
                             JSONObject json = new JSONObject(registrationJson);
-                            Log.i("PasskeyApi.createPasskey responseJson", json.toString());
                             JSObject result = JSObject.fromJSONObject(json);
 
                             call.resolve(result);
                         } catch (JSONException e) {
-                            call.reject("Failed to parse credential response: " + e.getMessage());
+                            call.reject("PasskeyApi.createPasskey", "Failed to parse credential response: ", e);
                         }
                     } else {
-                        call.reject("Unexpected credential type: " + response.getClass().getName());
+                        call.reject("PasskeyApi.createPasskey", "Unexpected credential type: " + response.getClass().getName());
                     }
                 }
 
                 @Override
                 public void onError(CreateCredentialException e) {
-                    call.reject("Credential creation failed", e);
+                    call.reject("PasskeyApi.createPasskey", "Credential creation failed", e);
                 }
             }
         );
     }
 
-    public JSObject authenticateWithPasskey(String requestJson) {
+    public JSObject authenticateWithPasskey(String requestJson, PluginCall call) {
         Log.i("PasskeyApi.authenticateWithPasskey", requestJson);
 
         GetPublicKeyCredentialOption publicKeyCredentialOption = new GetPublicKeyCredentialOption(
             requestJson, // WebAuthnRequestOptions JSON
             null, // clientDataHash (optional)
-            null // allowHybrid (optional)
+            Collections.emptySet()
         );
 
         GetCredentialRequest getRequest = new GetCredentialRequest.Builder().addCredentialOption(publicKeyCredentialOption).build();
@@ -105,21 +105,26 @@ public class PasskeyApi {
                 @Override
                 public void onResult(GetCredentialResponse response) {
                     if (response.getCredential() instanceof androidx.credentials.PublicKeyCredential) {
-                        androidx.credentials.PublicKeyCredential credential =
-                            (androidx.credentials.PublicKeyCredential) response.getCredential();
+                        try {
+                            androidx.credentials.PublicKeyCredential credential =
+                                (androidx.credentials.PublicKeyCredential) response.getCredential();
+                            String credentialJson = credential.getAuthenticationResponseJson();
+                            Log.i("PasskeyApi.authenticateWithPasskey - Received credential: ", credentialJson);
+                            JSONObject json = new JSONObject(credentialJson);
+                            JSObject result = JSObject.fromJSONObject(json);
 
-                        String credentialJson = credential.getAuthenticationResponseJson();
-
-                        // Sende credentialJson an deinen Server zur Verifikation
-                        Log.i("Passkey Login", "Received credential: " + credentialJson);
+                            call.resolve(result);
+                        } catch (JSONException e) {
+                            call.reject("Failed to parse credential response: " + e.getMessage());
+                        }
                     } else {
-                        Log.w("Passkey Login", "Nicht unterstützter Credential-Typ");
+                        call.reject("PasskeyApi.authenticateWithPasskey", "Nicht unterstützter Credential-Typ");
                     }
                 }
 
                 @Override
                 public void onError(GetCredentialException e) {
-                    Log.e("Passkey Login", "Fehler beim Login:", e);
+                    call.reject("PasskeyApi.authenticateWithPasskey", "Error while authentication with passkey:", e);
                 }
             }
         );

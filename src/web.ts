@@ -43,6 +43,8 @@ import { arrayBufferToBase64, base64ToArrayBuffer, derToP1363, p1363ToDer } from
 
 const LabelECDSA = 'CryptoApiECDSA:';
 const LabelECDH = 'CryptoApiECDH:';
+const BASE64URL_PADDING = '=';
+const BASE64URL_PAD_LENGTH = 4;
 
 export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async getECDSATags(): Promise<GetTagsResponse> {
@@ -300,7 +302,17 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   }
 
   async authenticateWithPasskey(options: AuthenticateWithPasskeyOptions): Promise<AuthenticateWithPasskeyResult> {
-    const publicKeyCredential = (await navigator.credentials.get({ publicKey: options })) as PublicKeyCredential;
+    const allowCredentials = options.allowedCredentials.map((cred) => {
+      return { id: this.base64urlToBuffer(cred.id), type: cred.type };
+    });
+
+    const webOptions = {
+      ...options,
+      challenge: base64ToArrayBuffer(options.challenge),
+      allowCredentials,
+    };
+
+    const publicKeyCredential = (await navigator.credentials.get({ publicKey: webOptions })) as PublicKeyCredential;
 
     if (!publicKeyCredential) {
       throw new Error('No response from authenticator');
@@ -308,11 +320,22 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
 
     const response = publicKeyCredential.response as AuthenticatorAssertionResponse;
 
+    const authenticatorAttachment =
+      'authenticatorAttachment' in publicKeyCredential
+        ? (publicKeyCredential as any).authenticatorAttachment
+        : undefined;
+
     return {
-      authenticatorData: response.authenticatorData,
-      clientDataJSON: response.clientDataJSON,
-      signature: response.signature,
-      userHandle: response.userHandle,
+      id: publicKeyCredential.id,
+      rawId: this.bufferToBase64url(new Uint8Array(publicKeyCredential.rawId)),
+      type: publicKeyCredential.type,
+      response: {
+        authenticatorData: this.bufferToBase64url(response.authenticatorData),
+        clientDataJSON: this.bufferToBase64url(response.clientDataJSON),
+        signature: this.bufferToBase64url(response.signature),
+        userHandle: response.userHandle ? this.bufferToBase64url(response.userHandle) : undefined,
+      },
+      authenticatorAttachment,
     };
   }
 
@@ -365,5 +388,18 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       binary += String.fromCharCode(bytes[i]);
     }
     return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  private base64urlToBuffer(base64url: string): ArrayBuffer {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+    const paddingNeeded = (BASE64URL_PAD_LENGTH - (base64.length % BASE64URL_PAD_LENGTH)) % BASE64URL_PAD_LENGTH;
+    const paddedBase64 = base64 + BASE64URL_PADDING.repeat(paddingNeeded);
+    const binary = atob(paddedBase64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    return bytes.buffer;
   }
 }

@@ -21,4 +21,5 @@ export declare class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     private deriveKey;
     private getLabel;
     private bufferToBase64url;
+    private base64urlToBuffer;
 }

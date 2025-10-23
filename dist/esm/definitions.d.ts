@@ -255,20 +255,26 @@ export interface RegisterPasskeyResult {
     authenticatorAttachment?: string;
 }
 export interface AuthenticateWithPasskeyOptions {
-    challenge: BufferSource;
+    challenge: string;
     rpId: string;
-    allowCredentials: Credential[];
+    allowedCredentials: Credential[];
     userVerification: 'required';
 }
 export interface Credential {
     type: 'public-key';
-    id: BufferSource;
+    id: string;
 }
 export interface AuthenticateWithPasskeyResult {
-    authenticatorData: ArrayBuffer;
-    clientDataJSON: ArrayBuffer;
-    signature: ArrayBuffer;
-    userHandle: ArrayBuffer | null;
+    id: string;
+    rawId: string;
+    type: string;
+    response: {
+        authenticatorData: string;
+        clientDataJSON: string;
+        signature: string;
+        userHandle?: string;
+    };
+    authenticatorAttachment?: string;
 }
 export interface CryptoApiPlugin {
     /**
