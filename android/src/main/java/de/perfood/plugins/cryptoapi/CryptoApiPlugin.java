@@ -115,7 +115,8 @@ public class CryptoApiPlugin extends Plugin {
                 ret.put("signature", signature);
             }
             call.resolve(ret);
-        } catch (InvalidKeyException e) { // UserNotAuthenticatedException belongs to InvalidKeyException
+        } catch (InvalidKeyException e) {
+            // UserNotAuthenticatedException belongs to InvalidKeyException
             // key is secured with biometry and needs authentication
             biometry.authenticate(
                 this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY),
@@ -167,7 +168,8 @@ public class CryptoApiPlugin extends Plugin {
             SecretKey secretKey = implementation.deriveSecret(tag, foreignPublicKey);
             JSObject encrypted = implementation.encrypt(secretKey, plaintext);
             call.resolve(encrypted);
-        } catch (InvalidKeyException e) { // UserNotAuthenticatedException belongs to InvalidKeyException
+        } catch (InvalidKeyException e) {
+            // UserNotAuthenticatedException belongs to InvalidKeyException
             // key is secured with biometry and needs authentication
             biometry.authenticate(
                 this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY),
@@ -207,7 +209,8 @@ public class CryptoApiPlugin extends Plugin {
             JSObject ret = new JSObject();
             ret.put("plaintext", plaintext);
             call.resolve(ret);
-        } catch (InvalidKeyException e) { // UserNotAuthenticatedException belongs to InvalidKeyException
+        } catch (InvalidKeyException e) {
+            // UserNotAuthenticatedException belongs to InvalidKeyException
             // key is secured with biometry and needs authentication
             biometry.authenticate(
                 this.getAuthenticationType(type != null ? type : CryptoApiPlugin.BIOMETRY),

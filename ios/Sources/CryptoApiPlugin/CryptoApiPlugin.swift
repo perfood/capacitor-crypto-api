@@ -24,13 +24,18 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getBiometricsStatus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getAvailableHardware", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "isDevicePasscodeSet", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "hasSecureHardware", returnType: CAPPluginReturnPromise)
-        CAPPluginMethod(name: "registerPasskey", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "hasSecureHardware", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "registerPasskey", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "authenticateWithPasskey", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CryptoApi()
     private let biometry = BiometryApi()
-    private let passkey = PasskeyApi()
+    private var passkey: PasskeyApi!
+
+    override public func load() {
+        super.load()
+        self.passkey = PasskeyApi(bridge: self.bridge)
+    }
 
     @objc func getECDSATags(_ call: CAPPluginCall) {
         let tags = implementation.getTags("ecdsa")
@@ -209,19 +214,72 @@ public class CryptoApiPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     @objc func registerPasskey(_ call: CAPPluginCall) {
-        print("CryptoApiPlugin.registerPasskey")
+        guard let rp = call.getObject("rp"),
+              let rpId = rp["id"] as? String,
+              let rpName = rp["name"] as? String,
+              let user = call.getObject("user"),
+              let userId = user["id"] as? String,
+              let userName = user["name"] as? String,
+              let userDisplayName = user["displayName"] as? String,
+              let challenge = call.getString("challenge")
+        else {
+            call.reject("invalid_arguments", "Missing rp.id, rp.name, user.id, user.name, user.displayName or challenge")
+            return
+        }
 
-        let result = passkey.registerPasskey()
+        let authSel = call.getObject("authenticatorSelection")
+        let residentKey = authSel?["residentKey"] as? String // "required" | nil
+        let userVerification = authSel?["userVerification"] as? String // "required" | "preferred" | "discouraged" | nil
 
-        call.resolve(result)
+        let options = PasskeyApi.RegisterPasskeyOptions(
+            rpId: rpId,
+            rpName: rpName,
+            challenge: challenge,
+            userId: userId,
+            userName: userName,
+            userDisplayName: userDisplayName,
+            residentKey: residentKey,
+            userVerification: userVerification
+        )
+
+        passkey.registerPasskey(options: options) { result in
+            switch result {
+            case .success(let payload):
+                call.resolve(payload)
+            case .failure(let error):
+                call.reject("registration_failed", error.localizedDescription)
+            }
+        }
     }
 
     @objc func authenticateWithPasskey(_ call: CAPPluginCall) {
-        print("CryptoApiPlugin.authenticateWithPasskey")
+        guard let rpId = call.getString("rpId"),
+              let challenge = call.getString("challenge") else {
+            call.reject("Missing required parameters")
+            return
+        }
 
-        let result = passkey.authenticateWithPasskey()
+        let allowCredentials = call.getArray("allowCredentials")?.compactMap { item -> [String: String]? in
+            guard let dict = item as? [String: Any],
+                  let id = dict["id"] as? String else { return nil }
+            return ["id": id]
+        }
 
-        call.resolve(result)
+        let options = PasskeyApi.AuthenticatePasskeyOptions(
+            rpId: rpId,
+            challenge: challenge,
+            allowCredentials: allowCredentials,
+            userVerification: call.getString("userVerification")
+        )
+
+        passkey.authenticateWithPasskey(options: options) { result in
+            switch result {
+            case .success(let response):
+                call.resolve(response)
+            case .failure(let error):
+                call.reject("Authentication failed", "\(error.localizedDescription)")
+            }
+        }
     }
 
     private func getAuthenticationPolicy(_ type: String) -> LAPolicy {
