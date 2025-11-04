@@ -268,10 +268,10 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   async registerPasskey(options: RegisterPasskeyOptions): Promise<RegisterPasskeyResult> {
     const createOptions = {
       ...options,
-      challenge: base64ToArrayBuffer(options.challenge),
+      challenge: this.base64urlToBuffer(options.challenge),
       user: {
         ...options.user,
-        id: base64ToArrayBuffer(options.user.id),
+        id: this.base64urlToBuffer(options.user.id),
       },
     };
     const publicKeyCredential = (await navigator.credentials.create({
