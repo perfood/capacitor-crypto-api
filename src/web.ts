@@ -302,13 +302,13 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
   }
 
   async authenticateWithPasskey(options: AuthenticateWithPasskeyOptions): Promise<AuthenticateWithPasskeyResult> {
-    const allowCredentials = options.allowedCredentials.map((cred) => {
+    const allowCredentials = options.allowedCredentials?.map((cred) => {
       return { id: this.base64urlToBuffer(cred.id), type: cred.type };
     });
 
     const webOptions = {
       ...options,
-      challenge: base64ToArrayBuffer(options.challenge),
+      challenge: this.base64urlToBuffer(options.challenge),
       allowCredentials,
     };
 

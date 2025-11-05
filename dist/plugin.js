@@ -260,10 +260,11 @@ var capacitorCryptoApi = (function (exports, core) {
             };
         }
         async authenticateWithPasskey(options) {
-            const allowCredentials = options.allowedCredentials.map((cred) => {
+            var _a;
+            const allowCredentials = (_a = options.allowedCredentials) === null || _a === void 0 ? void 0 : _a.map((cred) => {
                 return { id: this.base64urlToBuffer(cred.id), type: cred.type };
             });
-            const webOptions = Object.assign(Object.assign({}, options), { challenge: base64ToArrayBuffer(options.challenge), allowCredentials });
+            const webOptions = Object.assign(Object.assign({}, options), { challenge: this.base64urlToBuffer(options.challenge), allowCredentials });
             const publicKeyCredential = (await navigator.credentials.get({ publicKey: webOptions }));
             if (!publicKeyCredential) {
                 throw new Error('No response from authenticator');
