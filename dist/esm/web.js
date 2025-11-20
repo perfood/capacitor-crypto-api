@@ -178,7 +178,7 @@ export class CryptoApiWeb extends WebPlugin {
         };
     }
     async authenticateWithPasskey(options) {
-        const allowCredentials = (options.allowedCredentials || []).map((cred) => {
+        const allowCredentials = (options.allowCredentials || []).map((cred) => {
             return { id: this.base64urlToBuffer(cred.id), type: cred.type };
         });
         const webOptions = Object.assign(Object.assign({}, options), { challenge: this.base64urlToBuffer(options.challenge), allowCredentials });

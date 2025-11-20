@@ -952,13 +952,13 @@
           "type": "string"
         },
         {
-          "name": "allowedCredentials",
+          "name": "allowCredentials",
           "tags": [],
           "docs": "",
           "complexTypes": [
             "Credential"
           ],
-          "type": "Credential[]"
+          "type": "Credential[] | undefined"
         },
         {
           "name": "userVerification",

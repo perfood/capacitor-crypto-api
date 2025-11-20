@@ -539,12 +539,12 @@ authenticateWithPasskey(options: AuthenticateWithPasskeyOptions) => Promise<Auth
 
 #### AuthenticateWithPasskeyOptions
 
-| Prop                     | Type                      |
-| ------------------------ | ------------------------- |
-| **`challenge`**          | <code>string</code>       |
-| **`rpId`**               | <code>string</code>       |
-| **`allowedCredentials`** | <code>Credential[]</code> |
-| **`userVerification`**   | <code>'required'</code>   |
+| Prop                   | Type                      |
+| ---------------------- | ------------------------- |
+| **`challenge`**        | <code>string</code>       |
+| **`rpId`**             | <code>string</code>       |
+| **`allowCredentials`** | <code>Credential[]</code> |
+| **`userVerification`** | <code>'required'</code>   |
 
 
 #### Credential

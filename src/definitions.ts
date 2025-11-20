@@ -287,7 +287,7 @@ export interface RegisterPasskeyResult {
 export interface AuthenticateWithPasskeyOptions {
   challenge: string;
   rpId: string;
-  allowedCredentials: Credential[];
+  allowCredentials?: Credential[];
   userVerification: 'required';
 }
 
