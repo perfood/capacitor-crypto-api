@@ -147,7 +147,7 @@ public class CryptoApi {
             KeyFactory keyFactory = KeyFactory.getInstance(privateKey.getAlgorithm(), "AndroidKeyStore");
             KeyInfo keyInfo = (KeyInfo) keyFactory.getKeySpec(privateKey, KeyInfo.class);
 
-            if (!keyInfo.isInsideSecureHardware()) {
+            if (algorithm.equalsIgnoreCase("ecdsa") && !keyInfo.isInsideSecureHardware()) {
                 Log.e("CryptoApi.generateKey", "Key not inside secure hardware. Deleting key...");
                 KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
                 keyStore.load(null);
