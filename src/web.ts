@@ -39,7 +39,7 @@ import {
   PUBLIC_KEY_FORMAT,
   SECRET_KEY_LENGHT,
 } from './definitions';
-import { arrayBufferToBase64, base64ToArrayBuffer, derToP1363, p1363ToDer } from './utils';
+import { arrayBufferToBase64, base64ToArrayBuffer, derToP1363, p1363ToDer, toArrayBuffer } from './utils';
 
 const LabelECDSA = 'CryptoApiECDSA:';
 const LabelECDH = 'CryptoApiECDH:';
@@ -154,17 +154,13 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
       throw new Error('Private key not found');
     }
 
-    const signature = arrayBufferToBase64(
-      p1363ToDer(
-        new Uint8Array(
-          await crypto.subtle.sign(
-            CRYPTO_API_ECDSA_SIGN_ALGORITHM,
-            await this.importKey('ecdsa', PRIVATE_KEY_FORMAT, keyPair.privateKey, ['sign']),
-            base64ToArrayBuffer(btoa(options.data)),
-          ),
-        ),
-      ),
+    const signatureArrayBuffer = await crypto.subtle.sign(
+      CRYPTO_API_ECDSA_SIGN_ALGORITHM,
+      await this.importKey('ecdsa', PRIVATE_KEY_FORMAT, keyPair.privateKey, ['sign']),
+      toArrayBuffer(base64ToArrayBuffer(btoa(options.data))),
     );
+
+    const signature = arrayBufferToBase64(toArrayBuffer(p1363ToDer(new Uint8Array(signatureArrayBuffer))));
 
     return { signature };
   }
@@ -179,8 +175,8 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     const verified = await crypto.subtle.verify(
       CRYPTO_API_ECDSA_SIGN_ALGORITHM,
       await this.importKey('ecdsa', PUBLIC_KEY_FORMAT, options.foreignPublicKey, ['verify']),
-      derToP1363(base64ToArrayBuffer(options.signature)),
-      base64ToArrayBuffer(btoa(options.data)),
+      toArrayBuffer(derToP1363(base64ToArrayBuffer(options.signature))),
+      toArrayBuffer(base64ToArrayBuffer(btoa(options.data))),
     );
 
     return { verified };
@@ -205,7 +201,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     );
 
     return {
-      iv: arrayBufferToBase64(iv),
+      iv: arrayBufferToBase64(toArrayBuffer(iv)),
       ciphertext: arrayBufferToBase64(ciphertext),
     };
   }
@@ -220,10 +216,10 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     const decryptedData = await crypto.subtle.decrypt(
       {
         name: CRYPTO_API_AES_GCM_ALGORITHM,
-        iv: base64ToArrayBuffer(options.iv),
+        iv: toArrayBuffer(base64ToArrayBuffer(options.iv)),
       },
       await this.deriveKey(options.tag, options.foreignPublicKey),
-      base64ToArrayBuffer(options.ciphertext),
+      toArrayBuffer(base64ToArrayBuffer(options.ciphertext)),
     );
 
     return {
@@ -345,7 +341,7 @@ export class CryptoApiWeb extends WebPlugin implements CryptoApiPlugin {
     privateKeyBase64: string,
     keyUsages: KeyUsage[],
   ): Promise<CryptoKey> {
-    const keyData = base64ToArrayBuffer(privateKeyBase64);
+    const keyData = toArrayBuffer(base64ToArrayBuffer(privateKeyBase64));
     const keyAlgorithm = algorithm == 'ecdsa' ? CRYPTO_API_ECDSA_KEY_ALGORITHM : CRYPTO_API_ECDH_KEY_ALGORITHM;
     return crypto.subtle.importKey(format, keyData, keyAlgorithm, false, keyUsages);
   }

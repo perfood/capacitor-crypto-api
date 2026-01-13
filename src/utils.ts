@@ -51,3 +51,9 @@ export function derToP1363(sig: Uint8Array): Uint8Array {
 
   return new Uint8Array(match.map((h) => parseInt(h, 16)));
 }
+
+export function toArrayBuffer(data: Uint8Array): ArrayBuffer {
+  const buffer = new ArrayBuffer(data.byteLength);
+  new Uint8Array(buffer).set(data);
+  return buffer;
+}

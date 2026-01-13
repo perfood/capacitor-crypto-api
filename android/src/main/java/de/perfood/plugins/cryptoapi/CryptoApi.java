@@ -334,9 +334,8 @@ public class CryptoApi {
     }
 
     public boolean hasSecureHardware() {
-        boolean deviceSupportsStrongBox =
-            (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
-                this.context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE));
+        boolean deviceSupportsStrongBox = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+            this.context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE));
         return deviceSupportsStrongBox;
     }
 
@@ -347,7 +346,12 @@ public class CryptoApi {
 
             return (KeyStore.PrivateKeyEntry) keyStore.getEntry(label + tag, null);
         } catch (
-            Error | UnrecoverableEntryException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e
+            Error
+            | UnrecoverableEntryException
+            | CertificateException
+            | KeyStoreException
+            | IOException
+            | NoSuchAlgorithmException e
         ) {
             Log.e("CryptoApi.getPrivateKeyEntry", "Error:", e);
 
