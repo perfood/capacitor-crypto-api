@@ -27,9 +27,9 @@ export declare const CRYPTO_API_AES_GCM_ALGORITHM = "AES-GCM";
 export declare const CRYPTO_API_ECDH_ALGORITHM = "ECDH";
 export declare const SECRET_KEY_LENGHT = 256;
 export declare const IV_LENGTH = 12;
-export declare type BiometryType = 'BIOMETRY' | 'BIOMETRY_OR_PASSCODE' | 'PASSCODE';
-export declare type BiometricsStatus = 'SUCCESS' | 'HARDWARE_UNAVAILABLE' | 'NONE_ENROLLED' | 'UNKNOWN';
-export declare type BiometricsHardware = 'FINGER' | 'IRIS' | 'FACE';
+export type BiometryType = 'BIOMETRY' | 'BIOMETRY_OR_PASSCODE' | 'PASSCODE';
+export type BiometricsStatus = 'SUCCESS' | 'HARDWARE_UNAVAILABLE' | 'NONE_ENROLLED' | 'UNKNOWN';
+export type BiometricsHardware = 'FINGER' | 'IRIS' | 'FACE';
 export interface GetTagsResponse {
     /**
      * The key-pair tags.

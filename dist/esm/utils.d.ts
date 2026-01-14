@@ -14,3 +14,4 @@ export declare function p1363ToDer(sig: Uint8Array): Uint8Array;
  * Convert an ASN.1 DER signature to a raw (IEEE P1363) signature.
  */
 export declare function derToP1363(sig: Uint8Array): Uint8Array;
+export declare function toArrayBuffer(data: Uint8Array): ArrayBuffer;

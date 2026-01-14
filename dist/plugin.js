@@ -78,6 +78,11 @@ var capacitorCryptoApi = (function (exports, core) {
             throw new Error('Invalid signature');
         return new Uint8Array(match.map((h) => parseInt(h, 16)));
     }
+    function toArrayBuffer(data) {
+        const buffer = new ArrayBuffer(data.byteLength);
+        new Uint8Array(buffer).set(data);
+        return buffer;
+    }
 
     const CryptoApi = core.registerPlugin('CryptoApi', {
         web: () => Promise.resolve().then(function () { return web; }).then((m) => new m.CryptoApiWeb()),
@@ -170,7 +175,8 @@ var capacitorCryptoApi = (function (exports, core) {
             if (!keyPair.privateKey) {
                 throw new Error('Private key not found');
             }
-            const signature = arrayBufferToBase64(p1363ToDer(new Uint8Array(await crypto.subtle.sign(CRYPTO_API_ECDSA_SIGN_ALGORITHM, await this.importKey('ecdsa', PRIVATE_KEY_FORMAT, keyPair.privateKey, ['sign']), base64ToArrayBuffer(btoa(options.data))))));
+            const signatureArrayBuffer = await crypto.subtle.sign(CRYPTO_API_ECDSA_SIGN_ALGORITHM, await this.importKey('ecdsa', PRIVATE_KEY_FORMAT, keyPair.privateKey, ['sign']), toArrayBuffer(base64ToArrayBuffer(btoa(options.data))));
+            const signature = arrayBufferToBase64(toArrayBuffer(p1363ToDer(new Uint8Array(signatureArrayBuffer))));
             return { signature };
         }
         async verify(options) {
@@ -178,7 +184,7 @@ var capacitorCryptoApi = (function (exports, core) {
             if (window.location.protocol != 'https:') {
                 throw new Error('WebCrypto API is only available in secure contexts (https)');
             }
-            const verified = await crypto.subtle.verify(CRYPTO_API_ECDSA_SIGN_ALGORITHM, await this.importKey('ecdsa', PUBLIC_KEY_FORMAT, options.foreignPublicKey, ['verify']), derToP1363(base64ToArrayBuffer(options.signature)), base64ToArrayBuffer(btoa(options.data)));
+            const verified = await crypto.subtle.verify(CRYPTO_API_ECDSA_SIGN_ALGORITHM, await this.importKey('ecdsa', PUBLIC_KEY_FORMAT, options.foreignPublicKey, ['verify']), toArrayBuffer(derToP1363(base64ToArrayBuffer(options.signature))), toArrayBuffer(base64ToArrayBuffer(btoa(options.data))));
             return { verified };
         }
         async encrypt(options) {
@@ -192,7 +198,7 @@ var capacitorCryptoApi = (function (exports, core) {
                 iv,
             }, await this.deriveKey(options.tag, options.foreignPublicKey), new TextEncoder().encode(options.plaintext));
             return {
-                iv: arrayBufferToBase64(iv),
+                iv: arrayBufferToBase64(toArrayBuffer(iv)),
                 ciphertext: arrayBufferToBase64(ciphertext),
             };
         }
@@ -203,8 +209,8 @@ var capacitorCryptoApi = (function (exports, core) {
             }
             const decryptedData = await crypto.subtle.decrypt({
                 name: CRYPTO_API_AES_GCM_ALGORITHM,
-                iv: base64ToArrayBuffer(options.iv),
-            }, await this.deriveKey(options.tag, options.foreignPublicKey), base64ToArrayBuffer(options.ciphertext));
+                iv: toArrayBuffer(base64ToArrayBuffer(options.iv)),
+            }, await this.deriveKey(options.tag, options.foreignPublicKey), toArrayBuffer(base64ToArrayBuffer(options.ciphertext)));
             return {
                 plaintext: new TextDecoder().decode(decryptedData),
             };
@@ -286,7 +292,7 @@ var capacitorCryptoApi = (function (exports, core) {
             };
         }
         async importKey(algorithm, format, privateKeyBase64, keyUsages) {
-            const keyData = base64ToArrayBuffer(privateKeyBase64);
+            const keyData = toArrayBuffer(base64ToArrayBuffer(privateKeyBase64));
             const keyAlgorithm = algorithm == 'ecdsa' ? CRYPTO_API_ECDSA_KEY_ALGORITHM : CRYPTO_API_ECDH_KEY_ALGORITHM;
             return crypto.subtle.importKey(format, keyData, keyAlgorithm, false, keyUsages);
         }
@@ -351,6 +357,7 @@ var capacitorCryptoApi = (function (exports, core) {
     exports.base64ToArrayBuffer = base64ToArrayBuffer;
     exports.derToP1363 = derToP1363;
     exports.p1363ToDer = p1363ToDer;
+    exports.toArrayBuffer = toArrayBuffer;
 
     return exports;
 

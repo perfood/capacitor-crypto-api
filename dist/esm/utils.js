@@ -47,4 +47,9 @@ export function derToP1363(sig) {
         throw new Error('Invalid signature');
     return new Uint8Array(match.map((h) => parseInt(h, 16)));
 }
+export function toArrayBuffer(data) {
+    const buffer = new ArrayBuffer(data.byteLength);
+    new Uint8Array(buffer).set(data);
+    return buffer;
+}
 //# sourceMappingURL=utils.js.map
