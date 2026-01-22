@@ -41,28 +41,52 @@ npx cap sync
 
 <docgen-index>
 
-* [`list()`](#list)
+* [`getECDSATags()`](#getecdsatags)
+* [`getECDHTags()`](#getecdhtags)
 * [`generateKey(...)`](#generatekey)
 * [`loadKey(...)`](#loadkey)
 * [`deleteKey(...)`](#deletekey)
 * [`sign(...)`](#sign)
 * [`verify(...)`](#verify)
+* [`encrypt(...)`](#encrypt)
+* [`decrypt(...)`](#decrypt)
+* [`isBiometricsEnabled(...)`](#isbiometricsenabled)
+* [`getBiometricsStatus(...)`](#getbiometricsstatus)
+* [`getAvailableHardware()`](#getavailablehardware)
+* [`isDevicePasscodeSet()`](#isdevicepasscodeset)
+* [`hasSecureHardware()`](#hassecurehardware)
+* [`registerPasskey(...)`](#registerpasskey)
+* [`authenticateWithPasskey(...)`](#authenticatewithpasskey)
 * [Interfaces](#interfaces)
+* [Type Aliases](#type-aliases)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### list()
+### getECDSATags()
 
 ```typescript
-list() => Promise<ListResponse>
+getECDSATags() => Promise<GetTagsResponse>
 ```
 
-Returns all key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
 
-**Returns:** <code>Promise&lt;<a href="#listresponse">ListResponse</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#gettagsresponse">GetTagsResponse</a>&gt;</code>
+
+--------------------
+
+
+### getECDHTags()
+
+```typescript
+getECDHTags() => Promise<GetTagsResponse>
+```
+
+Returns all ECDH key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+
+**Returns:** <code>Promise&lt;<a href="#gettagsresponse">GetTagsResponse</a>&gt;</code>
 
 --------------------
 
@@ -76,6 +100,7 @@ generateKey(options: GenerateKeyOptions) => Promise<GenerateKeyResponse>
 Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),
 tags it for alter referencing and returns the public-key only,
 since the private-key is protected and can't be extracted.
+Possibility to secure private key with biometry.
 
 | Param         | Type                                                              |
 | ------------- | ----------------------------------------------------------------- |
@@ -167,14 +192,151 @@ Only ECDSA is supported.
 --------------------
 
 
+### encrypt(...)
+
+```typescript
+encrypt(options: EncryptOptions) => Promise<EncryptResponse>
+```
+
+Encrypt data with AES-GCM.
+
+| Param         | Type                                                      |
+| ------------- | --------------------------------------------------------- |
+| **`options`** | <code><a href="#encryptoptions">EncryptOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#encryptresponse">EncryptResponse</a>&gt;</code>
+
+--------------------
+
+
+### decrypt(...)
+
+```typescript
+decrypt(options: DecryptOptions) => Promise<DecryptResponse>
+```
+
+Decrypt data with AES-GCM.
+
+| Param         | Type                                                      |
+| ------------- | --------------------------------------------------------- |
+| **`options`** | <code><a href="#decryptoptions">DecryptOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#decryptresponse">DecryptResponse</a>&gt;</code>
+
+--------------------
+
+
+### isBiometricsEnabled(...)
+
+```typescript
+isBiometricsEnabled(options: BiometricsEnabledOptions) => Promise<BiometricsEnabledResponse>
+```
+
+Is biometry enabled on the device?
+
+| Param         | Type                                                                          |
+| ------------- | ----------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#biometricsenabledoptions">BiometricsEnabledOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#biometricsenabledresponse">BiometricsEnabledResponse</a>&gt;</code>
+
+--------------------
+
+
+### getBiometricsStatus(...)
+
+```typescript
+getBiometricsStatus(options: BiometricsStatusOptions) => Promise<BiometricsStatusResponse>
+```
+
+Get the status of biometry on the device.
+
+| Param         | Type                                                                        |
+| ------------- | --------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#biometricsstatusoptions">BiometricsStatusOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#biometricsstatusresponse">BiometricsStatusResponse</a>&gt;</code>
+
+--------------------
+
+
+### getAvailableHardware()
+
+```typescript
+getAvailableHardware() => Promise<AvailableHardwareResponse>
+```
+
+Get the list of available biometry hardware on the device.
+
+**Returns:** <code>Promise&lt;<a href="#availablehardwareresponse">AvailableHardwareResponse</a>&gt;</code>
+
+--------------------
+
+
+### isDevicePasscodeSet()
+
+```typescript
+isDevicePasscodeSet() => Promise<DevicePasscodeResponse>
+```
+
+Is the device passcode set on the device?
+
+**Returns:** <code>Promise&lt;<a href="#devicepasscoderesponse">DevicePasscodeResponse</a>&gt;</code>
+
+--------------------
+
+
+### hasSecureHardware()
+
+```typescript
+hasSecureHardware() => Promise<SecureHardwareResponse>
+```
+
+Does the device have secure hardware like StrongBox?
+
+**Returns:** <code>Promise&lt;<a href="#securehardwareresponse">SecureHardwareResponse</a>&gt;</code>
+
+--------------------
+
+
+### registerPasskey(...)
+
+```typescript
+registerPasskey(options: RegisterPasskeyOptions) => Promise<RegisterPasskeyResult>
+```
+
+| Param         | Type                                                                      |
+| ------------- | ------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#registerpasskeyoptions">RegisterPasskeyOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#registerpasskeyresult">RegisterPasskeyResult</a>&gt;</code>
+
+--------------------
+
+
+### authenticateWithPasskey(...)
+
+```typescript
+authenticateWithPasskey(options: AuthenticateWithPasskeyOptions) => Promise<AuthenticateWithPasskeyResult>
+```
+
+| Param         | Type                                                                                      |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#authenticatewithpasskeyoptions">AuthenticateWithPasskeyOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#authenticatewithpasskeyresult">AuthenticateWithPasskeyResult</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 
-#### ListResponse
+#### GetTagsResponse
 
 | Prop       | Type                  | Description        |
 | ---------- | --------------------- | ------------------ |
-| **`list`** | <code>string[]</code> | The key-pair tags. |
+| **`tags`** | <code>string[]</code> | The key-pair tags. |
 
 
 #### GenerateKeyResponse
@@ -186,9 +348,11 @@ Only ECDSA is supported.
 
 #### GenerateKeyOptions
 
-| Prop      | Type                | Description       |
-| --------- | ------------------- | ----------------- |
-| **`tag`** | <code>string</code> | The key-pair tag. |
+| Prop            | Type                                                  | Description                                             |
+| --------------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| **`tag`**       | <code>string</code>                                   | The key-pair tag.                                       |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code>                        | The elliptic curve algorithm                            |
+| **`type`**      | <code><a href="#biometrytype">BiometryType</a></code> | Biometry type if key is possibly secured with biometry. |
 
 
 #### LoadKeyResponse
@@ -200,16 +364,18 @@ Only ECDSA is supported.
 
 #### LoadKeyOptions
 
-| Prop      | Type                | Description       |
-| --------- | ------------------- | ----------------- |
-| **`tag`** | <code>string</code> | The key-pair tag. |
+| Prop            | Type                           | Description                                              |
+| --------------- | ------------------------------ | -------------------------------------------------------- |
+| **`tag`**       | <code>string</code>            | The key-pair tag.                                        |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code> | The elliptic curve algorithm was used to create the key. |
 
 
 #### DeleteKeyOptions
 
-| Prop      | Type                | Description       |
-| --------- | ------------------- | ----------------- |
-| **`tag`** | <code>string</code> | The key-pair tag. |
+| Prop            | Type                           | Description                                              |
+| --------------- | ------------------------------ | -------------------------------------------------------- |
+| **`tag`**       | <code>string</code>            | The key-pair tag.                                        |
+| **`algorithm`** | <code>'ecdsa' \| 'ecdh'</code> | The elliptic curve algorithm was used to create the key. |
 
 
 #### SignResponse
@@ -221,10 +387,11 @@ Only ECDSA is supported.
 
 #### SignOptions
 
-| Prop       | Type                | Description       |
-| ---------- | ------------------- | ----------------- |
-| **`tag`**  | <code>string</code> | The key-pair tag. |
-| **`data`** | <code>string</code> | The data to sign. |
+| Prop       | Type                                                  | Description                                             |
+| ---------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| **`tag`**  | <code>string</code>                                   | The key-pair tag.                                       |
+| **`data`** | <code>string</code>                                   | The data to sign.                                       |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> | Biometry type if key is possibly secured with biometry. |
 
 
 #### VerifyResponse
@@ -241,5 +408,168 @@ Only ECDSA is supported.
 | **`foreignPublicKey`** | <code>string</code> | The foreign public-key in base64 format. |
 | **`data`**             | <code>string</code> | The signed data.                         |
 | **`signature`**        | <code>string</code> | The signature in base64 format.          |
+
+
+#### EncryptResponse
+
+| Prop             | Type                | Description                                       |
+| ---------------- | ------------------- | ------------------------------------------------- |
+| **`iv`**         | <code>string</code> | The iv in base64 format.                          |
+| **`ciphertext`** | <code>string</code> | The ciphertext (encrypted data) in base64 format. |
+
+
+#### EncryptOptions
+
+| Prop                   | Type                                                  | Description                                             |
+| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| **`tag`**              | <code>string</code>                                   | The key-pair tag.                                       |
+| **`foreignPublicKey`** | <code>string</code>                                   | The foreign public-key in base64 format.                |
+| **`plaintext`**        | <code>string</code>                                   | The plaintext to be encrypted.                          |
+| **`type`**             | <code><a href="#biometrytype">BiometryType</a></code> | Biometry type if key is possibly secured with biometry. |
+
+
+#### DecryptResponse
+
+| Prop            | Type                | Description              |
+| --------------- | ------------------- | ------------------------ |
+| **`plaintext`** | <code>string</code> | The decrypted plaintext. |
+
+
+#### DecryptOptions
+
+| Prop                   | Type                                                  | Description                                             |
+| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| **`tag`**              | <code>string</code>                                   | The key-pair tag.                                       |
+| **`foreignPublicKey`** | <code>string</code>                                   | The foreign public-key in base64 format.                |
+| **`iv`**               | <code>string</code>                                   | The iv in base64 format.                                |
+| **`ciphertext`**       | <code>string</code>                                   | The ciphertext (encrypted data) in base64 format.       |
+| **`type`**             | <code><a href="#biometrytype">BiometryType</a></code> | Biometry type if key is possibly secured with biometry. |
+
+
+#### BiometricsEnabledResponse
+
+| Prop            | Type                 | Description                  |
+| --------------- | -------------------- | ---------------------------- |
+| **`isEnabled`** | <code>boolean</code> | Whether biometry is enabled. |
+
+
+#### BiometricsEnabledOptions
+
+| Prop       | Type                                                  | Description                                            |
+| ---------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> | The biometry type whose availability is to be checked. |
+
+
+#### BiometricsStatusResponse
+
+| Prop         | Type                                                          | Description                       |
+| ------------ | ------------------------------------------------------------- | --------------------------------- |
+| **`status`** | <code><a href="#biometricsstatus">BiometricsStatus</a></code> | Status of biometry on the device. |
+
+
+#### BiometricsStatusOptions
+
+| Prop       | Type                                                  | Description                                            |
+| ---------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| **`type`** | <code><a href="#biometrytype">BiometryType</a></code> | The biometry type whose availability is to be checked. |
+
+
+#### AvailableHardwareResponse
+
+| Prop           | Type                              | Description                          |
+| -------------- | --------------------------------- | ------------------------------------ |
+| **`hardware`** | <code>BiometricsHardware[]</code> | List of available biometry hardware. |
+
+
+#### DevicePasscodeResponse
+
+| Prop                      | Type                 | Description                     |
+| ------------------------- | -------------------- | ------------------------------- |
+| **`isDevicePasscodeSet`** | <code>boolean</code> | Whether device passcode is set. |
+
+
+#### SecureHardwareResponse
+
+| Prop                    | Type                 | Description                             |
+| ----------------------- | -------------------- | --------------------------------------- |
+| **`hasSecureHardware`** | <code>boolean</code> | Whether the device has secure hardware. |
+
+
+#### RegisterPasskeyResult
+
+| Prop                          | Type                                                                |
+| ----------------------------- | ------------------------------------------------------------------- |
+| **`id`**                      | <code>string</code>                                                 |
+| **`rawId`**                   | <code>string</code>                                                 |
+| **`type`**                    | <code>string</code>                                                 |
+| **`response`**                | <code>{ attestationObject: string; clientDataJSON: string; }</code> |
+| **`authenticatorAttachment`** | <code>string</code>                                                 |
+
+
+#### RegisterPasskeyOptions
+
+| Prop                         | Type                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| **`challenge`**              | <code>string</code>                                                      |
+| **`rp`**                     | <code>{ id: string; name: string; }</code>                               |
+| **`user`**                   | <code>{ id: string; name: string; displayName: string; }</code>          |
+| **`pubKeyCredParams`**       | <code>PublicKeyCredentialParameters[]</code>                             |
+| **`authenticatorSelection`** | <code>{ residentKey: 'required'; userVerification: 'preferred'; }</code> |
+| **`extensions`**             | <code>{ credProps: boolean; }</code>                                     |
+
+
+#### PublicKeyCredentialParameters
+
+| Prop       | Type                      |
+| ---------- | ------------------------- |
+| **`type`** | <code>'public-key'</code> |
+| **`alg`**  | <code>-7</code>           |
+
+
+#### AuthenticateWithPasskeyResult
+
+| Prop                          | Type                                                                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **`id`**                      | <code>string</code>                                                                                         |
+| **`rawId`**                   | <code>string</code>                                                                                         |
+| **`type`**                    | <code>string</code>                                                                                         |
+| **`response`**                | <code>{ authenticatorData: string; clientDataJSON: string; signature: string; userHandle?: string; }</code> |
+| **`authenticatorAttachment`** | <code>string</code>                                                                                         |
+
+
+#### AuthenticateWithPasskeyOptions
+
+| Prop                   | Type                      |
+| ---------------------- | ------------------------- |
+| **`challenge`**        | <code>string</code>       |
+| **`rpId`**             | <code>string</code>       |
+| **`allowCredentials`** | <code>Credential[]</code> |
+| **`userVerification`** | <code>'required'</code>   |
+
+
+#### Credential
+
+| Prop       | Type                      |
+| ---------- | ------------------------- |
+| **`type`** | <code>'public-key'</code> |
+| **`id`**   | <code>string</code>       |
+
+
+### Type Aliases
+
+
+#### BiometryType
+
+<code>'BIOMETRY' | 'BIOMETRY_OR_PASSCODE' | 'PASSCODE'</code>
+
+
+#### BiometricsStatus
+
+<code>'SUCCESS' | 'HARDWARE_UNAVAILABLE' | 'NONE_ENROLLED' | 'UNKNOWN'</code>
+
+
+#### BiometricsHardware
+
+<code>'FINGER' | 'IRIS' | 'FACE'</code>
 
 </docgen-api>

@@ -13,11 +13,37 @@ export const CRYPTO_API_ECDSA_SIGN_ALGORITHM = {
   hash: { name: 'SHA-256' },
 };
 
-export interface ListResponse {
+/**
+ * ECDH key algorithm.
+ */
+export const CRYPTO_API_ECDH_KEY_ALGORITHM = {
+  name: 'ECDH',
+  namedCurve: 'P-256',
+};
+
+export const PRIVATE_KEY_FORMAT = 'pkcs8';
+
+export const PUBLIC_KEY_FORMAT = 'spki';
+
+export const CRYPTO_API_AES_GCM_ALGORITHM = 'AES-GCM';
+
+export const CRYPTO_API_ECDH_ALGORITHM = 'ECDH';
+
+export const SECRET_KEY_LENGHT = 256;
+
+export const IV_LENGTH = 12;
+
+export type BiometryType = 'BIOMETRY' | 'BIOMETRY_OR_PASSCODE' | 'PASSCODE';
+
+export type BiometricsStatus = 'SUCCESS' | 'HARDWARE_UNAVAILABLE' | 'NONE_ENROLLED' | 'UNKNOWN';
+
+export type BiometricsHardware = 'FINGER' | 'IRIS' | 'FACE';
+
+export interface GetTagsResponse {
   /**
    * The key-pair tags.
    */
-  list: string[];
+  tags: string[];
 }
 
 export interface GenerateKeyOptions {
@@ -25,6 +51,14 @@ export interface GenerateKeyOptions {
    * The key-pair tag.
    */
   tag: string;
+  /**
+   * The elliptic curve algorithm
+   */
+  algorithm: 'ecdsa' | 'ecdh';
+  /**
+   * Biometry type if key is possibly secured with biometry.
+   */
+  type?: BiometryType;
 }
 
 export interface GenerateKeyResponse {
@@ -39,6 +73,10 @@ export interface LoadKeyOptions {
    * The key-pair tag.
    */
   tag: string;
+  /**
+   * The elliptic curve algorithm was used to create the key.
+   */
+  algorithm: 'ecdsa' | 'ecdh';
 }
 
 export interface LoadKeyResponse {
@@ -53,6 +91,10 @@ export interface DeleteKeyOptions {
    * The key-pair tag.
    */
   tag: string;
+  /**
+   * The elliptic curve algorithm was used to create the key.
+   */
+  algorithm: 'ecdsa' | 'ecdh';
 }
 
 export interface SignOptions {
@@ -64,7 +106,12 @@ export interface SignOptions {
    * The data to sign.
    */
   data: string;
+  /**
+   * Biometry type if key is possibly secured with biometry.
+   */
+  type?: BiometryType;
 }
+
 export interface SignResponse {
   /**
    * The signature in base64 format.
@@ -94,16 +141,190 @@ export interface VerifyResponse {
   verified: boolean;
 }
 
+export interface EncryptOptions {
+  /**
+   * The key-pair tag.
+   */
+  tag: string;
+  /**
+   * The foreign public-key in base64 format.
+   */
+  foreignPublicKey: string;
+  /**
+   * The plaintext to be encrypted.
+   */
+  plaintext: string;
+  /**
+   * Biometry type if key is possibly secured with biometry.
+   */
+  type?: BiometryType;
+}
+
+export interface EncryptResponse {
+  /**
+   * The iv in base64 format.
+   */
+  iv: string;
+  /**
+   * The ciphertext (encrypted data) in base64 format.
+   */
+  ciphertext: string;
+}
+
+export interface DecryptOptions {
+  /**
+   * The key-pair tag.
+   */
+  tag: string;
+  /**
+   * The foreign public-key in base64 format.
+   */
+  foreignPublicKey: string;
+  /**
+   * The iv in base64 format.
+   */
+  iv: string;
+  /**
+   * The ciphertext (encrypted data) in base64 format.
+   */
+  ciphertext: string;
+  /**
+   * Biometry type if key is possibly secured with biometry.
+   */
+  type?: BiometryType;
+}
+
+export interface DecryptResponse {
+  /**
+   * The decrypted plaintext.
+   */
+  plaintext: string;
+}
+
+export interface BiometricsEnabledOptions {
+  /**
+   * The biometry type whose availability is to be checked.
+   */
+  type: BiometryType;
+}
+
+export interface BiometricsEnabledResponse {
+  /**
+   * Whether biometry is enabled.
+   */
+  isEnabled: boolean;
+}
+
+export interface BiometricsStatusOptions {
+  /**
+   * The biometry type whose availability is to be checked.
+   */
+  type: BiometryType;
+}
+
+export interface BiometricsStatusResponse {
+  /**
+   * Status of biometry on the device.
+   */
+  status: BiometricsStatus;
+}
+
+export interface AvailableHardwareResponse {
+  /**
+   * List of available biometry hardware.
+   */
+  hardware: BiometricsHardware[];
+}
+
+export interface DevicePasscodeResponse {
+  /**
+   * Whether device passcode is set.
+   */
+  isDevicePasscodeSet: boolean;
+}
+
+export interface SecureHardwareResponse {
+  /**
+   * Whether the device has secure hardware.
+   */
+  hasSecureHardware: boolean;
+}
+
+export interface RegisterPasskeyOptions {
+  challenge: string;
+  rp: { id: string; name: string }; // relyingParty
+  user: {
+    id: string;
+    name: string;
+    displayName: string;
+  };
+  pubKeyCredParams: PublicKeyCredentialParameters[];
+  authenticatorSelection: {
+    residentKey: 'required';
+    userVerification: 'preferred';
+  };
+  extensions: {
+    credProps: boolean;
+  };
+}
+
+interface PublicKeyCredentialParameters {
+  type: 'public-key';
+  alg: -7;
+}
+
+export interface RegisterPasskeyResult {
+  id: string;
+  rawId: string; // base64url
+  type: string;
+  response: {
+    attestationObject: string; // base64url
+    clientDataJSON: string; // base64url
+  };
+  authenticatorAttachment?: string;
+}
+
+export interface AuthenticateWithPasskeyOptions {
+  challenge: string;
+  rpId: string;
+  allowCredentials?: Credential[];
+  userVerification: 'required';
+}
+
+export interface Credential {
+  type: 'public-key';
+  id: string; // base64url
+}
+
+export interface AuthenticateWithPasskeyResult {
+  id: string;
+  rawId: string; // base64url
+  type: string;
+  response: {
+    authenticatorData: string; // base64url
+    clientDataJSON: string; // base64url
+    signature: string; // base64url
+    userHandle?: string; // base64url
+  };
+  authenticatorAttachment?: string;
+}
+
 export interface CryptoApiPlugin {
   /**
-   * Returns all key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+   * Returns all ECDSA key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
    */
-  list(): Promise<ListResponse>;
+  getECDSATags(): Promise<GetTagsResponse>;
+
+  /**
+   * Returns all ECDH key-pair tags that are available in the Secure Enclave (iOS) or StrongBox/TEE (Android).
+   */
+  getECDHTags(): Promise<GetTagsResponse>;
 
   /**
    * Generates a key-pair in the Secure Enclave (iOS) or StrongBox/TEE (Android),
    * tags it for alter referencing and returns the public-key only,
    * since the private-key is protected and can't be extracted.
+   * Possibility to secure private key with biometry.
    *
    * @since 1.0.0
    */
@@ -141,4 +362,43 @@ export interface CryptoApiPlugin {
    * @since 1.0.0
    */
   verify(options: VerifyOptions): Promise<VerifyResponse>;
+
+  /**
+   * Encrypt data with AES-GCM.
+   */
+  encrypt(options: EncryptOptions): Promise<EncryptResponse>;
+
+  /**
+   * Decrypt data with AES-GCM.
+   */
+  decrypt(options: DecryptOptions): Promise<DecryptResponse>;
+
+  /**
+   * Is biometry enabled on the device?
+   */
+  isBiometricsEnabled(options: BiometricsEnabledOptions): Promise<BiometricsEnabledResponse>;
+
+  /**
+   * Get the status of biometry on the device.
+   */
+  getBiometricsStatus(options: BiometricsStatusOptions): Promise<BiometricsStatusResponse>;
+
+  /**
+   * Get the list of available biometry hardware on the device.
+   */
+  getAvailableHardware(): Promise<AvailableHardwareResponse>;
+
+  /**
+   * Is the device passcode set on the device?
+   */
+  isDevicePasscodeSet(): Promise<DevicePasscodeResponse>;
+
+  /**
+   * Does the device have secure hardware like StrongBox?
+   */
+  hasSecureHardware(): Promise<SecureHardwareResponse>;
+
+  registerPasskey(options: RegisterPasskeyOptions): Promise<RegisterPasskeyResult>;
+
+  authenticateWithPasskey(options: AuthenticateWithPasskeyOptions): Promise<AuthenticateWithPasskeyResult>;
 }
