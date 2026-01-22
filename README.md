@@ -1,12 +1,36 @@
 # @perfood/capacitor-crypto-api
 
-This is a capacitor plugin that provides a simple API to generate key-pairs in the Secure Enclave (iOS) or StrongBox/TEE (Android) and use them to sign and verify data.
+This capacitor plugin provides a unified cryptographic API for secure key management and cryptographic operations using platform-specific secure hardware:
 
-## Limitations of the Secure Enclave (iOS)
+- iOS: Secure Enclave
+- Android: StrongBox / TEE
+- Web (development): WebCrypto API
+
+It supports generating and storing elliptic curve key pairs and using them for:
+
+- ECDSA: signing and verifying data
+- ECDH: key agreement (e.g. for symmetric encryption)
+
+## Secure Hardware & Cryptographic Capabilities
+
+### iOS – Secure Enclave
 
 > "Works only with NIST P-256 elliptic curve keys. These keys can only be used for creating and verifying cryptographic signatures, or for elliptic curve Diffie-Hellman key exchange (and by extension, symmetric encryption)." - [Apple Developer Documentation](https://developer.apple.com/documentation/security/certificate_key_and_trust_services/keys/protecting_keys_with_the_secure_enclave)
 
-Since the Secure Enclave only supports the NIST P-256 elliptic curve, only ECDSA is supported. ECDH is not supported, but may be supported in the future. PRs are welcome.
+On iOS, the Secure Enclave imposes the following constraints:
+- Only NIST P-256 elliptic curve keys are supported
+- Supports ECDSA and ECDH
+- Private keys never leave the Secure Enclave
+- Keys can optionally be protected by biometrics
+
+### Android – StrongBox / TEE
+
+On Android, the plugin uses StrongBox when available and falls back to the Trusted Execution Environment (TEE).
+
+- Supports ECDSA and ECDH
+- Hardware-backed key storage
+- Behavior depends on device manufacturer and Android version
+- Keys can optionally be protected by biometrics
 
 ## Format of the signature
 
@@ -16,19 +40,73 @@ This plugin has the functions `derToP1363` and `p1363ToDer` to convert the signa
 
 ## For development
 
-The plugin also uses the WebCrypto API to generate key-pairs in the browser and use them to sign and verify data. The key-pairs are stored in the browser's local storage.
+For development and testing in the browser:
+
+- Uses the WebCrypto API
+- Key pairs are stored in the browser's localStorage
+- Supports ECDSA and ECDH
 
 > WebCrypto API is only available in secure contexts (https)
 
-## Use Case
+## Use Cases
 
-This can be used to realize a 2-factor-authentication mechanism, where the private-key is stored in the Secure Enclave (iOS) or StrongBox/TEE (Android) and the public-key is stored on the server.
+### Two-Factor / Cryptographic Authentication (ECDSA)
 
-The server creates a challenge and sends it to the client. The client signs the challenge with the private-key and sends the signed data back to the server.
+This plugin can be used to implement a strong cryptographic authentication mechanism.
 
-The server can then verify the signature of the data with the public-key and be sure that the data was signed by the private-key.
+1. The client generates an ECDSA key pair in secure hardware
+2. The public key is registered on the server
+3. The server sends a cryptographic challenge
+4. The client signs the challenge using the private key and sends the signed data back to the server
+5. The server verifies the signature using the stored public key
 
+Because the private key never leaves secure hardware, this provides strong protection against key exfiltration. If the keys are protected by biometrics, the native biometrics dialog box is displayed.
 There is an example in the [`example`](./example/README.md) directory.
+
+### Secure Key Exchange & Encryption (ECDH)
+
+The plugin supports Elliptic Curve Diffie-Hellman (ECDH) to securely derive shared secrets.
+
+Typical workflow:
+
+1. Client and server each have an ECDH key pair
+2. The public keys are exchanged
+3. Both sides derive the same shared secret using ECDH
+4. The derived secret is used as a symmetric key (e.g. AES)
+5. Data can now be securely:
+- Encrypted on one side
+- Decrypted on the other side
+
+Supported use cases:
+- End-to-end encrypted communication
+- Secure storage encryption
+
+Private keys remain protected in Secure Enclave (iOS) or StrongBox/TEE (Android).
+
+### Passkey (WebAuthn / FIDO2)
+
+The plugin supports Passkeys for passwordless authentication using native platform dialogs.
+
+#### Registration
+
+A passkey can be created after a successful login, ensuring account ownership.
+
+1. Client requests registration options from the backend (WebAuthn PublicKeyCredentialCreationOptions)
+2. Backend returns challenge and relying party information
+3. Client calls registerPasskey(...)
+4. Native passkey dialog is shown (Face ID / Touch ID / Biometrics)
+5. Client returns assertion to backend
+6. Backend verifies the attestation
+7. On success: credentialId and publicKey can be stored in the user database
+
+#### Authentication
+
+1. Client requests authentication options from backend
+2. Backend sends challenge
+3. Client calls authenticateWithPasskey(...)
+4. Native authentication dialog is shown
+5. Client returns assertion to backend
+6. Backend verifies the signature using the stored public key
 
 ## Install
 
